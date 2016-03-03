@@ -13,9 +13,9 @@ class CreateMedicalSchedulesTable extends Migration
     public function up()
     {
         Schema::create('medicalSchedules', function (Blueprint $table) {
-            $table->increments('medicalScheduleId');
-            $table->integer('medicalId')->unsigned();
-            $table->integer('userId')->unsigned();
+            $table->increments('medical_schedule_id');
+            $table->integer('medical_id')->unsigned();
+            $table->integer('user_id')->unsigned();
             $table->integer('dayOfWeek')->unsigned();
             $table->time('time');
             $table->decimal('amount', 2, 1);

@@ -14,7 +14,7 @@ class CreateDevicesTable extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             // Columns
-            $table->increments('deviceId');
+            $table->increments('device_id');
             $table->enum('type', ['iPhone', 'Apple Watch', 'Weegschaal']);
         });
     }

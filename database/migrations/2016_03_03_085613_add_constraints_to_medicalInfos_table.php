@@ -13,7 +13,7 @@ class AddConstraintsToMedicalInfosTable extends Migration
     public function up()
     {
         Schema::table('medicalInfos', function (Blueprint $table) {
-            $table->foreign('userId')->references('userId')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 

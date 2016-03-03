@@ -13,8 +13,8 @@ class CreateDeviceRentsTable extends Migration
     public function up()
     {
         Schema::create('deviceRents', function (Blueprint $table) {
-            $table->integer('userId')->unsigned();
-            $table->integer('deviceId')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->integer('device_id')->unsigned();
         });
     }
 

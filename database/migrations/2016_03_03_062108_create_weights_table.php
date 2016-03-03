@@ -13,10 +13,10 @@ class CreateWeightsTable extends Migration
     public function up()
     {
         Schema::create('weights', function (Blueprint $table) {
-            $table->increments('weightId');
+            $table->increments('weight_id');
             $table->decimal('weight', 5, 2);
-            $table->dateTime('createdAt');
-            $table->integer('userId')->unsigned();
+            $table->dateTime('created_at');
+            $table->integer('user_id')->unsigned();
         });
     }
 
