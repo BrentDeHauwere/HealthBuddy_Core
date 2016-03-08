@@ -13,6 +13,7 @@ class CreateDeviceRentsTable extends Migration
     public function up()
     {
         Schema::create('deviceRents', function (Blueprint $table) {
+            $table->increments('device_rent_id');
             $table->integer('user_id')->unsigned();
             $table->integer('device_id')->unsigned();
         });
