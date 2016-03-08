@@ -13,4 +13,12 @@ class MedicalInfo extends Model
      * @var string
      */
     protected $primaryKey = 'medical_info_id';
+
+    /**
+     * Get the user that owns the medicalInfo.
+     */
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }
