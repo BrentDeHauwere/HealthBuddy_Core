@@ -12,6 +12,22 @@ class AddressesTableSeeder extends Seeder
     public function run()
     {
         DB::table('addresses')->insert([
+            'street' => 'Kaai',
+            'streetNumber' => 170,
+            'zipCode' => '1000',
+            'city' => 'Anderlecht',
+            'country' => 'België'
+        ]);
+
+        DB::table('addresses')->insert([
+            'street' => 'Nieuwstraat',
+            'streetNumber' => 80,
+            'zipCode' => '1000',
+            'city' => 'Brussel',
+            'country' => 'België'
+        ]);
+
+        DB::table('addresses')->insert([
             'street' => 'Stenen Stichel',
             'streetNumber' => 9,
             'zipCode' => '9200',
