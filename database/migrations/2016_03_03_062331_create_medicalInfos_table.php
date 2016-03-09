@@ -13,7 +13,7 @@ class CreateMedicalInfosTable extends Migration
     public function up()
     {
         Schema::create('medicalInfos', function (Blueprint $table) {
-            $table->increments('medical_info_id');
+            $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('length')->unsigned();
             $table->decimal('weight', 5, 2);

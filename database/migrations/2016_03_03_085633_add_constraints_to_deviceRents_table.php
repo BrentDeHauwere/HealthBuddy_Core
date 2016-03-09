@@ -13,8 +13,8 @@ class AddConstraintsToDeviceRentsTable extends Migration
     public function up()
     {
         Schema::table('deviceRents', function (Blueprint $table) {
-            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('device_id')->references('id')->on('devices')->onDelete('cascade');
             $table->unique(['user_id', 'device_id']);
         });
     }

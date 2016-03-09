@@ -19,7 +19,7 @@ class User extends Model
      */
     public function address()
     {
-        return $this->hasOne('App\Address');
+        return $this->hasOne('App\Address', 'address_id', 'address_id');
     }
 
     /**
