@@ -27,7 +27,8 @@ class AddConstraintsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign('users_address_id_foreign');
+            $table->dropForeign('users_buddy_id_foreign');
         });
     }
 }

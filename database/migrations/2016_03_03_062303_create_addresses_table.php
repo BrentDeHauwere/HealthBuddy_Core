@@ -17,7 +17,7 @@ class CreateAddressesTable extends Migration
             $table->string('street');
             $table->integer('streetNumber')->unsigned();
             $table->integer('bus')->unsigned()->nullable();
-            $table->integer('zipCode')->unsigned();
+            $table->string('zipCode');
             $table->string('city');
             $table->string('country');
         });

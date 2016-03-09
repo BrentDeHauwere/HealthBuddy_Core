@@ -25,7 +25,7 @@ class AddConstraintsToWeightsTable extends Migration
     public function down()
     {
         Schema::table('weights', function (Blueprint $table) {
-            //
+            $table->dropForeign('weights_user_id_foreign');
         });
     }
 }

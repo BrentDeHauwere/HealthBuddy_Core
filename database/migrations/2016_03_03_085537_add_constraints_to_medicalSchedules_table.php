@@ -26,7 +26,8 @@ class AddConstraintsToMedicalSchedulesTable extends Migration
     public function down()
     {
         Schema::table('medicalSchedules', function (Blueprint $table) {
-            //
+            $table->dropForeign('medicalschedules_medical_id_foreign');
+            $table->dropForeign('medicalschedules_user_id_foreign');
         });
     }
 }

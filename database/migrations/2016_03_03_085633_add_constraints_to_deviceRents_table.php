@@ -27,7 +27,8 @@ class AddConstraintsToDeviceRentsTable extends Migration
     public function down()
     {
         Schema::table('deviceRents', function (Blueprint $table) {
-            //
+            $table->dropForeign('devicerents_user_id_foreign');
+            $table->dropForeign('devicerents_device_id_foreign');
         });
     }
 }

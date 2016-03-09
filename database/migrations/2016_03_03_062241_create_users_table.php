@@ -17,6 +17,8 @@ class CreateUsersTable extends Migration
             $table->string('firstName');
             $table->string('lastName');
             $table->integer('address_id')->unsigned();
+            $table->enum('gender', ['M', 'V']);
+            $table->dateTime('dateOfBirth');
             $table->string('email');
             $table->string('password');
             $table->enum('role', ['Zorgwinkel', 'Zorgmantel', 'Zorgbehoevende']);
