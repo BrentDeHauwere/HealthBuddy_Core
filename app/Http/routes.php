@@ -4,4 +4,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('user/{id}', 'UserController@showProfile');
+Route::get('user/{user}', 'UserController@showProfile');
