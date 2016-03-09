@@ -6,8 +6,13 @@ use \App\User;
 
 class UserController extends Controller
 {
-    public function showProfile(User $user)
+    public function showProfile($user)
     {
-        return $user->with('address');
+        return User::with('address', 'medicalInfo', 'devices')->find($user);
+    }
+
+    public function showPatients(User $user)
+    {
+        return $user->patients;
     }
 }
