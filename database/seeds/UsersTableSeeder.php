@@ -33,5 +33,17 @@ class UsersTableSeeder extends Seeder
             'role' => 'Zorgbehoevende',
             'buddy_id' => 1
         ]);
+
+        DB::table('users')->insert([
+            'firstName' => 'Eli',
+            'lastName' => 'Boey',
+            'address_id' => 2,
+            'gender' => 'M',
+            'dateOfBirth' => '1997-09-20',
+            'email' => 'eli_wallie@gmail.com',
+            'password' => bcrypt('secret'),
+            'role' => 'Zorgbehoevende',
+            'buddy_id' => 1
+        ]);
     }
 }

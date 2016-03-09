@@ -7,11 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     /**
+     * Hide certain columns.
+     */
+    protected $hidden = ['password'];
+
+    /**
      * Get the address record associated with the user.
      */
     public function address()
     {
-        return $this->hasOne('App\Address', 'id', 'id');
+        return $this->hasOne('App\Address', 'id', 'address_id');
     }
 
     /**
@@ -27,14 +32,6 @@ class User extends Model
      */
     public function buddy()
     {
-        return $this->hasOne('App\User', 'buddy_id', 'user_id');
-    }
-
-    /**
-     * Get the patients of the buddy.
-     */
-    public function patients()
-    {
-        return $this->belongsTo('App\User', 'buddy_id', 'user_id');
+        return $this->hasOne('App\User', 'id', 'buddy_id');
     }
 }
