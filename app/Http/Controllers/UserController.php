@@ -8,9 +8,8 @@ use App\Http\Requests;
 
 class UserController extends Controller
 {
-    public function login()
+    public function showProfile(User $user)
     {
-        $people = ['Taylor', 'Matt', 'Jeffrey'];
-        return view('welcome', compact('people'));
+        return $user;
     }
 }
