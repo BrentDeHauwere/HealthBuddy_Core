@@ -13,4 +13,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::auth();
 
     Route::get('/home', 'HomeController@index');
+
+    Route::post('/addmodal','ModalController@add');
+    Route::post('/editmodal','ModalController@edit');
+    Route::post('/resetmodal','ModalController@reset');
+    Route::post('/linkmodal','ModalController@link');
 });
