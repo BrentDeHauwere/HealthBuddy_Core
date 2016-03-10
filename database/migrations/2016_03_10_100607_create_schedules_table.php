@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMedicalSchedulesTable extends Migration
+class CreateSchedulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,9 @@ class CreateMedicalSchedulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('medicalSchedules', function (Blueprint $table) {
+        Schema::create('schedules', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('medical_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+            $table->integer('medicine_id')->unsigned();
             $table->integer('dayOfWeek')->unsigned();
             $table->time('time');
             $table->decimal('amount', 2, 1);
@@ -29,6 +28,6 @@ class CreateMedicalSchedulesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('medicalSchedules');
+        Schema::drop('schedules');
     }
 }

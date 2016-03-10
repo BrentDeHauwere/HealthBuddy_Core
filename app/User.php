@@ -59,4 +59,12 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Weight');
     }
+
+    /**
+     * Get the medicines of the user.
+     */
+    public function medicines()
+    {
+        return $this->hasMany('App\Medicine');
+    }
 }
