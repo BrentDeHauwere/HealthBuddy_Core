@@ -38,6 +38,7 @@
     <label for="role" class="col-sm-2 control-label">Role</label>
     <div class="col-sm-10">
       <select class="form-control" name="role">
+        <option>{{ $user->role }}</option>
         <option>Zorgbehoevende</option>
         <option>ZorgMantel</option>
       </select>
