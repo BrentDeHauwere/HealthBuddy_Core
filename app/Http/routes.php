@@ -42,7 +42,11 @@ Route::group(['middleware' => 'web'], function () {
 	Dit zijn de ios login routes.
 	gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51 
 */
-Route::group(['prefix' => 'api/v1', 'middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/short', 'UrlMapperController@store');
-		Route::get('weights/{user}', 'UserController@showWeights');
+		Route::get('/api/user', function(\Illuminate\Http\Request $request) {
+			// dd($request->all());
+			return App\User::where('api_token','=',$request->api_token)->get();
+
+		});
 });
