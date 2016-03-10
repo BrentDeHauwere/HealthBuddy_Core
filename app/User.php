@@ -51,4 +51,12 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Device');
     }
+
+    /**
+     * Get the weights of the user.
+     */
+    public function weights()
+    {
+        return $this->hasMany('App\Weight');
+    }
 }
