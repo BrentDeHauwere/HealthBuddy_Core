@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->dateTime('dateOfBirth');
             $table->string('email');
             $table->string('password');
+            $table->rememberToken();
             $table->enum('role', ['Zorgwinkel', 'Zorgmantel', 'Zorgbehoevende']);
             $table->integer('buddy_id')->unsigned()->nullable();
         });
