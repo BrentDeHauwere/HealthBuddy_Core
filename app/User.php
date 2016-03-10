@@ -10,7 +10,7 @@ class User extends Authenticatable
     /**
      * Hide certain columns.
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'api_token'];
 
     /**
      * Get the address record associated with the user.
