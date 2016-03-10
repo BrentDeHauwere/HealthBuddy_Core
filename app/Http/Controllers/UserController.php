@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use \App\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+use \App\Medicine;
+
 
 class UserController extends Controller
 {
@@ -28,6 +32,11 @@ class UserController extends Controller
         return $user->weights;
     }
 
+    public function showSchedule($user)
+    {
+        return Medicine::with('schedule')->where('user_id', '=', $user)->get();
+    }
+
     /**
     *  The login function for the API
     *  
@@ -37,10 +46,11 @@ class UserController extends Controller
     public function apiLogin(Request $request) {
         try{
             $user = User::where('email','=',$request->email)->firstOrFail();
-        }catch(ModelNotFoundException ex){
+            return $user->api_token; 
 
+        }catch(ModelNotFoundException $ex){
+            dd($ex);
         }
 
-        return $user->api_token;  
     }
 }

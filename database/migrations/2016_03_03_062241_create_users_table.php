@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('lastName');
             $table->integer('address_id')->unsigned();
             $table->enum('gender', ['M', 'V']);
-            $table->dateTime('dateOfBirth');
+            $table->date('dateOfBirth');
             $table->string('email');
             $table->string('password');
             $table->rememberToken();
