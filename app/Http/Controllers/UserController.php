@@ -6,6 +6,7 @@ use \App\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Hash;
 
 use \App\Medicine;
 
@@ -45,12 +46,24 @@ class UserController extends Controller
     */
     public function apiLogin(Request $request) {
         try{
+
             $user = User::where('email','=',$request->email)->firstOrFail();
-            return $user->api_token; 
+            
+            if(Hash::check($request->password, $user->password)){
+                // on each login, regenerate the api_token.
+                $user->api_token = str_random(60);
+                $user->save();
+
+                // return the api_token.
+                return $user->api_token;
+            }
+            else{
+                throw new ModelNotFoundException('Wrong password');
+            }
 
         }catch(ModelNotFoundException $ex){
-            dd($ex);
+            // print get_class_methods($ex);
+            print($ex->getMessage());
         }
-
     }
 }
