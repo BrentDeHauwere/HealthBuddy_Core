@@ -26,7 +26,8 @@ Route::get('/api/login', function (\Illuminate\Http\Request $request) {
         'api_token' => App\User::find()->api_token
     ]);
     */
-    return App\User::where('email', '=', $request->email)->first()->api_token;
+    // return App\User::where('email', '=', $request->email)->first()->api_token;
+    return 'logged in';
 });
 /*
 	Dit zijn de login paths van de website
