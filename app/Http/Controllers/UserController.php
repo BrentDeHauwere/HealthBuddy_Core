@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use \App\User;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
@@ -24,5 +26,21 @@ class UserController extends Controller
     public function showWeights(User $user)
     {
         return $user->weights;
+    }
+
+    /**
+    *  The login function for the API
+    *  
+    *   @param Request $request
+    *   @return api_token
+    */
+    public function apiLogin(Request $request) {
+        try{
+            $user = User::where('email','=',$request->email)->firstOrFail();
+        }catch(ModelNotFoundException ex){
+
+        }
+
+        return $user->api_token;  
     }
 }

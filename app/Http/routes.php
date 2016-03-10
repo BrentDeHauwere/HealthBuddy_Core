@@ -12,22 +12,24 @@ Route::get('weights/{user}', 'UserController@showWeights');
 /*
 	De open route om de api te laten inloggen 
 */
-Route::get('/api/login', function (\Illuminate\Http\Request $request) {
-    // hier komt validatie -> steek deze in de controller later op een andere plaats
+// Route::get('/api/login', function (\Illuminate\Http\Request $request) {
+//     // hier komt validatie -> steek deze in de controller later op een andere plaats
 
-    // check if user en pass are ok
-    // generate new token in db
-    // send token back
+//     // check if user en pass are ok
+//     // generate new token in db
+//     // send token back
 
-    // App\User::find();
-    // dump && die
-    // dd($request->all());
-    /*return response()->json([
-        'api_token' => App\User::find()->api_token
-    ]);
-    */
-    return App\User::where('email', '=', $request->email)->first()->api_token;
-});
+//     // App\User::find();
+//     // dump && die
+//     // dd($request->all());
+//     /*return response()->json([
+//         'api_token' => App\User::find()->api_token
+//     ]);
+//     */
+//     return App\User::where('email', '=', $request->email)->first()->api_token;
+// });
+Route::get('/api/login', 'UserController@apiLogin');
+
 /*
 	Dit zijn de login paths van de website
 */
