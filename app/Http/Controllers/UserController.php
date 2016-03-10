@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use \App\User;
+use \App\Medicine;
 
 class UserController extends Controller
 {
@@ -24,5 +25,10 @@ class UserController extends Controller
     public function showWeights(User $user)
     {
         return $user->weights;
+    }
+
+    public function showSchedule($user)
+    {
+        return Medicine::with('schedule')->where('user_id', '=', $user)->get();
     }
 }
