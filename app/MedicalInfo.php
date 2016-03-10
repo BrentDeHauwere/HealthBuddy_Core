@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class MedicalInfo extends Model
 {
     /**
-     * Eloquent will also assume that each table has a primary key column named id.
-     * You may define a $primaryKey property to override this convention.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'medical_info_id';
+    * The table associated with the model.
+    *
+    * @var string
+    */
+    protected $table = 'medicalInfos';
 
     /**
      * Get the user that owns the medicalInfo.

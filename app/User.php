@@ -3,23 +3,21 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Model
+class User extends Authenticatable
 {
     /**
-     * Eloquent will also assume that each table has a primary key column named id.
-     * You may define a $primaryKey property to override this convention.
-     *
-     * @var string
+     * Hide certain columns.
      */
-    protected $primaryKey = 'user_id';
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Get the address record associated with the user.
      */
     public function address()
     {
-        return $this->hasOne('App\Address');
+        return $this->hasOne('App\Address', 'id', 'address_id');
     }
 
     /**
@@ -31,11 +29,11 @@ class User extends Model
     }
 
     /**
-     * Get the buddy for the user.
+     * Get the buddy of the patient.
      */
     public function buddy()
     {
-        return $this->hasOne('App\User', 'buddy_id', 'user_id');
+        return $this->hasOne('App\User', 'id', 'buddy_id');
     }
 
     /**
@@ -43,6 +41,22 @@ class User extends Model
      */
     public function patients()
     {
-        return $this->belongsTo('App\User', 'buddy_id', 'user_id');
+        return $this->hasMany('App\User', 'buddy_id', 'id');
+    }
+
+    /**
+     * Get the devices of the user.
+     */
+    public function devices()
+    {
+        return $this->hasMany('App\Device');
+    }
+
+    /**
+     * Get the weights of the user.
+     */
+    public function weights()
+    {
+        return $this->hasMany('App\Weight');
     }
 }

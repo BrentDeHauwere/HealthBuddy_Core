@@ -14,8 +14,9 @@ class AddConstraintsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->unique('email');
-            $table->foreign('address_id')->references('address_id')->on('addresses')->onDelete('cascade');
-            $table->foreign('buddy_id')->references('user_id')->on('users');
+            $table->unique('api_token');
+            $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
+            $table->foreign('buddy_id')->references('id')->on('users');
         });
     }
 
@@ -27,7 +28,8 @@ class AddConstraintsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropForeign('users_address_id_foreign');
+            $table->dropForeign('users_buddy_id_foreign');
         });
     }
 }

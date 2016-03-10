@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddConstraintsToMedicalInfosTable extends Migration
+class AddConstraintsToDevicesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class AddConstraintsToMedicalInfosTable extends Migration
      */
     public function up()
     {
-        Schema::table('medicalInfos', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -24,8 +24,8 @@ class AddConstraintsToMedicalInfosTable extends Migration
      */
     public function down()
     {
-        Schema::table('medicalInfos', function (Blueprint $table) {
-            $table->dropForeign('medicalinfos_user_id_foreign');
+        Schema::table('devices', function (Blueprint $table) {
+            $table->dropForeign('devices_user_id_foreign');
         });
     }
 }
