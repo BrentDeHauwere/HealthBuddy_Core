@@ -99,6 +99,46 @@ class ApiController extends Controller
         return false;
     }
 
+
+
+
+    /**
+     * These functions are for updating records in the database
+     * @param $request
+     * @param $user_id
+     * @return mixed
+     */
+    public function updateUser(Request $request, $user_id)
+    {
+        $user = $this->getAuthenticatedUser();
+
+        if($this->isPatient($user_id) || $user->id == $user_id)
+        {
+
+            // TODO will put valitation here
+            // http://slashnode.com/mastering-form-validation-laravel-5/
+            // TODO thx to wanz who gave me that link and told me to NOT follow the link i found (laravelbook)
+            return "updateUser:: not implemented yet";
+        }
+        else {
+            abort(403, 'Wrong id provided.');
+        }
+    }
+
+    /*
+     * These functions are for creating records in the database
+     */
+    public function createWeight($patient_id)
+    {
+        if($this->isPatient($patient_id))
+        {
+            return 'createWeight:: NotImplemented';
+        }
+        else {
+            abort(403, 'Wrong id provided.');
+        }
+    }
+
     /**
      * This is a function to get the authenticated user,
      * in both the web and api cases.

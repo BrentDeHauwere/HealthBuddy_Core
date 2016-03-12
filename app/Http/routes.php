@@ -47,6 +47,7 @@ Route::group(['middleware' => 'web'], function () {
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('/short', 'UrlMapperController@store');
 
+    // Routes to get/query records
     Route::post('profile', 'ApiController@showProfile');
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
@@ -54,4 +55,9 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
     Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
 
+    // Routes to update records
+    Route::post('user/{user_id}/update', 'ApiController@updateUser');
+
+    // Routes to create records
+    Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
 });
