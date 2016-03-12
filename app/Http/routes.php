@@ -9,10 +9,19 @@ Route::get('/', function () {
 });
 
 /**
+ * A Route to goto the login page,
+ * used to redirect certain requests directly to the login page
+ */
+Route::get('/login', function () {
+    return view('auth');
+});
+
+/**
  * The Login Route for the API.
  * After successfully authenticating the server responds with an api_token.
  */
 Route::post('/api/login', 'UserController@apiLogin');
+
 
 
 /**
@@ -38,9 +47,9 @@ Route::group(['middleware' => 'web'], function () {
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('/short', 'UrlMapperController@store');
 
-    Route::get('user/{user}', 'UserController@showProfile');
-    Route::get('patients/{user}', 'UserController@showPatients');
-    Route::get('devices/{user}', 'UserController@showDevices');
-    Route::get('weights/{user}', 'UserController@showWeights');
-    Route::get('schedule/{user}', 'UserController@showSchedule');
+    Route::post('user/{user}', 'ApiController@showProfile');
+    Route::post('patients/{user}', 'ApiController@showPatients');
+    Route::post('devices/{user}', 'ApiController@showDevices');
+    Route::post('weights/{user}', 'ApiController@showWeights');
+    Route::post('schedule/{user}', 'ApiController@showSchedule');
 });
