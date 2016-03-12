@@ -1,12 +1,12 @@
 <?php
 
 /**
- * The default, reachable, homepage
+ * The default, reachable, homepage.
+ * From where a user can login.
  */
 Route::get('/', function () {
     return view('welcome');
 });
-
 
 /**
  * The Login Route for the API.
@@ -20,7 +20,6 @@ Route::post('/api/login', 'UserController@apiLogin');
  */
 Route::group(['middleware' => 'web'], function () {
     Route::auth();
-
     Route::get('/home', 'HomeController@index');
 
     Route::get('user/{user}', 'UserController@showProfile');
@@ -28,7 +27,6 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('devices/{user}', 'UserController@showDevices');
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
-
 });
 
 
@@ -40,15 +38,9 @@ Route::group(['middleware' => 'web'], function () {
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('/short', 'UrlMapperController@store');
 
-    Route::post('/user', function(\Illuminate\Http\Request $request) {
-	    // dd($request->all());
-		return App\User::where('api_token','=',$request->api_token)->get();
-    });
-
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
-
 });
