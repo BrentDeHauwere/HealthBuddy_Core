@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MedicalInfo;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Requests;
@@ -12,6 +13,7 @@ use Hash;
 use \App\User;
 use \App\Medicine;
 use \App\Weight;
+use \App\Schedule;
 
 class ApiController extends Controller
 {
@@ -26,6 +28,28 @@ class ApiController extends Controller
     {
         $auth_user = $this->getAuthenticatedUser();
         return $auth_user->patients;
+    }
+
+    /**
+     * @param $patient_id
+     * @return mixed
+     */
+    public function showPatient($patient_id)
+    {
+        if($this->isPatient($patient_id)) {
+            $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->get();
+            $medicines = Medicine::where('user_id', '=',$patient_id)->get();
+            $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+            $lastWeight = Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
+
+            return response()->json([
+                'patient' => $patient,
+                'schedule' => $schedule,
+                'medicines' => $medicines,
+                'weight' => $lastWeight,
+            ]);
+        }
+        abort(403, 'Wrong Patient_id provided.');
     }
 
     public function showWeights($patient_id)

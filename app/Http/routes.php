@@ -49,6 +49,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     Route::post('profile', 'ApiController@showProfile');
     Route::post('patients', 'ApiController@showPatients');
+    Route::post('patient/{patient_id}', 'ApiController@showPatient');
     Route::post('weights/{patient_id}', 'ApiController@showWeights');
     Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
     Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
