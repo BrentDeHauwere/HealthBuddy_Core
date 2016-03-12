@@ -4,79 +4,76 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 use App\Http\Requests;
+
 use Auth;
 use Hash;
 
 use \App\User;
-
+use \App\Medicine;
+use \App\Weight;
 
 class ApiController extends Controller
 {
-    public function showProfile($user_id)
+    public function showProfile()
     {
-        $auth_user = $this->getAuthenticatedUser();
-        if($user_id == $auth_user->id) {
-            return User::with('address', 'medicalInfo')->find($user_id);
-        }
-        else
-        {
-            return "Unauthorized";
-        }
+        // this must return a JSON object with the user and his info and his patients;
+        $auth_user = User::with('address', 'patients')->find($this->getAuthenticatedUser()->id);
+        return $auth_user;
     }
 
-    public function showPatients(User $user)
+    public function showPatients()
     {
         $auth_user = $this->getAuthenticatedUser();
-        if($user->id == $auth_user->id) {
-            return $user->patients;
-        }
-        else
-        {
-            return "Unauthorized";
-        }
+        return $auth_user->patients;
     }
 
-    public function showDevices(User $user)
+    public function showWeights($patient_id)
     {
-
-        $auth_user = $this->getAuthenticatedUser();
-        if($user->id == $auth_user->id) {
-            return $user->devices;
+        if($this->isPatient($patient_id)) {
+            return Weight::where('user_id', '=', $patient_id)->get();
         }
-        else
-        {
-            return "Unauthorized";
-        }
-
+        abort(403, 'Wrong Patient_id provided.');
     }
 
-    public function showWeights(User $user)
+    public function showLastWeight($patient_id)
     {
-        $auth_user = $this->getAuthenticatedUser();
-        if($user->id == $auth_user->id) {
-            return $user->weights;
+        if($this->isPatient($patient_id)) {
+            return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
         }
-        else
-        {
-            return "Unauthorized";
-        }
+        abort(403, 'Wrong Patient_id provided.');
     }
 
-    public function showSchedule($user)
+    public function showSchedule($patient_id)
     {
-        $auth_user = $this->getAuthenticatedUser();
-        if($user->id == $auth_user->id) {
-            return Medicine::with('schedule')->where('user_id', '=', $user)->get();
+        // send the requested patient info
+        if($this->isPatient($patient_id)) {
+            return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
         }
-        else
-        {
-            return "Unauthorized";
+        else {
+            abort(403, 'Wrong Patient_id provided.');
         }
     }
 
 
+
+    /**
+     * This is a function to check if an id corresponds to an id of the authenticated user's patients.
+     *
+     * @param $patient_id
+     * @return bool returns true if the given ID corrsponds to a patient of the authenticated user.
+     */
+    public function isPatient($patient_id)
+    {
+        $user = $this->getAuthenticatedUser();
+        foreach ($user->patients as $patient) {
+            if($patient->id == $patient_id)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * This is a function to get the authenticated user,

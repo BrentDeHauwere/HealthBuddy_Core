@@ -20,7 +20,7 @@ Route::get('/login', function () {
  * The Login Route for the API.
  * After successfully authenticating the server responds with an api_token.
  */
-Route::post('/api/login', 'UserController@apiLogin');
+Route::post('/api/login', 'ApiController@apiLogin');
 
 
 
@@ -47,9 +47,10 @@ Route::group(['middleware' => 'web'], function () {
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('/short', 'UrlMapperController@store');
 
-    Route::post('user/{user}', 'ApiController@showProfile');
-    Route::post('patients/{user}', 'ApiController@showPatients');
-    Route::post('devices/{user}', 'ApiController@showDevices');
-    Route::post('weights/{user}', 'ApiController@showWeights');
-    Route::post('schedule/{user}', 'ApiController@showSchedule');
+    Route::post('profile', 'ApiController@showProfile');
+    Route::post('patients', 'ApiController@showPatients');
+    Route::post('weights/{patient_id}', 'ApiController@showWeights');
+    Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
+    Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
+
 });
