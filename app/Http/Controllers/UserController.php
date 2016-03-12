@@ -4,18 +4,44 @@ namespace App\Http\Controllers;
 
 use \App\User;
 
+
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Hash;
+use Auth;
 
 use \App\Medicine;
 
 
 class UserController extends Controller
 {
-    public function showProfile($user)
+    /**
+     * This is a function to get the authenticated user,
+     * in both the web and api cases.
+     * @return mixed
+     */
+    public function getAuthenticatedUser()
     {
-        return User::with('address', 'medicalInfo')->find($user);
+        // get the web-user
+        $user = Auth::guard()->user();
+
+        // get the api-user
+        if(!isset($user) && $user == null) {
+            $user = Auth::guard('api')->user();
+        }
+        return $user;
+    }
+
+    public function showProfile($user_id)
+    {
+        $auth_user = $this->getAuthenticatedUser();
+        if($user_id == $auth_user->id) {
+            return User::with('address', 'medicalInfo')->find($user_id);
+        }
+        else
+        {
+            return "Unauthorized";
+        }
     }
 
     public function showPatients(User $user)
@@ -30,7 +56,8 @@ class UserController extends Controller
 
     public function showWeights(User $user)
     {
-        return $user->weights;
+        // return $user->weights;
+        return $user;
     }
 
     public function showSchedule($user)
