@@ -51,7 +51,7 @@
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/home') }}">HealthBuddy</a></li>
-                    <li><a href="{{ url('/home') }}">Home</a></li>
+                    <li><a href="{{ url('/home') }}">Gebruiker beheer</a></li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->
