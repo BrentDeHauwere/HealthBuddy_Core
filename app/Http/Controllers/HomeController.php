@@ -24,7 +24,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $users = \App\User::get();
-        return view('home')->with('users',$users);
+        return view('home');
     }
 }
