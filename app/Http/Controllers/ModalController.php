@@ -25,7 +25,7 @@ class ModalController extends Controller
      */
     public function add(Request $request)
     {
-        return view('addmodal');
+        return view('modals/addmodal');
     }
 
     public function edit(Request $request)
@@ -33,7 +33,7 @@ class ModalController extends Controller
       if(Input::has('data')){
         $user = \App\User::find($request->input('data'));
         if(!empty($user)){
-          return view('editmodal')->with('user',$user);
+          return view('modals/editmodal')->with('user',$user);
         }
         else{
           return 'Something went wrong, No User was found with that id';
@@ -51,7 +51,7 @@ class ModalController extends Controller
       if(Input::has('data')){
         $user = \App\User::find($request->input('data'));
         if(!empty($user)){
-          return view('resetmodal')->with('user',$user);
+          return view('modals/resetmodal')->with('user',$user);
         }
         else{
           return 'Something went wrong, No User was found with that id';
@@ -68,7 +68,7 @@ class ModalController extends Controller
       if(Input::has('data')){
         $user = \App\User::find($request->input('data'));
         if(!empty($user)){
-          return view('linkmodal')->with('user',$user);
+          return view('modals/linkmodal')->with('user',$user);
         }
         else{
           return 'Something went wrong, No User was found with that id';

@@ -12,7 +12,7 @@
 @endif
 <div class="container nowidth">
     <div class="col-md-10 col-md-offset-1">
-      <legend><h3 class="text-center">GebruikerBeheer</h3></legend>
+      <legend><h3 class="text-center">Gebruikerbeheer</h3></legend>
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-10">
