@@ -13,6 +13,13 @@ class User extends Authenticatable
     protected $hidden = ['password', 'remember_token', 'api_token'];
 
     /**
+     * Make sure nobody edits certain fields of the record.
+     * @var array
+     */
+    protected $guarded = ['id', 'password', 'role', 'address_id',
+        'remember_token', 'api_token', 'created_at', 'updated_at'];
+
+    /**
      * Get the address record associated with the user.
      */
     public function address()

@@ -24,11 +24,11 @@ class UsersTableSeeder extends Seeder
         ]);
 
         DB::table('users')->insert([
-            'firstName' => 'Tobias',
-            'lastName' => 'Van Eeckhout',
+            'firstName' => 'eddi',
+            'lastName' => 'DeLanghe',
             'address_id' => 4,
             'gender' => 'M',
-            'dateOfBirth' => '1990-08-23',
+            'dateOfBirth' => '1790-08-23',
             'email' => 'eddi_wallie@gmail.com',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
@@ -47,6 +47,20 @@ class UsersTableSeeder extends Seeder
             'api_token' => str_random(60),
             'role' => 'Zorgbehoevende',
             'buddy_id' => 1
+        ]);
+
+
+        DB::table('users')->insert([
+            'firstName' => 'Marie',
+            'lastName' => 'De Bee',
+            'address_id' => 1,
+            'gender' => 'M',
+            'dateOfBirth' => '1962-09-20',
+            'email' => 'marie@gmail.com',
+            'password' => bcrypt('secret'),
+            'api_token' => str_random(60),
+            'role' => 'Zorgwinkel',
+            // 'buddy_id' => 1
         ]);
     }
 }
