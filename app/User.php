@@ -10,7 +10,14 @@ class User extends Authenticatable
     /**
      * Hide certain columns.
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'api_token'];
+
+    /**
+     * Make sure nobody edits certain fields of the record.
+     * @var array
+     */
+    protected $guarded = ['id', 'password', 'role', 'address_id',
+        'remember_token', 'api_token', 'created_at', 'updated_at'];
 
     /**
      * Get the address record associated with the user.
@@ -58,5 +65,13 @@ class User extends Authenticatable
     public function weights()
     {
         return $this->hasMany('App\Weight');
+    }
+
+    /**
+     * Get the medicines of the user.
+     */
+    public function medicines()
+    {
+        return $this->hasMany('App\Medicine');
     }
 }
