@@ -4,9 +4,15 @@
   <!--<meta id="token" content="niks" />-->
 @endsection
 @section('content')
-<div class="container">
+
+@if(session('response'))
+  <script type="text/javascript">alert('{{ session('response') }}')</script>
+@elseif(session('success'))
+  <script type="text/javascript">alert('{{ session('success') }}')</script>
+@endif
+<div class="container nowidth">
     <div class="col-md-10 col-md-offset-1">
-      <legend><h3 class="text-center">User Beheer</h3></legend>
+      <legend><h3 class="text-center">GebruikerBeheer</h3></legend>
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-10">
@@ -22,7 +28,7 @@
               <td>Address</td>
               <td>Postal</td>
               <td>Country</td>
-              <td>Gender</td>
+              <td>M/V</td>
               <td>Date of birth</td>
               <td>Email</td>
               <td>Role</td>
@@ -92,7 +98,6 @@
       data: {data: d},
       cache: false,
       success: function(data){
-          console.log(button);
          $("#modal").html(data);
          $('#modal').modal('show');
       },

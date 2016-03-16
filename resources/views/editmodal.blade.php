@@ -1,12 +1,14 @@
 <div class="modal-dialog">
   <!-- Modal content-->
+  <form class="form-horizontal">
+  <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h4 class="modal-title">Edit a user</h4>
     </div>
     <div class="modal-body">
-      <form class="form-horizontal">
+
          <input type="hidden" name="id" value="{{ $user->id }}">
          <div class="form-group">
           <label for="firstname" class="col-sm-2 control-label">First Name</label>
@@ -55,8 +57,9 @@
     </div>
     <div class="modal-footer">
       <input type="submit" class="btn btn-primary" name="submit" value="Submit"/>
-      </form>
+
       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
   </div>
+  </form>
 </div>

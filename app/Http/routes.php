@@ -43,6 +43,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
+    Route::post('user/add','UserController@addUser');
+
 });
 
 
