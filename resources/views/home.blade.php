@@ -57,26 +57,26 @@
   $(document).ready(function(){
         $("#AddUser").on("click", function(e){
           console.log(this);
-          ajaxCall(this,"","/addmodal");
+          ajaxCall("","/addmodal");
         });
         $(".EditUser").on("click", function(e){
           console.log(this);
           var data = $(this).siblings('input').val();
-          ajaxCall(this,data,"/editmodal");
+          ajaxCall(data,"/editmodal");
         });
         $(".ResetPass").on("click", function(e){
           console.log(this);
           var data = $(this).siblings('input').val();
 
-          ajaxCall(this,data,"/resetmodal");
+          ajaxCall(data,"/resetmodal");
         });
         $(".LinkDev").on("click", function(e){
           console.log(this);
           var data = $(this).siblings('input').val();
-          ajaxCall(this,data,"/linkmodal");
+          ajaxCall(data,"/linkmodal");
         });
   });
-  function ajaxCall(button,data,url){
+  function ajaxCall(data,url){
     var d = data;
     $.ajax({
       type: "POST",
