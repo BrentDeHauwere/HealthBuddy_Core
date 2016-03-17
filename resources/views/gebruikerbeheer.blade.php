@@ -60,6 +60,22 @@
 @endsection
 @section('footer')
 <script type="text/javascript">
+  $(document).on('click', '#submitAdd', function() {
+    console.log('something');
+    var fm = $('#firstname').val();
+    var lm = $('#lastname').val();
+    var pw = $('#password').val();
+    console.log(pw);
+    var cf = $('#confirm').val();
+    var date = $('#date').val();
+    var email = $('#email').val();
+    var gender = $('#gender').val();
+    var role = $('#role').val();
+    var data = {"firstname":fm,"lastname":lm,"password":pw,"confirm":cf,"date":date,"email":email,"gender":gender,"role":role};
+    console.log(data);
+    ajaxCall(data,"/user/add");
+  });
+
   $(document).ready(function(){
         $("#AddUser").on("click", function(e){
           console.log(this);
@@ -91,18 +107,20 @@
             var token = $('#token').attr('content');
             console.log(token);
             if (token) {
-                  console.log("token");
+                  //console.log("token");
                   return xhr.setRequestHeader('X-CSRF-TOKEN', token);
             }
       },
       data: {data: d},
       cache: false,
       success: function(data){
+         $('#modal').empty();
          $("#modal").html(data);
          $('#modal').modal('show');
       },
       error: function(error){
         console.log("error");
+        $('#modal').empty();
         $("#modal").html("Something went wrong");
         $('#modal').modal('show');
       }

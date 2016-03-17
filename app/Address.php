@@ -9,6 +9,8 @@ class Address extends Model
     /**
      * Get the user that owns the address.
      */
+    public $timestamps = false;
+
     public function user()
     {
         return $this->belongsTo('App\User');

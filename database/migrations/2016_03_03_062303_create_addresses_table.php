@@ -10,6 +10,8 @@ class CreateAddressesTable extends Migration
      *
      * @return void
      */
+    //disable updated at and created at
+
     public function up()
     {
         Schema::create('addresses', function (Blueprint $table) {

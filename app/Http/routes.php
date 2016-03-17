@@ -44,6 +44,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
     Route::post('user/add','UserController@addUser');
+    Route::post('user/addAddress','UserController@addUserAddress');
 
 });
 
