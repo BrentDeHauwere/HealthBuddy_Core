@@ -181,7 +181,7 @@ class ApiController extends Controller
 
         }catch(ModelNotFoundException $ex){
             // print get_class_methods($ex);
-            print($ex->getMessage());
+            abort(401, $ex->getMessage());
         }
     }
 }
