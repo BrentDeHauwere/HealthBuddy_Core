@@ -180,8 +180,7 @@ class ApiController extends Controller
             }
 
         }catch(ModelNotFoundException $ex){
-            // print get_class_methods($ex);
-            abort(401, $ex->getMessage());
-        }
+            return response($ex->getMessage(), 401);
+       }
     }
 }
