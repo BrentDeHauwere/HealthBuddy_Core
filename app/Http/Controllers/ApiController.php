@@ -21,7 +21,7 @@ class ApiController extends Controller
     public function showProfile()
     {
         // this must return a JSON object with the user and his info and his patients;
-        $auth_user = User::with('address', 'patients')->find($this->getAuthenticatedUser()->id);
+        $auth_user = User::with('patients')->find($this->getAuthenticatedUser()->id);
         return $auth_user;
     }
 
@@ -175,7 +175,7 @@ class ApiController extends Controller
 
                 // return the api_token.
                 $api_token = $user->api_token; 
-                $profile = User::with('address', 'patients')->find($user->id);
+                $profile = User::with('patients')->find($user->id);
                 return response()->json(array('api_token'=>$api_token,'profile'=>$profile));
             }
             else{
