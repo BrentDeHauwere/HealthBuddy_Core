@@ -29,6 +29,9 @@ Route::post('/api/login', 'ApiController@apiLogin');
  */
 Route::group(['middleware' => 'web'], function () {
     Route::auth();
+    Route::get('/', function () {
+        return view('welkom');
+    });
     Route::get('/home', 'HomeController@index');
 
     Route::post('/addmodal','ModalController@add');
