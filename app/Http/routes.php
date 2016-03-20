@@ -5,7 +5,7 @@
  * From where a user can login.
  */
 Route::get('/', function () {
-    return view('welcome');
+    return view('welkom');
 });
 
 /**
