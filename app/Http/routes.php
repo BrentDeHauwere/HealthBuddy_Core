@@ -31,7 +31,6 @@ Route::group(['middleware' => 'web'], function () {
     Route::auth();
     Route::get('/home', 'HomeController@index');
 
-
     Route::post('/addmodal','ModalController@add');
     Route::post('/editmodal','ModalController@edit');
     Route::post('/resetmodal','ModalController@reset');
@@ -43,6 +42,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
+    Route::get('apparaatbeheer/show', 'DeviceController@index');
+    Route::get('apparaatbeheer/add', 'DeviceController@create');
+    Route::post('apparaatbeheer/add', 'DeviceController@store');
+    Route::delete('apparaatbeheer/{device}', 'DeviceController@destroy');
 });
 
 
