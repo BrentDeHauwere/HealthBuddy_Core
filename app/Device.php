@@ -13,4 +13,9 @@ class Device extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public static function getPossbileTypes()
+    {
+        return ['iPhone', 'Apple Watch', 'Weegschaal'];
+    }
 }

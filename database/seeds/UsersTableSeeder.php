@@ -24,7 +24,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         DB::table('users')->insert([
-            'firstName' => 'eddi',
+            'firstName' => 'Eddi',
             'lastName' => 'DeLanghe',
             'address_id' => 4,
             'gender' => 'M',
