@@ -42,10 +42,15 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
+<<<<<<< HEAD
     Route::get('apparaatbeheer/show', 'DeviceController@index');
     Route::get('apparaatbeheer/add', 'DeviceController@create');
     Route::post('apparaatbeheer/add', 'DeviceController@store');
     Route::delete('apparaatbeheer/{device}', 'DeviceController@destroy');
+=======
+    Route::post('user/add','UserController@addUser');
+
+>>>>>>> master
 });
 
 

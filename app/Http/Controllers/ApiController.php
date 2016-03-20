@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\MedicalInfo;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Http\Requests;
 
@@ -20,7 +21,7 @@ class ApiController extends Controller
     public function showProfile()
     {
         // this must return a JSON object with the user and his info and his patients;
-        $auth_user = User::with('address', 'patients')->find($this->getAuthenticatedUser()->id);
+        $auth_user = User::with('patients')->find($this->getAuthenticatedUser()->id);
         return $auth_user;
     }
 
@@ -173,15 +174,16 @@ class ApiController extends Controller
                 $user->save();
 
                 // return the api_token.
-                return $user->api_token;
+                $api_token = $user->api_token; 
+                $profile = User::with('patients')->find($user->id);
+                return response()->json(array('api_token'=>$api_token,'profile'=>$profile));
             }
             else{
                 throw new ModelNotFoundException('Wrong password');
             }
 
         }catch(ModelNotFoundException $ex){
-            // print get_class_methods($ex);
-            print($ex->getMessage());
-        }
+            return response($ex->getMessage(), 401);
+       }
     }
 }
