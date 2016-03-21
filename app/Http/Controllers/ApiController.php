@@ -51,13 +51,10 @@ class ApiController extends Controller
 
     public function showMedicines ($patient_id){
         if($this->isPatient($patient_id)) {
-          $medicines = Medicine::where('user_id', '=',$patient_id)->get();
           $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+          /// $medicines = Medicine::where('user_id', '=',$patient_id)->get();
 
-          return response()->json([
-            'schedule' => $schedule,
-            'medicines' => $medicines,
-            ]);
+          return $schedule;
       }
       abort(403, 'Wrong Patient_id provided.');
   }
