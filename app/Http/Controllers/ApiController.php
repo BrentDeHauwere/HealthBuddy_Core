@@ -39,46 +39,55 @@ class ApiController extends Controller
     {
         if($this->isPatient($patient_id)) {
             $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->get();
-            $medicines = Medicine::where('user_id', '=',$patient_id)->get();
-            $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
             $lastWeight = Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
 
             return response()->json([
                 'patient' => $patient,
-                'schedule' => $schedule,
-                'medicines' => $medicines,
                 'weight' => $lastWeight,
+                ]);
+        }
+        abort(403, 'Wrong Patient_id provided.');
+    }
+
+    public function showMedicines ($patient_id){
+        if($this->isPatient($patient_id)) {
+          $medicines = Medicine::where('user_id', '=',$patient_id)->get();
+          $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+
+          return response()->json([
+            'schedule' => $schedule,
+            'medicines' => $medicines,
             ]);
-        }
-        abort(403, 'Wrong Patient_id provided.');
-    }
-
-    public function showWeights($patient_id)
-    {
-        if($this->isPatient($patient_id)) {
-            return Weight::where('user_id', '=', $patient_id)->get();
-        }
-        abort(403, 'Wrong Patient_id provided.');
-    }
-
-    public function showLastWeight($patient_id)
-    {
-        if($this->isPatient($patient_id)) {
-            return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
-        }
-        abort(403, 'Wrong Patient_id provided.');
-    }
-
-    public function showSchedule($patient_id)
-    {
+      }
+      abort(403, 'Wrong Patient_id provided.');
+  }
+  public function showSchedule($patient_id){
         // send the requested patient info
-        if($this->isPatient($patient_id)) {
-            return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-        }
-        else {
-            abort(403, 'Wrong Patient_id provided.');
-        }
+    if($this->isPatient($patient_id)) {
+        return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
     }
+    else {
+        abort(403, 'Wrong Patient_id provided.');
+    }
+}
+
+public function showWeights($patient_id)
+{
+    if($this->isPatient($patient_id)) {
+        return Weight::where('user_id', '=', $patient_id)->get();
+    }
+    abort(403, 'Wrong Patient_id provided.');
+}
+
+public function showLastWeight($patient_id)
+{
+    if($this->isPatient($patient_id)) {
+        return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
+    }
+    abort(403, 'Wrong Patient_id provided.');
+}
+
+
 
 
 
@@ -184,6 +193,6 @@ class ApiController extends Controller
 
         }catch(ModelNotFoundException $ex){
             return response($ex->getMessage(), 401);
-       }
+        }
     }
 }
