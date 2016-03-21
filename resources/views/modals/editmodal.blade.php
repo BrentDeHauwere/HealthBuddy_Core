@@ -1,6 +1,6 @@
 <div class="modal-dialog">
   <!-- Modal content-->
-  <form class="form-horizontal">
+  <form class="form-horizontal" method="POST" action="/user/edituser">
   <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
   <div class="modal-content">
     <div class="modal-header">

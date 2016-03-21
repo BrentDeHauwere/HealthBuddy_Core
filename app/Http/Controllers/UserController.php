@@ -57,6 +57,31 @@ class UserController extends Controller
         }
         return $user;
     }
+
+    public function reset(Request $request){
+        $user = \App\User::Where('id','=',$request->input('id'));
+        $user->password = $request->('password');
+        $user->save();
+    }
+
+    public function linkDevice(Request $request){
+      $userid = $request->('id');
+      $device = \App\Device::Where('id','=',$request->('device'));
+      $device->save();
+    }
+
+    public function editUser(Request $request){
+      $user = \App\User::Where('id','=',$request->input('id'));
+      $user->firstName = $request->input('firstname');
+      $user->lastName = $request->input('lastname');
+      $user->dateOfBirth = $request->input('date');
+      $user->email = $request->input('email');
+      $user->gender = $request->input('gender');
+      $user->role = $request->input('role');
+      $user->save();
+
+    }
+
     public function addUserAddress(Request $request){
       $address = new Address();
       $address->street = $request->input('street');

@@ -68,7 +68,8 @@ class ModalController extends Controller
       if(Input::has('data')){
         $user = \App\User::find($request->input('data'));
         if(!empty($user)){
-          return view('modals/linkmodal')->with('user',$user);
+          $devices = \App\Device::get();
+          return view('modals/linkmodal')->with('user',$user,'devices',$devices);
         }
         else{
           return 'Something went wrong, No User was found with that id';

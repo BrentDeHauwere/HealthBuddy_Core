@@ -16,26 +16,19 @@ Route::get('/login', function () {
     return view('auth');
 });
 
+Route::post('/api/login', 'ApiController@apiLogin');
+
 /**
  * The Login Route for the API.
  * After successfully authenticating the server responds with an api_token.
  */
-Route::post('/api/login', 'ApiController@apiLogin');
-
-
 
 /**
  * These are the routes one can visit after logging in on the website
  */
 Route::group(['middleware' => 'web'], function () {
+
     Route::auth();
-    Route::get('/home', 'HomeController@index');
-
-
-    Route::post('/addmodal','ModalController@add');
-    Route::post('/editmodal','ModalController@edit');
-    Route::post('/resetmodal','ModalController@reset');
-    Route::post('/linkmodal','ModalController@link');
 
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
@@ -43,8 +36,16 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
+    Route::get('/home', 'HomeController@index');
+    Route::post('/addmodal','ModalController@add');
+    Route::post('/editmodal','ModalController@edit');
+    Route::post('/resetmodal','ModalController@reset');
+    Route::post('/linkmodal','ModalController@link');
     Route::post('user/add','UserController@addUser');
     Route::post('user/addAddress','UserController@addUserAddress');
+    Route::post('user/edit','UserController@editUser');
+    Route::post('user/link','UserController@linkDevice');
+    Route::post('user/reset','UserController@reset');
 
 });
 
