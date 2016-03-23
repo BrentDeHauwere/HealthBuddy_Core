@@ -53,15 +53,14 @@ Route::group(['middleware' => 'web'], function () {
 
 
 /**
- * These are the routes one can get to after logging in through the api and gettint an api_token.
- * gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51
- *
+ * These are the routes one can get to after logging in through the api and receiving an api_token.
+ * Gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51
 */
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     /*
     * 
     */
-    Route::post('/short', 'UrlMapperController@store');
+    // Route::post('/short', 'UrlMapperController@store');
 
     // Routes to get/query records
     Route::post('profile', 'ApiController@showProfile');
@@ -74,7 +73,15 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
+    Route::post('address/{address_id}', 'ApiController@updateAddress');
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
+
+
+    // -haal medische gegevens op van patient
+    // -haal address op van user
+    // -update user
+    // -update medische gegevens
+    // -update address --> progress
 });

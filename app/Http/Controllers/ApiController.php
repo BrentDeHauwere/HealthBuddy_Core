@@ -10,18 +10,27 @@ use App\Http\Requests;
 
 use Auth;
 use Hash;
+use DB;
 
 use \App\User;
 use \App\Medicine;
 use \App\Weight;
 use \App\Schedule;
 
+// use App\Http\Requests\Request;
+use App\Http\Requests\UpdateUserApiRequest;
+
+/**
+ *This is the Controller that handles all API requests,
+ * @author eddi
+ */
 class ApiController extends Controller
 {
     public function showProfile()
     {
         // this must return a JSON object with the user and his info and his patients;
         $auth_user = User::with('patients')->find($this->getAuthenticatedUser()->id);
+        $patients = User::where('buddy_id', '=' ,$auth_user->id);
         return $auth_user;
     }
 
@@ -93,6 +102,7 @@ public function showLastWeight($patient_id)
      *
      * @param $patient_id
      * @return bool returns true if the given ID corrsponds to a patient of the authenticated user.
+     * @author eddi
      */
     public function isPatient($patient_id)
     {
@@ -110,25 +120,42 @@ public function showLastWeight($patient_id)
 
 
     /**
-     * These functions are for updating records in the database
+     * This function is for updateing a users info.
      * @param $request
      * @param $user_id
      * @return mixed
+     * @author eddi
      */
-    public function updateUser(Request $request, $user_id)
+    public function updateUser(UpdateUserApiRequest $request, $user_id)
     {
         $user = $this->getAuthenticatedUser();
 
         if($this->isPatient($user_id) || $user->id == $user_id)
         {
+            // DB::table('users')
+            // ->where('id', $user_id)
+            // ->update(array(
+            //     'firstName' => $request->firstName,
+            //     'lastName' => $request->lastName
+            //     ));
+            // $user->firstName = $request->firstName;
+            // $user->update();
 
-            // TODO will put valitation here
-            // http://slashnode.com/mastering-form-validation-laravel-5/
-            // TODO thx to wanz who gave me that link and told me to NOT follow the link i found (laravelbook)
-            return "updateUser:: not implemented yet";
+            return "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
         }
         else {
             abort(403, 'Wrong id provided.');
+        }
+    }
+
+    public function updateAddress(Request $request){
+        $user = $this->getAuthenticatedUser();
+
+        if(true){
+            return 'not implemented yet';
+        }
+        else {
+            abort(403, 'Wrong AddressID');
         }
     }
 
@@ -168,6 +195,7 @@ public function showLastWeight($patient_id)
      *
      *   @param Request $request
      *   @return api_token
+     *   @author eddi
      */
     public function apiLogin(Request $request) {
         try{
@@ -181,8 +209,7 @@ public function showLastWeight($patient_id)
 
                 // return the api_token.
                 $api_token = $user->api_token; 
-                $profile = User::with('patients')->find($user->id);
-                return response()->json(array('api_token'=>$api_token,'profile'=>$profile));
+                return response()->json(array('api_token' => $api_token));
             }
             else{
                 throw new ModelNotFoundException('Wrong password');
