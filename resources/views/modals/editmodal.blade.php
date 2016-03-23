@@ -1,7 +1,7 @@
 <div class="modal-dialog">
   <!-- Modal content-->
-  <form class="form-horizontal" method="POST" action="/user/edituser">
-  <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+  <form class="form-horizontal" method="POST" action="user/editAddressUser" novalidate="novalidate">
+  <!--<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">-->
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -9,7 +9,7 @@
     </div>
     <div class="modal-body">
 
-         <input type="hidden" name="id" value="{{ $user->id }}">
+         <input type="hidden" name="id" id="id" value="{{ $user->id }}">
          <div class="form-group">
           <label for="firstname" class="col-sm-2 control-label">First Name</label>
           <div class="col-sm-10">
@@ -37,7 +37,7 @@
         <div class="form-group">
           <label for="gender" class="col-sm-2 control-label">Gender</label>
           <div class="col-sm-10">
-            <select class="form-control" name="gender">
+            <select class="form-control" id="gender" name="gender">
               <option>{{ $user->gender }}</option>
               <option>M</option>
               <option>V</option>
@@ -47,7 +47,7 @@
         <div class="form-group">
           <label for="role" class="col-sm-2 control-label">Role</label>
           <div class="col-sm-10">
-            <select class="form-control" name="role">
+            <select class="form-control" id="role" name="role">
               <option>{{ $user->role }}</option>
               <option>Zorgbehoevende</option>
               <option>ZorgMantel</option>
@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn btn-primary" name="submit" value="Submit"/>
+      <input type="button" class="btn btn-primary" id="submitEdit" name="submitEdit" value="Submit"/>
 
       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>

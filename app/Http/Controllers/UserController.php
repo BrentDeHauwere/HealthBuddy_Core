@@ -59,27 +59,68 @@ class UserController extends Controller
     }
 
     public function reset(Request $request){
-        $user = \App\User::Where('id','=',$request->input('id'));
-        $user->password = $request->('password');
-        $user->save();
+        $id = $request->input('id');
+        $user = \App\User::where('id','=',$id)->first();
+        $user->password = $request->input('password');
+        $saved = $user->save();
+        if($saved){
+          return redirect('/home')->with('success','Password was succesfully saved');
+        }
+        else{
+          return redirect('/home')->with('response','Password was not saved');
+        }
     }
 
     public function linkDevice(Request $request){
-      $userid = $request->('id');
-      $device = \App\Device::Where('id','=',$request->('device'));
-      $device->save();
+      $userid = $request->input('id');
+      $device = \App\Device::Where('id','=',$request->input('device'))->first();
+      $device->user_id = $userid;
+      $savedAdd = $device->save();
+      if($savedAdd){
+        return redirect('/home')->with('success','Device was succesfully linked');
+      }
+      else{
+        return redirect('/home')->with('response','Device was not linked');
+      }
     }
 
     public function editUser(Request $request){
-      $user = \App\User::Where('id','=',$request->input('id'));
-      $user->firstName = $request->input('firstname');
-      $user->lastName = $request->input('lastname');
-      $user->dateOfBirth = $request->input('date');
-      $user->email = $request->input('email');
-      $user->gender = $request->input('gender');
-      $user->role = $request->input('role');
-      $user->save();
 
+      $id = $request->input('data.id');
+      $user = \App\User::where('id','=',$id)->first();
+      $user->firstName = $request->input('data.firstname');
+      $user->lastName = $request->input('data.lastname');
+      $user->dateOfBirth = $request->input('data.date');
+      $user->email = $request->input('data.email');
+      $user->gender = $request->input('data.gender');
+      $user->role = $request->input('data.role');
+      $saved = $user->save();
+      if($saved){
+        $addrID = $user->address_id;
+        $addr = \App\Address::where('id','=',$addrID)->first();
+        return view('modals/editaddressmodal')->with('id',$id)->with('address',$addr);
+      }
+      else{
+        return redirect('/home')->with('response','User was not saved');
+      }
+    }
+
+    public function editAddress(Request $request){
+
+      $address = \App\Address::where('id','=',$request->input('id'))->first();
+      $address->street = $request->input('street');
+      $address->streetNumber = $request->input('streetnumber');
+      $address->bus = $request->input('bus');
+      $address->zipCode = $request->input('zipcode');
+      $address->city = $request->input('city');
+      $address->country = $request->input('country');
+      $savedAdd = $address->save();
+      if($savedAdd){
+        return redirect('/home')->with('success','Address was succesfully saved');
+      }
+      else{
+        return redirect('/home')->with('response','Address was not saved');
+      }
     }
 
     public function addUserAddress(Request $request){
@@ -116,63 +157,21 @@ class UserController extends Controller
     }
 
     public function addUser(Request $request){
-      if(!(Input::has('data'))){
-        return redirect('/home')->with('response','No data found');
-      }
 
-      if(Input::has('data.firstname') && Input::has('data.lastname') && Input::has('data.password') && Input::has('data.confirm') && Input::has('data.date') && Input::has('data.email') && Input::has('data.gender') && Input::has('data.role')){
-        if($request->input('data.password') == $request->input('data.confirm')){
-          $user = \App\User::where('email','=',$request->input('data.email'))->first();
-          //$user = NULL;
-          if(!($user)){
-            if(preg_match('/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/', $request->input('data.password')) === 1){
-              if(preg_match('/^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})/', $request->input('data.email')) === 1){
-                if($request->input('data.gender') == 'M' || $request->input('data.gender') == 'V'){
-                  if($request->input('data.role') == 'Zorgwinkel' || $request->input('data.role') == 'Zorgmantel' || $request->input('data.role') == 'Zorgbehoevende'){
-                    $array = [
-                        "firstName" => $request->input('data.firstname'),
-                        "lastName" => $request->input('data.lastname'),
-                        "password" => $request->input('data.password'),
-                        "dateOfBirth" => $request->input('data.date'),
-                        "email" => $request->input('data.email'),
-                        "gender" => $request->input('data.gender'),
-                        "role" => $request->input('data.role'),
-                    ];
-                    $request->session()->put($array);
-                    if($request->session()->has('firstName')){
-                      return view('modals/addaddressmodal');
-                    }
-                    else{
-                      return redirect('/home')->with('response','User could not be made');
-                    }
-                  }
-                  else{
-                    return redirect('/home')->with('response','Role cannot be this value');
-                  }
-                }
-                else{
-                  return redirect('/home')->with('response','Gender can only be M or V');
-                }
+        $array = [
+            "firstName" => $request->input('data.firstname'),
+            "lastName" => $request->input('data.lastname'),
+            "password" => $request->input('data.password'),
+            "dateOfBirth" => $request->input('data.date'),
+            "email" => $request->input('data.email'),
+            "gender" => $request->input('data.gender'),
+            "role" => $request->input('data.role'),
+        ];
 
-              }
-              else{
-                return redirect('/home')->with('response','This is not a valid email');
-              }
-            }
-            else{
-              return redirect('/home')->with('response','Password must have atleast 8 characters and both Alphabetic and number');
-            }
-          }
-          else{
-            return redirect('/home')->with('response','Email was not unique');
-          }
+        $request->session()->put($array);
+        if($request->session()->has('firstName')){
+          return view('modals/addaddressmodal');
         }
-        else{
-          return redirect('/home')->with('response','Passwords were not the same');
-        }
-      }
-      else{
-        return redirect('/home')->with('response','Not all fields were filled in');
-      }
+
     }
 }

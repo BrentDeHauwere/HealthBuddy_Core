@@ -76,6 +76,20 @@
     ajaxCall(data,"/user/add");
   });
 
+  $(document).on('click', '#submitEdit', function() {
+    console.log('something');
+    var fm = $('#firstname').val();
+    var lm = $('#lastname').val();
+    var date = $('#date').val();
+    var email = $('#email').val();
+    var gender = $('#gender').val();
+    var role = $('#role').val();
+    var dataID = $('#id').val();
+    var data = {"id":dataID,"firstname":fm,"lastname":lm,"date":date,"email":email,"gender":gender,"role":role};
+    console.log(data);
+    ajaxCall(data,"/user/editUser");
+  });
+
   $(document).ready(function(){
         $("#AddUser").on("click", function(e){
           console.log(this);
@@ -98,6 +112,7 @@
           ajaxCall(data,"/linkmodal");
         });
   });
+
   function ajaxCall(data,url){
     var d = data;
     $.ajax({

@@ -43,7 +43,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/linkmodal','ModalController@link');
     Route::post('user/add','UserController@addUser');
     Route::post('user/addAddress','UserController@addUserAddress');
-    Route::post('user/edit','UserController@editUser');
+    Route::post('user/editUser','UserController@editUser');
+    Route::post('user/editAddress','UserController@editAddress');
     Route::post('user/link','UserController@linkDevice');
     Route::post('user/reset','UserController@reset');
 
