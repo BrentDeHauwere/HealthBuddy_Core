@@ -54,24 +54,39 @@ Route::group(['middleware' => 'web'], function () {
 
 
 /**
- * These are the routes one can get to after logging in through the api and gettint an api_token.
- * gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51
- *
+ * These are the routes one can get to after logging in through the api and receiving an api_token.
+ * Gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51
 */
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
-    Route::post('/short', 'UrlMapperController@store');
+    /*
+    * TODO: find out who put this here, and ask why it is needed?
+    * eddi thinks it's not needed.
+    */
+    // Route::post('/short', 'UrlMapperController@store');
 
     // Routes to get/query records
     Route::post('profile', 'ApiController@showProfile');
+    Route::post('address/{user_id}', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
+
     Route::post('weights/{patient_id}', 'ApiController@showWeights');
     Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
+    
+    Route::post('medicalinfo/{patient_id}', 'ApiController@showMedicalInfo');
+    Route::post('medicines/{patient_id}', 'ApiController@showMedicines');
     Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
+
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
+    Route::post('address/{address_id}', 'ApiController@updateAddress');
+
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
+
+    // -update user
+    // -update medische gegevens
+    // -update address --> progress
 });

@@ -12,73 +12,163 @@ use Auth;
 use Hash;
 
 use \App\User;
+use \App\Address;
 use \App\Medicine;
 use \App\Weight;
 use \App\Schedule;
 
+// use App\Http\Requests\Request;
+use App\Http\Requests\UpdateUserApiRequest;
+
+/**
+ *This is the Controller that handles all API requests,
+ * @author eddi
+ */
 class ApiController extends Controller
 {
+    /**
+    *   This function returns the budddy and his info + the buddy's patients and their info.
+    * The address and patients are retrieved seperately since we need maximum flexibility.
+    *   @author eddi
+    */
     public function showProfile()
     {
-        // this must return a JSON object with the user and his info and his patients;
-        $auth_user = User::with('patients')->find($this->getAuthenticatedUser()->id);
+        // retrieve the buddy
+        $auth_user = User::find($this->getAuthenticatedUser()->id);
+
+        // retrieve the buddy's address
+        $address = Address::where('id', '=' ,$auth_user->address_id)->first();
+        // retrieve the buddy's patients and their infos
+        $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
+        ->with('medicalinfo')->get();
+        
+        // now add the medicines and schedules to the patients
+        foreach ($patients_db as $patient) {
+            $patient->patients = null;
+            $patient->medicines = Medicine::with('schedule')->get();
+        }
+
+        // append the patients to the buddy-object
+        $auth_user->address = $address;
+        $auth_user->patients = $patients_db;
+        
+        // return the buddy
         return $auth_user;
     }
 
+     /**
+     * This function retrieves the address of a user.
+     * If that user is either the buddy OR a patient of the buddy. 
+     * @param $user_id
+     * @author eddi
+     */
+    public function showAddress($user_id)
+    {
+        $auth_user = $this->getAuthenticatedUser();
+
+        if( $auth_user->id == $user_id) {
+            return $auth_user->address;
+        }
+        elseif ($this->isPatient($user_id)) {
+            $address = User::where('id', '=', $user_id)->first()->address;
+            return $address;   
+        }
+        return response('Wrong id provided.', 403);
+    }
+
+
+    /**
+    * This function retrieves a buddy's patients.
+    * @author eddi
+    */
     public function showPatients()
     {
         $auth_user = $this->getAuthenticatedUser();
-        return $auth_user->patients;
+
+         // retrieve the buddy's patients and their medicalinfo.
+        $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
+        ->with('medicalinfo')->get();
+        
+        // now add the medicines and schedules to the patients
+        foreach ($patients_db as $patient) {
+            $patient->patients = null;
+            $patient->medicines = Medicine::with('schedule')->get();
+        }
+        return $patients_db;
     }
 
     /**
+     * This function returns a patient given a correct id and if the patient is a 
+     *  patient of the buddy. 
      * @param $patient_id
      * @return mixed
+    * @author eddi
      */
     public function showPatient($patient_id)
     {
         if($this->isPatient($patient_id)) {
-            $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->get();
-            $medicines = Medicine::where('user_id', '=',$patient_id)->get();
-            $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-            $lastWeight = Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
-
-            return response()->json([
-                'patient' => $patient,
-                'schedule' => $schedule,
-                'medicines' => $medicines,
-                'weight' => $lastWeight,
-            ]);
+            $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
+            $patient->medicines = Medicine::with('schedule')->get();
+            $patient->patients = null;
+            return $patient;
         }
-        abort(403, 'Wrong Patient_id provided.');
+        return response('Wrong Patient_id provided.', 403);
     }
 
-    public function showWeights($patient_id)
-    {
+    /**
+    * This function retrieves a patients medicines.
+    * @author eddi
+    */
+    public function showMedicines ($patient_id){
         if($this->isPatient($patient_id)) {
-            return Weight::where('user_id', '=', $patient_id)->get();
-        }
-        abort(403, 'Wrong Patient_id provided.');
-    }
+          $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+          return $schedule;
+      }
+      return response('Wrong Patient_id provided.', 403);
+  }
 
-    public function showLastWeight($patient_id)
-    {
-        if($this->isPatient($patient_id)) {
-            return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
-        }
-        abort(403, 'Wrong Patient_id provided.');
-    }
-
-    public function showSchedule($patient_id)
-    {
+  /**
+    * This function retrieves a patients schedule, when to take his medicines.
+    * @author eddi
+    */
+  public function showSchedule($patient_id){
         // send the requested patient info
-        if($this->isPatient($patient_id)) {
-            return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-        }
-        else {
-            abort(403, 'Wrong Patient_id provided.');
-        }
+    if($this->isPatient($patient_id)) {
+        return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
     }
+    return response('Wrong Patient_id provided.', 403);
+}
+
+ /**
+    * This function retrieves a patients medicalInfo.
+    * @author eddi
+    */
+  public function showMedicalInfo($patient_id){
+        // send the requested patient info
+    if($this->isPatient($patient_id)) {
+        return MedicalInfo::where('user_id', '=', $patient_id)->first();
+    }
+    return response('Wrong Patient_id provided.', 403);
+}
+
+
+public function showWeights($patient_id)
+{
+    if($this->isPatient($patient_id)) {
+        return Weight::where('user_id', '=', $patient_id)->get();
+    }
+    return response('Wrong Patient_id provided.', 403);
+}
+
+public function showLastWeight($patient_id)
+{
+    if($this->isPatient($patient_id)) {
+        return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
+    }
+    return response('Wrong Patient_id provided.', 403);
+}
+
+
 
 
 
@@ -87,6 +177,7 @@ class ApiController extends Controller
      *
      * @param $patient_id
      * @return bool returns true if the given ID corrsponds to a patient of the authenticated user.
+     * @author eddi
      */
     public function isPatient($patient_id)
     {
@@ -104,26 +195,39 @@ class ApiController extends Controller
 
 
     /**
-     * These functions are for updating records in the database
+     * This function is for updateing a users info.
      * @param $request
      * @param $user_id
      * @return mixed
+     * @author eddi
      */
-    public function updateUser(Request $request, $user_id)
+    public function updateUser(UpdateUserApiRequest $request, $user_id)
     {
         $user = $this->getAuthenticatedUser();
 
         if($this->isPatient($user_id) || $user->id == $user_id)
         {
+            // DB::table('users')
+            // ->where('id', $user_id)
+            // ->update(array(
+            //     'firstName' => $request->firstName,
+            //     'lastName' => $request->lastName
+            //     ));
+            $user->firstName = $request->firstName;
+            $user->update();
 
-            // TODO will put valitation here
-            // http://slashnode.com/mastering-form-validation-laravel-5/
-            // TODO thx to wanz who gave me that link and told me to NOT follow the link i found (laravelbook)
-            return "updateUser:: not implemented yet";
+            return "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
         }
-        else {
-            abort(403, 'Wrong id provided.');
+        return response('Wrong id provided.', 403);
+    }
+
+    public function updateAddress(Request $request){
+        $user = $this->getAuthenticatedUser();
+
+        if(true){
+            return 'not implemented yet';
         }
+        return response('Wrong Address_id.', 403);
     }
 
     /*
@@ -135,9 +239,7 @@ class ApiController extends Controller
         {
             return 'createWeight:: NotImplemented';
         }
-        else {
-            abort(403, 'Wrong id provided.');
-        }
+        return response('Wrong id provided.', 403);
     }
 
     /**
@@ -157,11 +259,15 @@ class ApiController extends Controller
         return $user;
     }
 
+
+
+
     /**
      *  The login function for the API
      *
      *   @param Request $request
      *   @return api_token
+     *   @author eddi
      */
     public function apiLogin(Request $request) {
         try{
@@ -175,8 +281,7 @@ class ApiController extends Controller
 
                 // return the api_token.
                 $api_token = $user->api_token; 
-                $profile = User::with('patients')->find($user->id);
-                return response()->json(array('api_token'=>$api_token,'profile'=>$profile));
+                return response()->json(array('api_token' => $api_token));
             }
             else{
                 throw new ModelNotFoundException('Wrong password');
@@ -184,6 +289,6 @@ class ApiController extends Controller
 
         }catch(ModelNotFoundException $ex){
             return response($ex->getMessage(), 401);
-       }
+        }
     }
 }
