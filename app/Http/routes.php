@@ -68,17 +68,20 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Route::post('/short', 'UrlMapperController@store');
 
     // Routes to get/query records
-    Route::post('profile', 'ApiController@showProfile');
+    Route::post('buddyprofile', 'ApiController@showBuddyProfile');
     Route::post('address/{user_id}', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
-
     Route::post('weights/{patient_id}', 'ApiController@showWeights');
     Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
 
     Route::post('medicalinfo/{patient_id}', 'ApiController@showMedicalInfo');
     Route::post('medicines/{patient_id}', 'ApiController@showMedicines');
     Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
+
+    Route::post('weights/{patient_id}', 'ApiController@showWeights');
+    Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
+
 
 
     // Routes to update records
