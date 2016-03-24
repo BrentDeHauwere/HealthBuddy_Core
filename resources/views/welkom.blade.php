@@ -8,7 +8,7 @@
                 <div class="panel-heading">Welkom in de ZorgWinkel!</div>
 
                 <div class="panel-body">
-                Gelive in te loggen alvorens verder te gaan. 
+                Gelieve in te loggen alvorens verder te gaan.
                 </div>
             </div>
         </div>
