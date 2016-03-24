@@ -1,7 +1,7 @@
 <div class="modal-dialog">
   <!-- Modal content-->
   <form class="form-horizontal" method="POST" action="user/editAddress">
-  <input type="hidden" name="id" value="{{$id}}">
+  <input type="hidden" name="id" value="{{$address->id}}">
   <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
   <div class="modal-content">
     <div class="modal-header">

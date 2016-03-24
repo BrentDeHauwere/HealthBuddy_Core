@@ -64,10 +64,10 @@ class UserController extends Controller
         $user->password = $request->input('password');
         $saved = $user->save();
         if($saved){
-          return redirect('/home')->with('success','Password was succesfully saved');
+          return redirect()->back()->with('success','Password was succesfully saved');
         }
         else{
-          return redirect('/home')->with('response','Password was not saved');
+          return redirect()->back()->with('error','Password was not saved');
         }
     }
 
@@ -77,10 +77,23 @@ class UserController extends Controller
       $device->user_id = $userid;
       $savedAdd = $device->save();
       if($savedAdd){
-        return redirect('/home')->with('success','Device was succesfully linked');
+        return redirect()->back()->with('success','Device was succesfully linked');
       }
       else{
-        return redirect('/home')->with('response','Device was not linked');
+        return redirect()->back()->with('error','Deivce could not be linked');
+      }
+    }
+
+    public function linkBuddy(Request $request){
+      $buddy = \App\User::where('id','=',$request->input('buddy'))->first();
+      $userid = $request->input('user');
+      $buddy->buddy_id = $userid;
+      $savedAdd = $buddy->save();
+      if($savedAdd){
+        return view('/modals/successmodal')->with('success','Buddy was linked');
+      }
+      else{
+        return view('/modals/errormodal')->with('error','Buddy could not be linked');
       }
     }
 
@@ -92,16 +105,17 @@ class UserController extends Controller
       $user->lastName = $request->input('data.lastname');
       $user->dateOfBirth = $request->input('data.date');
       $user->email = $request->input('data.email');
+      $user->phone = $request->input('data.phone');
       $user->gender = $request->input('data.gender');
       $user->role = $request->input('data.role');
       $saved = $user->save();
       if($saved){
         $addrID = $user->address_id;
         $addr = \App\Address::where('id','=',$addrID)->first();
-        return view('modals/editaddressmodal')->with('id',$id)->with('address',$addr);
+        return view('modals/editaddressmodal')->with('address',$addr);
       }
       else{
-        return redirect('/home')->with('response','User was not saved');
+        return view('/modals/errormodal')->with('error','User could not be edited');
       }
     }
 
@@ -116,10 +130,10 @@ class UserController extends Controller
       $address->country = $request->input('country');
       $savedAdd = $address->save();
       if($savedAdd){
-        return redirect('/home')->with('success','Address was succesfully saved');
+        return redirect()->back()->with('success','Update was succesfully saved');
       }
       else{
-        return redirect('/home')->with('response','Address was not saved');
+        return redirect()->back()->with('error','Address could not be saved');
       }
     }
 
@@ -139,20 +153,21 @@ class UserController extends Controller
         $user->password = $request->session()->get('password');
         $user->dateOfBirth = $request->session()->get('dateOfBirth');
         $user->email = $request->session()->get('email');
+        $user->phone = $request->session()->get('phone');
         $user->role = $request->session()->get('role');
         $user->address_id = $address->id;
         $savedUser = $user->save();
 
         if($savedUser){
-          return redirect('/home')->with('success','User was succesfully saved');
+          return redirect()->back()->with('success','User was succesfully saved');
         }
         else{
           $address->delete();
-          return redirect('/home')->with('response','Could not save the user');
+          return redirect()->back()->with('error','User could not be saved');
         }
       }
       else{
-        return redirect('/home')->with('response','Could not save the address');
+        return redirect()->back()->with('error','Address could not be saved');
       }
     }
 
@@ -164,6 +179,7 @@ class UserController extends Controller
             "password" => $request->input('data.password'),
             "dateOfBirth" => $request->input('data.date'),
             "email" => $request->input('data.email'),
+            "phone" => $request->input('data.phone'),
             "gender" => $request->input('data.gender'),
             "role" => $request->input('data.role'),
         ];
@@ -171,6 +187,9 @@ class UserController extends Controller
         $request->session()->put($array);
         if($request->session()->has('firstName')){
           return view('modals/addaddressmodal');
+        }
+        else{
+          return view('/modals/errormodal')->with('error','Could not persist user data');
         }
 
     }

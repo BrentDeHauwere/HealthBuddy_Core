@@ -41,11 +41,13 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/editmodal','ModalController@edit');
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
+    Route::post('/buddymodal','ModalController@linkBuddy');
     Route::post('user/add','UserController@addUser');
     Route::post('user/addAddress','UserController@addUserAddress');
     Route::post('user/editUser','UserController@editUser');
     Route::post('user/editAddress','UserController@editAddress');
     Route::post('user/link','UserController@linkDevice');
+    Route::post('user/linkBuddy','UserController@linkBuddy');
     Route::post('user/reset','UserController@reset');
 
 });
