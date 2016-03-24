@@ -68,6 +68,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the latest weight of the user.
+     */
+    public function latestWeight()
+    {
+        return $this->HasOne('App\Weight')->latest();
+    }
+
+    /**
      * Get the medicines of the user.
      */
     public function medicines()

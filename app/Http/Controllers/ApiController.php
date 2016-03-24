@@ -31,7 +31,7 @@ class ApiController extends Controller
     * The address and patients are retrieved seperately since we need maximum flexibility.
     *   @author eddi
     */
-    public function showProfile()
+    public function showBuddyProfile()
     {
         // retrieve the buddy
         $auth_user = User::find($this->getAuthenticatedUser()->id);
@@ -51,7 +51,10 @@ class ApiController extends Controller
         // append the patients to the buddy-object
         $auth_user->address = $address;
         $auth_user->patients = $patients_db;
-        
+        $auth_user->medicalinfo = null;
+        $auth_user->medicines = null;
+        // $auth_user->weight = null;
+
         // return the buddy
         return $auth_user;
     }
@@ -62,8 +65,8 @@ class ApiController extends Controller
      * @param $user_id
      * @author eddi
      */
-    public function showAddress($user_id)
-    {
+     public function showAddress($user_id)
+     {
         $auth_user = $this->getAuthenticatedUser();
 
         if( $auth_user->id == $user_id) {
@@ -143,7 +146,7 @@ class ApiController extends Controller
     * This function retrieves a patients medicalInfo.
     * @author eddi
     */
-  public function showMedicalInfo($patient_id){
+ public function showMedicalInfo($patient_id){
         // send the requested patient info
     if($this->isPatient($patient_id)) {
         return MedicalInfo::where('user_id', '=', $patient_id)->first();
@@ -173,6 +176,63 @@ public function showLastWeight($patient_id)
 
 
     /**
+     * This function is for updateing a users info.
+     * @param $request
+     * @param $user_id
+     * @return mixed
+     * @author eddi
+     */
+    public function updateUser(UpdateUserApiRequest $request, $user_id)
+    {
+        $auth_user = $this->getAuthenticatedUser();
+        $user = User::find($user_id);
+
+        if($this->isPatient($user_id) || $auth_user->id == $user_id)
+        {
+            $user->firstName = $request->firstName;
+            $user->save();
+
+            return "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
+        }
+        return response('Wrong id provided.', 403);
+    }
+
+
+    public function updateAddress(Request $request){
+        $user = $this->getAuthenticatedUser();
+
+        if(true){
+            return 'not implemented yet';
+        }
+        return response('Wrong Address_id.', 403);
+    }
+
+
+
+
+    /*
+     * These functions are for creating records in the database
+     */
+
+
+    /**
+    * This function adds a new weight to the patients records.
+    * @author eddi 
+    */
+    public function createWeight($patient_id)
+    {
+        if($this->isPatient($patient_id))
+        {
+            return 'createWeight:: NotImplemented';
+        }
+        return response('Wrong id provided.', 403);
+    }
+
+
+
+
+
+    /**
      * This is a function to check if an id corresponds to an id of the authenticated user's patients.
      *
      * @param $patient_id
@@ -191,57 +251,6 @@ public function showLastWeight($patient_id)
         return false;
     }
 
-
-
-
-    /**
-     * This function is for updateing a users info.
-     * @param $request
-     * @param $user_id
-     * @return mixed
-     * @author eddi
-     */
-    public function updateUser(UpdateUserApiRequest $request, $user_id)
-    {
-        $user = $this->getAuthenticatedUser();
-
-        if($this->isPatient($user_id) || $user->id == $user_id)
-        {
-            // DB::table('users')
-            // ->where('id', $user_id)
-            // ->update(array(
-            //     'firstName' => $request->firstName,
-            //     'lastName' => $request->lastName
-            //     ));
-            $user->firstName = $request->firstName;
-            $user->update();
-
-            return "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
-        }
-        return response('Wrong id provided.', 403);
-    }
-
-    public function updateAddress(Request $request){
-        $user = $this->getAuthenticatedUser();
-
-        if(true){
-            return 'not implemented yet';
-        }
-        return response('Wrong Address_id.', 403);
-    }
-
-    /*
-     * These functions are for creating records in the database
-     */
-    public function createWeight($patient_id)
-    {
-        if($this->isPatient($patient_id))
-        {
-            return 'createWeight:: NotImplemented';
-        }
-        return response('Wrong id provided.', 403);
-    }
-
     /**
      * This is a function to get the authenticated user,
      * in both the web and api cases.
@@ -258,9 +267,6 @@ public function showLastWeight($patient_id)
         }
         return $user;
     }
-
-
-
 
     /**
      *  The login function for the API
