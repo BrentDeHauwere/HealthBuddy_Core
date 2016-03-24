@@ -39,6 +39,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
 
+    Route::post('user/add','UserController@addUser');
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');
