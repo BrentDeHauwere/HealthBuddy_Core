@@ -39,10 +39,14 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
 
+    Route::post('user/add','UserController@addUser');
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');
     Route::get('weights/{user}', 'UserController@showWeights');
+    Route::get('latestWeight', function () { // TESTING PURPOSES: TO DELETE
+        return \App\User::with('latestWeight')->get();
+    });
     Route::get('schedule/{user}', 'UserController@showSchedule');
 
     Route::get('apparaatbeheer/show', 'DeviceController@index');
@@ -68,6 +72,8 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('address/{user_id}', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
+    Route::post('weights/{patient_id}', 'ApiController@showWeights');
+    Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
 
     Route::post('medicalinfo/{patient_id}', 'ApiController@showMedicalInfo');
     Route::post('medicines/{patient_id}', 'ApiController@showMedicines');
@@ -75,7 +81,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     Route::post('weights/{patient_id}', 'ApiController@showWeights');
     Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
-    
+
 
 
     // Routes to update records
