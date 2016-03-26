@@ -48,7 +48,7 @@ class UpdateUserApiRequest extends Request
         return [
         'firstName'     => 'min:2|max:255',
         'lastName'      => 'min:2|max:255',
-        'pĥone'         => 'max:255|min:7',
+        'pĥone'         => 'max:25|min:7',
         'gender'        => 'in:M,V',
         'dateOfBirth'   => 'before:today|after:1890-01-01',
         ];
