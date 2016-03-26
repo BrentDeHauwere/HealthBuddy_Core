@@ -11,7 +11,7 @@ class Address extends Model
 	     * Make sure nobody edits certain fields of the record.
 	     * @var array
 	     */
-	protected $guarded = ['id', 'created_at', 'updated_at'];
+	protected $guarded = ['id'];
 
     
     /**

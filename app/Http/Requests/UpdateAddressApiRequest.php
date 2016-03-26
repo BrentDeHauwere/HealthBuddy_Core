@@ -17,12 +17,12 @@ class UpdateAddressApiRequest extends Request
      */
     public function authorize()
     {   
-        $user = $this->getAuthenticatedUser();
-        $address_id = $this->route('address_id');
+        $auth_user = $this->getAuthenticatedUser();
+        $user_id = $this->route('user_id');
+        $patient = User::find($user_id);
         
         // check if the addresss belongs to the buddy or one of it's patients
-        if($this->isAddressOfPatient($address_id) 
-            || $user->address_id == $address_id)
+        if($this->isPatient($user_id))
         {
             return true;
         }
@@ -42,8 +42,8 @@ class UpdateAddressApiRequest extends Request
     {
         return [
         'street'        => 'min:2|max:255',
-        'streetNumber'  => 'min:1|max:10000',
-        'bus'           => 'min:0|max:1000',
+        'streetNumber'  => 'numeric|between:1,10000',
+        'bus'           => 'numeric|between:1,1000',
         'zipCode'       => 'min:2|max:255',
         'city'          => 'min:2|max:255',
         'country'       => 'min:2|max:255',

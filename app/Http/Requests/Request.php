@@ -21,7 +21,9 @@ abstract class Request extends FormRequest
             'min'       => 'Het :attribute moet minstens: :values lang zijn.',
             'max'       => 'Het :attribute mag maximaal: :values lang zijn.',
             'unique'    => 'Het :attribute moet uniek zijn.',
-            'alpha_num' => 'Het :attribute moet alfanumeriek zijn.'
+            'alpha_num' => 'Het :attribute moet alfanumeriek zijn.',
+            'numberic' => 'Het :attribute moet numeriek zijn.',
+            'email'     => 'Het :attribute moet een geldig emailadres zijn.'
         ];
     }
 }

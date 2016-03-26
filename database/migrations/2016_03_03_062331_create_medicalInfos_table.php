@@ -20,6 +20,7 @@ class CreateMedicalInfosTable extends Migration
             $table->enum('bloodType', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']);
             $table->string('medicalCondition')->nullable();
             $table->string('allergies')->nullable();
+            $table->timestamps(); // eloquent needs this: created_at && updated_at
         });
     }
 

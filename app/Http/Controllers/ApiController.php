@@ -212,12 +212,19 @@ class ApiController extends Controller
 
     if($this->isPatient($user_id) || $auth_user->id == $user_id)
     {
-      // automatically fill the user with the received info (after the validation).
-      $user->fill($request->all());
+      $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
+
+      foreach ($fields as $f) {
+        if(isset($request->$f) && !empty($request->$f))
+        {
+          $user->$f = $request->$f;
+        }
+      }
+
+      $user->save();
 
       // save the updated user to the db.
-      // return ($user->save())?"User updated":"User not updated";
-      return "UpdateUser:: Cannot auto fill user -> api_token overwritten, hardcode :/";
+      return ($user->save())?"User updated.":response("User not updated", 403);
     }
     return response('Wrong id provided.', 403);
   }
@@ -232,23 +239,28 @@ class ApiController extends Controller
    * @return mixed
    * @author eddi
    */
-  public function updateAddress(UpdateAddressApiRequest $request, $address_id)
+  public function updateAddress(UpdateAddressApiRequest $request, $user_id)
   {
-    // Address fielsd: id  street  streetNumber  bus   zipCode   city  country
-    $address = Address::find($address_id);
+    $patient = User::find($user_id);
+    $address = $patient->address;
+    $fields = array('street', 'streetNumber', 'bus', 'zipCode', 'city', 'country');
+
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $address->$f = $request->$f;
+      }
+    }
     
-
-    // automatically fill the user with the received info (after the validation).
-    $address->fill($request->all());
-
-    // return $address;
-    echo $address;
-      // save the updated user to the db.
-   // return ($address->save())?"Address updated":"Address not updated";
-    return "UpdateUser:: Cannot auto fill user -> api_token overwritten, hardcode :/";
+    // save the updated user to the db.
+    return ($address->save())?"Address updated":response("Address not updated", 403);
   }
 
 
+  public function updateMedicalInfo(Request $request, $user_id){
+
+    return response("updateMedicalInfo:: not implemented yet");
+  }
 
 
   /*

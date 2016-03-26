@@ -82,13 +82,11 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
-    Route::post('address/{address_id}/update', 'ApiController@updateAddress');
-
+    Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
+    Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
 
-    // -update user
     // -update medische gegevens
-    // -update address --> progress
 });
