@@ -184,17 +184,25 @@ public function showLastWeight($patient_id)
  */
 public function updateUser(UpdateUserApiRequest $request, $user_id)
 {
+  // get the user that send the request.
   $auth_user = $this->getAuthenticatedUser();
+  // find the user to be changed.
   $user = User::find($user_id);
+  // save it's original email, it is not guarded meaning it is fillable, but we don't want the API to update it.
+  $original_email = $user->email; 
 
   if($this->isPatient($user_id) || $auth_user->id == $user_id)
   {
+    // automatically fill the user with the received info (after the validation).
     $user->fill($request->all());
+    // this is needed to make sure the email is not changed, since email is not guarded in the User.php model.
+    $user->email = $original_email;
+    // save the updated user to the db.
     $user->save();
 
-    return $user; // "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
+    return User::find($user_id);// "updateUser:: not implemented yet, validation in progress, testing updating a few parameters only";
   }
-    return response('Wrong id provided.', 403);
+  return response('Wrong id provided.', 403);
 }
 
 public function updateAddress(Request $request){
