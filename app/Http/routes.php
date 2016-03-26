@@ -69,30 +69,24 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     // Routes to get/query records
     Route::post('buddyprofile', 'ApiController@showBuddyProfile');
-    Route::post('address/{user_id}', 'ApiController@showAddress');
+    Route::post('user/{user_id}/address', 'ApiController@showAddress');
+    
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
-    Route::post('weights/{patient_id}', 'ApiController@showWeights');
-    Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
-
-    Route::post('medicalinfo/{patient_id}', 'ApiController@showMedicalInfo');
-    Route::post('medicines/{patient_id}', 'ApiController@showMedicines');
-    Route::post('schedule/{patient_id}', 'ApiController@showSchedule');
-
-    Route::post('weights/{patient_id}', 'ApiController@showWeights');
-    Route::post('lastWeight/{patient_id}', 'ApiController@showLastWeight');
-
+    Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
+    Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
+    Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
+    Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
+    Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
-    Route::post('address/{address_id}', 'ApiController@updateAddress');
-
+    Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
+    Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
 
-    // -update user
     // -update medische gegevens
-    // -update address --> progress
 });
