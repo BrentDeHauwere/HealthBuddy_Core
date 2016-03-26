@@ -42,11 +42,15 @@ class UpdateUserApiRequest extends Request
      */
     public function rules()
     {
+        /**
+        * This is the original way, expecting post params for each user value
+        */
         return [
-        'email' => 'bail|email|unique:users,email',
-        'password' => 'bail|min:8',
-        'firstName' => 'bail|min:2|max:255',
-        'lastName' => 'bail|min:2|max:255',
+        'firstName'     => 'min:2|max:255',
+        'lastName'      => 'min:2|max:255',
+        'pĥone'         => 'max:255|min:7',
+        'gender'        => 'in:M,V',
+        'dateOfBirth'   => 'before:today|after:1890-01-01',
         ];
     }
 
@@ -58,8 +62,8 @@ class UpdateUserApiRequest extends Request
      * @return bool returns true if the given ID corrsponds to a patient of the authenticated user.
      * @author eddi
      */
-    public function isPatient($patient_id)
-    {
+       public function isPatient($patient_id)
+       {
         $user = $this->getAuthenticatedUser();
         foreach ($user->patients as $patient) {
             if($patient->id == $patient_id)
