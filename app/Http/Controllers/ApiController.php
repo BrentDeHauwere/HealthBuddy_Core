@@ -39,7 +39,7 @@ class ApiController extends Controller
   public function showBuddyProfile()
   {
       // retrieve the buddy
-    $auth_user = User::find($this->getAuthenticatedUser()->id);
+    $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
 
       // retrieve the buddy's address
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
@@ -72,13 +72,13 @@ class ApiController extends Controller
    */
   public function showAddress($user_id)
   {
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
     // check if the $user_id belongs to the buddy
     if( $auth_user->id == $user_id) {
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif ($this->isPatient($user_id)) {
+    elseif (ApiHelper::isPatient($user_id)) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -92,7 +92,7 @@ class ApiController extends Controller
   */
   public function showPatients()
   {
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
 
     // retrieve the buddy's patients and their medicalinfo.
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
@@ -115,7 +115,7 @@ class ApiController extends Controller
    */
   public function showPatient($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
       $patient->medicines = Medicine::with('schedule')->get();
       $patient->patients = null;
@@ -129,7 +129,7 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
       return $schedule;
     }
@@ -142,7 +142,7 @@ class ApiController extends Controller
     */
   public function showSchedule($patient_id){
         // send the requested patient info
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -154,7 +154,7 @@ class ApiController extends Controller
       */
   public function showMedicalInfo($patient_id){
           // send the requested patient info
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return MedicalInfo::where('user_id', '=', $patient_id)->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -163,7 +163,7 @@ class ApiController extends Controller
 
   public function showWeights($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Weight::where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -171,7 +171,7 @@ class ApiController extends Controller
 
   public function showLastWeight($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -193,7 +193,7 @@ class ApiController extends Controller
   public function updateUser(UpdateUserApiRequest $request, $user_id)
   {
     // get the user that send the request.
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
     // find the user to be changed.
     $user = User::find($user_id);
 
@@ -214,7 +214,7 @@ class ApiController extends Controller
       return response('Not allowed to change the buddy email.', 403);
     }
 
-    if($this->isPatient($user_id) || $auth_user->id == $user_id)
+    if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
 
@@ -297,7 +297,7 @@ class ApiController extends Controller
       echo 'No file found.';
     }
 
-    // $path = 'trashFolder/user_'.$this->getAuthenticatedUser()->id . '/medicines/';
+    // $path = 'trashFolder/user_'.ApiHelper::getAuthenticatedUser()->id . '/medicines/';
     // $request->file('file')->move($path, $request->file->getClientOriginalName());
     // echo $request->file->getClientOriginalName();
     echo "___" . $request->file->getMaxFilesize();
@@ -317,13 +317,12 @@ class ApiController extends Controller
    */
   public function createWeight($patient_id)
   {
-    if($this->isPatient($patient_id))
+    if(ApiHelper::isPatient($patient_id))
     {
       return 'createWeight:: NotImplemented';
     }
     return response('Wrong id provided.', 403);
   }
-
 
 
 
@@ -357,80 +356,5 @@ class ApiController extends Controller
       return response($ex->getMessage(), 401);
     }
   }
-
-
-
-
-
-
-
-
-
-  // /**
-  // * These next functions are login and other helper functions.
-  // */
-
-  // // TODO: These functions should get their own file
-  // /**
-  //  * This is a function to check if an id corresponds to an id of the authenticated user's patients.
-  //  *
-  //  * @param $patient_id
-  //  * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
-  //  * @author eddi
-  //  */
-  // function isPatient($patient_id)
-  // {
-  //   $user = $this->getAuthenticatedUser();
-  //   foreach ($user->patients as $patient) {
-  //     if($patient->id == $patient_id)
-  //     {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // /**
-  //  * This function checks if a given address belongs to a patient of the buddy, or logged in user.
-  //  * 
-  //  * @param $address_id
-  //  * @return bool returns true if the given ID corresponds to an addres of a patient of the authenticated user.
-  //  * @author eddi
-  //  */
-  // function isAddressOfPatient($address_id)
-  // {
-  //   // the boolean that will be returned.
-  //   $isAddressOfPatient = false;
-  //   // fetch all users with the give address_id.
-  //   $users_with_address = User::where('address_id', '=', $address_id)->get();
-
-  //   // to be allowed to change the address, only 1 user can have it. 
-  //   if(sizeof($users_with_address) == 1)
-  //   {
-  //     // check if the user with that address is a patient or the buddy.
-  //     if($this->isPatient($users_with_address->first()->id) )
-  //     {
-  //       $isAddressOfPatient = true;
-  //     }  
-  //   }
-  //   return $isAddressOfPatient;
-  // }
-
-  // /**
-  //  * This is a function to get the authenticated user,
-  //  * in both the web and api cases.
-  //  * @return mixed
-  //  */
-  // function getAuthenticatedUser()
-  // {
-  //     // get the web-user
-  //   $user = Auth::guard()->user();
-
-  //     // get the api-user
-  //   if(!isset($user) && $user == null) {
-  //     $user = Auth::guard('api')->user();
-  //   }
-  //   return $user;
-  // }
 
 }
