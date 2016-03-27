@@ -18,6 +18,7 @@ class CreateSchedulesTable extends Migration
             $table->integer('dayOfWeek')->unsigned();
             $table->time('time');
             $table->decimal('amount', 2, 1);
+            $table->timestamps(); // eloquent needs this: created_at && updated_at
         });
     }
 

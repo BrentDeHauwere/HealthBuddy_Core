@@ -3,15 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-
-use App\User;
-use App\MedicalInfo;
-
-// helper functions
 use App\ApiHelper;
+use App\User;
 
-
-class UpdateMedicalInfoApiRequest extends Request
+class UpdateScheduleApiRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +20,8 @@ class UpdateMedicalInfoApiRequest extends Request
         $patient = User::find($user_id);
 
         // check if the addresss belongs to the buddy or one of it's patients
-        if(ApiHelper::isPatient($user_id))
+        if(ApiHelper::isPatient($user_id) 
+            && ApiHelper::isScheduleOfPatientsMedicine($user_id, $this->route('schedule_id')))
         {
             return true;
         }
@@ -40,11 +36,9 @@ class UpdateMedicalInfoApiRequest extends Request
     public function rules()
     {
         return [
-        'length'            => 'numeric|between:30,300',
-        'weight'            => 'numeric|between:25.0,450.1',
-        'bloodType'         => 'in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-        'medicalCondition'  => 'max:255',
-        'allergies'         => 'max:255',
+        'dayOfWeek'     => 'numeric|between:1,7',
+        'time'          => 'date_format:H:i:s',
+        'amount'        => 'numeric',
         ];
     }
 }

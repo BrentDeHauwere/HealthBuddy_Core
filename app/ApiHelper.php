@@ -58,6 +58,48 @@ class ApiHelper {
 	}
 
 	/**
+	 * This function checks if a schedule belongs to a medicine of a given user
+	 * @param user_id The id of the user to which the medicine should belong.
+	 * @param schedule_id The id of the schedule to match to a cerain user.
+	 * @return boolean True if this schedule belongs to a medicine of the given user, false if not.
+	 * @author eddi
+	 */
+	public static function isScheduleOfPatientsMedicine($user_id, $schedule_id)
+	{
+	  	// the boolean that will be returned.
+		$isScheduleValid = false;
+
+	  	// fetch all users with the medicines.
+		$medicines_with_schedules = Medicine::where('user_id', '=', $user_id)->with('schedule')->get();
+
+		$schedule = Schedule::find($schedule_id);
+
+		if($schedule != null && ApiHelper::isPatient($user_id))
+		{
+			foreach ($medicines_with_schedules as $m) {
+				if($m->id == $schedule->medicine_id)
+				{
+					$isScheduleValid = true;
+				}		
+			}
+		}
+		return $isScheduleValid;
+	}
+
+	/**
+	 * This function checks if a medicine belongs to a given user
+	 * @param user_id The id of the user to which the medicine should belong.
+	 * @param medicine_id The id of the medicine to check.
+	 * @return boolean True if this medicine belongs to the given user, false if not.
+	 * @author eddi
+	 */
+	public static function isMedicineOfPatient($user_id, $medicine_id)
+	{
+		$medicines = Medicine::where('user_id','=',$user_id)->where('id','=',$medicine_id)->get();
+		return (sizeof($medicines) == 1)?true:false;
+	}
+
+	/**
 	 * This is a function to get the authenticated user,
 	 * in both the web and api cases.
 	 * @return mixed

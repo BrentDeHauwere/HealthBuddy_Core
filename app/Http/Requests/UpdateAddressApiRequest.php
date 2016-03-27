@@ -26,11 +26,7 @@ class UpdateAddressApiRequest extends Request
         {
             return true;
         }
-        else
-        {
-            // the address does not belong to buddy nor patient, abort.
-            return response('That address does not belong to a patient', 403);
-        }   
+        return false;
     }
 
     /**

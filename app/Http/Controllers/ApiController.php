@@ -21,6 +21,8 @@ use \App\Schedule;
 use App\Http\Requests\UpdateUserApiRequest;
 use App\Http\Requests\UpdateAddressApiRequest;
 use App\Http\Requests\UpdateMedicalInfoApiRequest;
+use App\Http\Requests\UpdateScheduleApiRequest;
+use App\Http\Requests\CreateScheduleApiRequest;
 
 // api helper functions
 use App\ApiHelper;
@@ -246,12 +248,6 @@ class ApiController extends Controller
   public function updateAddress(UpdateAddressApiRequest $request, $user_id)
   {
     $patient = User::find($user_id);
-    // check if the user is a patient of the buddy.
-    if(!ApiHelper::isPatient($user_id))
-    {
-            // the address does not belong to buddy nor patient, abort.
-      return response('This user is not a patient', 403);
-    }   
 
     // retrieve the users address.
     $address = $patient->address;
@@ -276,7 +272,7 @@ class ApiController extends Controller
    * or one of it's patients.
    *
    * @param $request
-   * @param $user_id
+   * @param $user_id The id of the user for which the medicalinfo needs to be changed. Needed for validation.
    * @return mixed
    * @author eddi
    */
@@ -284,26 +280,43 @@ class ApiController extends Controller
   {
     $patient = User::find($user_id);
 
-    // check if the addresss belongs to the buddy or one of it's patients
-    if(!ApiHelper::isPatient($user_id))
-    {
-            // the address does not belong to buddy nor patient, abort.
-      return response('This user is not a patient', 403);
-    }   
-    
     $medicalinfo = $patient->medicalinfo;
+    // the updatable fields.
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
-
+    // fill in the updated fields.
     foreach ($fields as $f) {
       if(isset($request->$f) && !empty($request->$f))
       {
         $medicalinfo->$f = $request->$f;
       }
-    }
-    
-    echo User::find($user_id)->medicalinfo;
+    }    
     return ($medicalinfo->save())?"MedicalInfo updated":response("MedicalInfo not updated", 403);
-    
+  }
+
+  /**
+   * This function is for updating a users medicalinfo, only if the medicalinfo
+   * belongs to the buddy
+   * or one of it's patients.
+   *
+   * @param $request The parameters of the schedule to be changed.
+   * @param $user_id the id of the user to which the schedule belongs, this is needed to validate the request.
+   * @param $schedule_id the id of the schedule to be changed.
+   * @return mixed
+   * @author eddi
+   */
+  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $schedule_id)
+  {
+    $patient = User::find($user_id);   
+    $schedule = Schedule::find($schedule_id);
+    $fields = array('dayOfWeek','time','amount');
+
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $schedule->$f = $request->$f;
+      }
+    }
+    return ($schedule->save())?"Schedule updated":response("Schedule not updated", 403);
   }
 
 
@@ -330,10 +343,26 @@ class ApiController extends Controller
    * These functions are for creating records in the database
    */
 
+  public function createSchedule(CreateScheduleApiRequest $request, $user_id)
+  {
+    $schedule = new Schedule();
+    $fields = array('medicine_id','dayOfWeek','time','amount');
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $schedule->$f = $request->$f;
+      }
+    }
+    return ($schedule->save())?"Schedule created":response("Schedule not created", 403);
+  }
+
 
   /**
    * This function adds a new weight to the patients records.
+   * @param request The parameters to create the weight object from. 
+   * @param patient_id The id of the patient to which the weight belons
    * @author eddi 
+   * @return mixed
    */
   public function createWeight($patient_id)
   {
@@ -345,6 +374,16 @@ class ApiController extends Controller
   }
 
 
+  /**
+  * These functions delete records from the database.
+  */
+  public function deleteSchedule(Request $request, $user_id, $schedule_id)
+  {
+    if(!ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
+      return response("This schedule is not from a patient.", 403);
+    }
+    return 'sdfsdfsdfsdf';
+  }
 
 
   /**

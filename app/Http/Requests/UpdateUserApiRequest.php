@@ -30,9 +30,6 @@ class UpdateUserApiRequest extends Request
         if($user_id == $auth_user->id || ApiHelper::isPatient($user_id)){
             return true;
         }
-        else {
-            return false;
-        }
         return true;
     }
 

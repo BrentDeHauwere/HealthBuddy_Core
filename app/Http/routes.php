@@ -61,16 +61,9 @@ Route::group(['middleware' => 'web'], function () {
  * Gebaseerd op volgende tutorial: https://gistlog.co/JacobBennett/090369fbab0b31130b51
 */
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
-    /*
-    * TODO: find out who put this here, and ask why it is needed?
-    * eddi thinks it's not needed.
-    */
-    // Route::post('/short', 'UrlMapperController@store');
-
-    // Routes to get/query records
+    // Routes to get records
     Route::post('buddyprofile', 'ApiController@showBuddyProfile');
     Route::post('user/{user_id}/address', 'ApiController@showAddress');
-    
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
@@ -84,17 +77,19 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
     Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
     Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
-    // - pas medicatie aan 
-    // - pas schedule aan
-    // - pas medicalinfo aan
+    Route::post('user/{user_id}/schedule/{schedule_id}/update', 'ApiController@updateSchedule');
+    // - pas medicatie aan FOTO FILE
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
-    // - voeg medicatie toe 
-    // - voeg schedule toe
+    Route::post('user/{user_id}/schedule/create', 'ApiController@createSchedule');
+    // - voeg medicatie toe FOTO FILE
 
     // routes to delete records
+    Route::post('user/{user_id}/schedule/{schedule_id}', 'ApiController@deleteSchedule');
     // - verwijder medicatie 
+        // FOTO FILE mee verwijderen
+        // schedules mee verwijderen 
     // - verwijder schedule
 
 
