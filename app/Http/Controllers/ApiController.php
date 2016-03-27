@@ -202,7 +202,7 @@ class ApiController extends Controller
       && !empty($request->buddy_id)
       && $request->buddy_id != $user->buddy_id)
     {
-      return response('Not allowed to change the buddy of a patient.', 403);
+      return response('Not allowed to change the buddy itself.', 403);
     }
 
     // check if the request wants to change the email of the buddy
@@ -234,19 +234,28 @@ class ApiController extends Controller
   }
 
   /**
-   * This function is for updateing a users address info, only if the address
+   * This function is for updating a users address info, only if the address
    * belongs to the buddy
    * or one of it's patients.
    *
    * @param $request
-   * @param $address_id
+   * @param $user_id
    * @return mixed
    * @author eddi
    */
   public function updateAddress(UpdateAddressApiRequest $request, $user_id)
   {
     $patient = User::find($user_id);
+    // check if the user is a patient of the buddy.
+    if(!ApiHelper::isPatient($user_id))
+    {
+            // the address does not belong to buddy nor patient, abort.
+      return response('This user is not a patient', 403);
+    }   
+
+    // retrieve the users address.
     $address = $patient->address;
+    // these are the fields to be updated
     $fields = array('street', 'streetNumber', 'bus', 'zipCode', 'city', 'country');
 
     foreach ($fields as $f) {
@@ -261,17 +270,29 @@ class ApiController extends Controller
   }
 
 
+  /**
+   * This function is for updating a users medicalinfo, only if the medicalinfo
+   * belongs to the buddy
+   * or one of it's patients.
+   *
+   * @param $request
+   * @param $user_id
+   * @return mixed
+   * @author eddi
+   */
   public function updateMedicalInfo(UpdateMedicalInfoApiRequest $request, $user_id)
   {
     $patient = User::find($user_id);
+
+    // check if the addresss belongs to the buddy or one of it's patients
+    if(!ApiHelper::isPatient($user_id))
+    {
+            // the address does not belong to buddy nor patient, abort.
+      return response('This user is not a patient', 403);
+    }   
+    
     $medicalinfo = $patient->medicalinfo;
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
-    // user_id   int(10)     UNSIGNED
-    // length  int(10)     UNSIGNED
-    // weight  decimal(5,2)
-    // bloodType   enum('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
-    // medicalCondition  varchar(255)
-    // allergies   varchar(255)
 
     foreach ($fields as $f) {
       if(isset($request->$f) && !empty($request->$f))
@@ -280,11 +301,10 @@ class ApiController extends Controller
       }
     }
     
-    echo $medicalinfo;
-    return response("updateMedicalInfo:: not implemented yet");
+    echo User::find($user_id)->medicalinfo;
+    return ($medicalinfo->save())?"MedicalInfo updated":response("MedicalInfo not updated", 403);
+    
   }
-
-
 
 
 

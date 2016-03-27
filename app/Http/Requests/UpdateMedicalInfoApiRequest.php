@@ -23,7 +23,7 @@ class UpdateMedicalInfoApiRequest extends Request
         $auth_user = ApiHelper::getAuthenticatedUser();
         $user_id = $this->route('user_id');
         $patient = User::find($user_id);
-        
+
         // check if the addresss belongs to the buddy or one of it's patients
         if(ApiHelper::isPatient($user_id))
         {
@@ -32,7 +32,7 @@ class UpdateMedicalInfoApiRequest extends Request
         else
         {
             // the address does not belong to buddy nor patient, abort.
-            return response('That address does not belong to a patient', 403);
+            return response('This user is not a patient.', 403);
         }   
         return false;
     }
@@ -46,15 +46,12 @@ class UpdateMedicalInfoApiRequest extends Request
     {
 
         $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
-        // user_id   int(10)     UNSIGNED
-        // length  int(10)     UNSIGNED
-        // weight  decimal(5,2)
-        // bloodType   enum('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
-        // medicalCondition  varchar(255)
-        // allergies   varchar(255)
-
         return [
-            //
+        'length'            => 'numeric|between:30,300',
+        'weight'            => 'numeric|between:25.0,450.1',
+        'bloodType'         => 'in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+        'medicalCondition'  => 'max:255',
+        'allergies'         => 'max:255',
         ];
     }
 }
