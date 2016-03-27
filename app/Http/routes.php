@@ -84,9 +84,25 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
     Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
     Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
+    // - pas medicatie aan 
+    // - pas schedule aan
+    // - pas medicalinfo aan
 
     // Routes to create records
     Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
+    // - voeg medicatie toe 
+    // - voeg schedule toe
 
-    // -update medische gegevens
+    // routes to delete records
+    // - verwijder medicatie 
+    // - verwijder schedule
+
+
+
+    // info on files
+    // https://laravel.com/docs/5.2/requests#files
+    // http://api.symfony.com/3.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
+    Route::post('user/{patient_id}/medicine/upload', 'ApiController@fileUpload');
+
+    
 });

@@ -20,6 +20,10 @@ use \App\Schedule;
 // use App\Http\Requests\Request;
 use App\Http\Requests\UpdateUserApiRequest;
 use App\Http\Requests\UpdateAddressApiRequest;
+use App\Http\Requests\UpdateMedicalInfoApiRequest;
+
+// api helper functions
+use App\ApiHelper;
 
 /**
  *This is the Controller that handles all API requests,
@@ -257,10 +261,49 @@ class ApiController extends Controller
   }
 
 
-  public function updateMedicalInfo(Request $request, $user_id){
+  public function updateMedicalInfo(UpdateMedicalInfoApiRequest $request, $user_id)
+  {
+    $patient = User::find($user_id);
+    $medicalinfo = $patient->medicalinfo;
+    $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
+    // user_id   int(10)     UNSIGNED
+    // length  int(10)     UNSIGNED
+    // weight  decimal(5,2)
+    // bloodType   enum('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
+    // medicalCondition  varchar(255)
+    // allergies   varchar(255)
 
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $medicalinfo->$f = $request->$f;
+      }
+    }
+    
+    echo $medicalinfo;
     return response("updateMedicalInfo:: not implemented yet");
   }
+
+
+
+
+
+  public function fileUpload(Request $request, $file_name)
+  {
+    if($request->hasFile('file'))
+    {
+      $request->file('file');
+    }else {
+      echo 'No file found.';
+    }
+
+    // $path = 'trashFolder/user_'.$this->getAuthenticatedUser()->id . '/medicines/';
+    // $request->file('file')->move($path, $request->file->getClientOriginalName());
+    // echo $request->file->getClientOriginalName();
+    echo "___" . $request->file->getMaxFilesize();
+    return response('___fileUpload:: NotImplemented yet..', 403);
+  }
+
 
 
   /*
@@ -280,6 +323,7 @@ class ApiController extends Controller
     }
     return response('Wrong id provided.', 403);
   }
+
 
 
 
@@ -314,67 +358,79 @@ class ApiController extends Controller
     }
   }
 
-  // TODO: These functions should get their own file
-  /**
-   * This is a function to check if an id corresponds to an id of the authenticated user's patients.
-   *
-   * @param $patient_id
-   * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
-   * @author eddi
-   */
-  function isPatient($patient_id)
-  {
-    $user = $this->getAuthenticatedUser();
-    foreach ($user->patients as $patient) {
-      if($patient->id == $patient_id)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
 
-  /**
-   * This function checks if a given address belongs to a patient of the buddy, or logged in user.
-   * 
-   * @param $address_id
-   * @return bool returns true if the given ID corresponds to an addres of a patient of the authenticated user.
-   * @author eddi
-   */
-  function isAddressOfPatient($address_id)
-  {
-    // the boolean that will be returned.
-    $isAddressOfPatient = false;
-    // fetch all users with the give address_id.
-    $users_with_address = User::where('address_id', '=', $address_id)->get();
 
-    // to be allowed to change the address, only 1 user can have it. 
-    if(sizeof($users_with_address) == 1)
-    {
-      // check if the user with that address is a patient or the buddy.
-      if($this->isPatient($users_with_address->first()->id) )
-      {
-        $isAddressOfPatient = true;
-      }  
-    }
-    return $isAddressOfPatient;
-  }
 
-  /**
-   * This is a function to get the authenticated user,
-   * in both the web and api cases.
-   * @return mixed
-   */
-  function getAuthenticatedUser()
-  {
-      // get the web-user
-    $user = Auth::guard()->user();
 
-      // get the api-user
-    if(!isset($user) && $user == null) {
-      $user = Auth::guard('api')->user();
-    }
-    return $user;
-  }
+
+
+
+
+  // /**
+  // * These next functions are login and other helper functions.
+  // */
+
+  // // TODO: These functions should get their own file
+  // /**
+  //  * This is a function to check if an id corresponds to an id of the authenticated user's patients.
+  //  *
+  //  * @param $patient_id
+  //  * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
+  //  * @author eddi
+  //  */
+  // function isPatient($patient_id)
+  // {
+  //   $user = $this->getAuthenticatedUser();
+  //   foreach ($user->patients as $patient) {
+  //     if($patient->id == $patient_id)
+  //     {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  // /**
+  //  * This function checks if a given address belongs to a patient of the buddy, or logged in user.
+  //  * 
+  //  * @param $address_id
+  //  * @return bool returns true if the given ID corresponds to an addres of a patient of the authenticated user.
+  //  * @author eddi
+  //  */
+  // function isAddressOfPatient($address_id)
+  // {
+  //   // the boolean that will be returned.
+  //   $isAddressOfPatient = false;
+  //   // fetch all users with the give address_id.
+  //   $users_with_address = User::where('address_id', '=', $address_id)->get();
+
+  //   // to be allowed to change the address, only 1 user can have it. 
+  //   if(sizeof($users_with_address) == 1)
+  //   {
+  //     // check if the user with that address is a patient or the buddy.
+  //     if($this->isPatient($users_with_address->first()->id) )
+  //     {
+  //       $isAddressOfPatient = true;
+  //     }  
+  //   }
+  //   return $isAddressOfPatient;
+  // }
+
+  // /**
+  //  * This is a function to get the authenticated user,
+  //  * in both the web and api cases.
+  //  * @return mixed
+  //  */
+  // function getAuthenticatedUser()
+  // {
+  //     // get the web-user
+  //   $user = Auth::guard()->user();
+
+  //     // get the api-user
+  //   if(!isset($user) && $user == null) {
+  //     $user = Auth::guard('api')->user();
+  //   }
+  //   return $user;
+  // }
 
 }

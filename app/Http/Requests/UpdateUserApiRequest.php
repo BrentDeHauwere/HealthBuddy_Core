@@ -7,6 +7,7 @@ use App\Http\Controllers\ApiController;
 use Auth;
 
 use App\User;
+use App\ApiHelper;
 
 /**
  * This is a Class created to Validate a Request and check userinput 
@@ -24,9 +25,9 @@ class UpdateUserApiRequest extends Request
      */
     public function authorize()
     {
-        $auth_user = User::find($this->getAuthenticatedUser()->id);
+        $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
         $user_id = $this->route('user_id');
-        if($user_id == $auth_user->id || $this->isPatient($user_id)){
+        if($user_id == $auth_user->id || ApiHelper::isPatient($user_id)){
             return true;
         }
         else {
@@ -55,40 +56,4 @@ class UpdateUserApiRequest extends Request
         ];
     }
 
-
-       /**
-     * This is a function to check if an id corresponds to an id of the authenticated user's patients.
-     *
-     * @param $patient_id
-     * @return bool returns true if the given ID corrsponds to a patient of the authenticated user.
-     * @author eddi
-     */
-       public function isPatient($patient_id)
-       {
-        $user = $this->getAuthenticatedUser();
-        foreach ($user->patients as $patient) {
-            if($patient->id == $patient_id)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This is a function to get the authenticated user,
-     * in both the web and api cases.
-     * @return mixed
-     */
-    public function getAuthenticatedUser()
-    {
-        // get the web-user
-        $user = Auth::guard()->user();
-
-        // get the api-user
-        if(!isset($user) && $user == null) {
-            $user = Auth::guard('api')->user();
-        }
-        return $user;
-    }
 }
