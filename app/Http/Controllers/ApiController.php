@@ -20,6 +20,15 @@ use \App\Schedule;
 // use App\Http\Requests\Request;
 use App\Http\Requests\UpdateUserApiRequest;
 use App\Http\Requests\UpdateAddressApiRequest;
+use App\Http\Requests\UpdateMedicalInfoApiRequest;
+use App\Http\Requests\UpdateScheduleApiRequest;
+use App\Http\Requests\UpdateMedicineApiRequest;
+use App\Http\Requests\CreateScheduleApiRequest;
+use App\Http\Requests\CreateMedicineApiRequest;
+
+
+// api helper functions
+use App\ApiHelper;
 
 /**
  *This is the Controller that handles all API requests,
@@ -35,7 +44,7 @@ class ApiController extends Controller
   public function showBuddyProfile()
   {
       // retrieve the buddy
-    $auth_user = User::find($this->getAuthenticatedUser()->id);
+    $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
 
       // retrieve the buddy's address
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
@@ -68,13 +77,13 @@ class ApiController extends Controller
    */
   public function showAddress($user_id)
   {
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
     // check if the $user_id belongs to the buddy
     if( $auth_user->id == $user_id) {
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif ($this->isPatient($user_id)) {
+    elseif (ApiHelper::isPatient($user_id)) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -88,7 +97,7 @@ class ApiController extends Controller
   */
   public function showPatients()
   {
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
 
     // retrieve the buddy's patients and their medicalinfo.
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
@@ -111,7 +120,7 @@ class ApiController extends Controller
    */
   public function showPatient($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
       $patient->medicines = Medicine::with('schedule')->get();
       $patient->patients = null;
@@ -125,12 +134,62 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if($this->isPatient($patient_id)) {
-      $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-      return $schedule;
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
     }
-    return response('Wrong Patient_id provided.', 403);
+    $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+    return $medicine;
   }
+
+  /**
+  * This function retrieves a patients medicine.
+  * @param 
+  * @author eddi
+  */
+  public function showMedicine ($patient_id, $medicine_id)
+  {
+    // is this a buddy's patient? 
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+     return response('Wrong medicine_id provided.', 403); 
+    }
+
+    // fetch the medicine
+    $medicine = Medicine::find($medicine_id);
+
+    return $medicine;
+ }
+
+ public function showMedicinePhoto($patient_id, $medicine_id)
+  {
+    // is this a buddy's patient? 
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+     return response('Wrong medicine_id provided.', 403); 
+    }
+
+    $medicine = Medicine::find($medicine_id);
+    
+    if($medicine->photoUrl == null || empty($medicine->photoUrl))
+    {
+      return response("This medicine has no photo", 404);
+    }
+    $photo = "empty";
+    // attach the photo if there is one.
+    if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+    {
+      $photo = file_get_contents($medicine->photoUrl);
+    }
+    return $photo;
+ }
 
   /**
     * This function retrieves a patients schedule, when to take his medicines.
@@ -138,7 +197,7 @@ class ApiController extends Controller
     */
   public function showSchedule($patient_id){
         // send the requested patient info
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -150,7 +209,7 @@ class ApiController extends Controller
       */
   public function showMedicalInfo($patient_id){
           // send the requested patient info
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return MedicalInfo::where('user_id', '=', $patient_id)->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -159,7 +218,7 @@ class ApiController extends Controller
 
   public function showWeights($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Weight::where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -167,11 +226,15 @@ class ApiController extends Controller
 
   public function showLastWeight($patient_id)
   {
-    if($this->isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id)) {
       return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
+
+
+
 
 
 
@@ -189,7 +252,7 @@ class ApiController extends Controller
   public function updateUser(UpdateUserApiRequest $request, $user_id)
   {
     // get the user that send the request.
-    $auth_user = $this->getAuthenticatedUser();
+    $auth_user = ApiHelper::getAuthenticatedUser();
     // find the user to be changed.
     $user = User::find($user_id);
 
@@ -198,7 +261,7 @@ class ApiController extends Controller
       && !empty($request->buddy_id)
       && $request->buddy_id != $user->buddy_id)
     {
-      return response('Not allowed to change the buddy of a patient.', 403);
+      return response('Not allowed to change the buddy itself.', 403);
     }
 
     // check if the request wants to change the email of the buddy
@@ -210,7 +273,7 @@ class ApiController extends Controller
       return response('Not allowed to change the buddy email.', 403);
     }
 
-    if($this->isPatient($user_id) || $auth_user->id == $user_id)
+    if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
 
@@ -224,25 +287,28 @@ class ApiController extends Controller
       $user->save();
 
       // save the updated user to the db.
-      return ($user->save())?"User updated.":response("User not updated", 403);
+      return ($user->save())?$user:response("User not updated", 500);
     }
     return response('Wrong id provided.', 403);
   }
 
   /**
-   * This function is for updateing a users address info, only if the address
+   * This function is for updating a users address info, only if the address
    * belongs to the buddy
    * or one of it's patients.
    *
    * @param $request
-   * @param $address_id
+   * @param $user_id
    * @return mixed
    * @author eddi
    */
   public function updateAddress(UpdateAddressApiRequest $request, $user_id)
   {
     $patient = User::find($user_id);
+
+    // retrieve the users address.
     $address = $patient->address;
+    // these are the fields to be updated
     $fields = array('street', 'streetNumber', 'bus', 'zipCode', 'city', 'country');
 
     foreach ($fields as $f) {
@@ -253,35 +319,248 @@ class ApiController extends Controller
     }
     
     // save the updated user to the db.
-    return ($address->save())?"Address updated":response("Address not updated", 403);
+    return ($address->save())?$address:response("Address not updated", 500);
   }
 
 
-  public function updateMedicalInfo(Request $request, $user_id){
+  /**
+   * This function is for updating a users medicalinfo, only if the medicalinfo
+   * belongs to the buddy
+   * or one of it's patients.
+   *
+   * @param $request
+   * @param $user_id The id of the user for which the medicalinfo needs to be changed. Needed for validation.
+   * @return mixed
+   * @author eddi
+   */
+  public function updateMedicalInfo(UpdateMedicalInfoApiRequest $request, $user_id)
+  {
+    $patient = User::find($user_id);
 
-    return response("updateMedicalInfo:: not implemented yet");
+    $medicalinfo = $patient->medicalinfo;
+    // the updatable fields.
+    $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
+    // fill in the updated fields.
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $medicalinfo->$f = $request->$f;
+      }
+    }    
+    return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
   }
+
+  /**
+   * This function is for updating a users medicalinfo, only if the medicalinfo
+   * belongs to the buddy
+   * or one of it's patients.
+   *
+   * @param $request The parameters of the schedule to be changed.
+   * @param $user_id the id of the user to which the schedule belongs, this is needed to validate the request.
+   * @param $schedule_id the id of the schedule to be changed.
+   * @return mixed
+   * @author eddi
+   */
+  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $schedule_id)
+  {
+    $patient = User::find($user_id);   
+    $schedule = Schedule::find($schedule_id);
+    $fields = array('dayOfWeek','time','amount');
+
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $schedule->$f = $request->$f;
+      }
+    }
+    return ($schedule->save())?$schedule:response("Schedule not updated", 500);
+  }
+
+  /**
+   * This function is for updating a medicine, only if the medicine
+   * belongs to a patient of the buddy. If the name is changed the photo is deleted, to prevent wrong medication to be taken. 
+   * Optionally a new photo can be provided, this will update the photo. 
+   * It is recommended to use this function to update the photo alone.
+   * @param $request The parameters of the medicine to be changed.
+   * @param $user_id the id of the user to which the medicine belongs, this is needed to validate the request.
+   * @param $medicine_id the id of the medicine to be changed.
+   * @return mixed
+   * @author eddi
+   */
+  public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
+  {
+    $medicine = Medicine::find($medicine_id);
+
+    // if the name of the medicine changed, the photo is no longer valid!
+    if($request->name != $medicine->name)
+    {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+        $medicine->photoUrl = null;
+      }
+    }
+
+    // update the fields from the medicine
+    $fields = array('name','info');
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $medicine->$f = $request->$f;
+      }
+    }
+
+    // if there is a photo attached -> update it.
+    if(isset($request->photo) && !empty($request->photo))
+    {
+      $path = 'userdata/user_'. $user_id . '/medicines/';
+      // sanitize the filename given the name of the medication.
+      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+      $fullPath = $path.$filename;
+
+      if($request->photo->move($path, 
+        $filename) != $fullPath)
+      {
+        return response('Saving the picture failed', 500);
+      }
+      // add the photoUrl to the medicine
+      $medicine->photoUrl = $fullPath;
+    }
+    return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
+  }
+
 
 
   /*
    * These functions are for creating records in the database
    */
 
-
   /**
-   * This function adds a new weight to the patients records.
-   * @author eddi 
-   */
-  public function createWeight($patient_id)
+    * This function creates a schedule for a medicine, validating the user and the medicine before creation.
+    * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */
+  public function createSchedule(CreateScheduleApiRequest $request, $user_id)
   {
-    if($this->isPatient($patient_id))
-    {
-      return 'createWeight:: NotImplemented';
+    $schedule = new Schedule();
+    $fields = array('medicine_id','dayOfWeek','time','amount');
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $schedule->$f = $request->$f;
+      }
     }
-    return response('Wrong id provided.', 403);
+    return ($schedule->save())?$schedule:response("Schedule not created", 403);
   }
 
 
+  /**
+    * This function creates a medicine for a patient, validating the user before creation.
+    * @param $request The fields with which to create the medicine, optionally containing a photo.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */
+  public function createMedicine(CreateMedicineApiRequest $request, $user_id)
+  {
+    $path = 'userdata/user_'. $user_id . '/medicines/';
+    // sanitize the filename given the name of the medication.
+    $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+    $fullPath = $path.$filename;
+
+    if($request->photo->move($path, 
+      $filename) != $fullPath)
+    {
+      return response('Saving the picture failed', 500);
+    }
+
+    // create the medicine object to store in DB
+    $medicine = new Medicine;
+    $medicine->user_id = $user_id;
+    $medicine->name = trim($request->name);
+    $medicine->info = trim($request->info);
+    $medicine->photoUrl = $fullPath;
+
+    // store the medicine in the DB.
+    if($medicine->save() != 1)
+    {
+      unlink($fullPath);
+      return response('Saving the medicine failed', 500);
+    }
+
+    return $medicine;
+  }
+
+  
+
+  /**
+   * This function adds a new weight to the patients records.
+   * @param request The parameters to create the weight object from. 
+   * @param patient_id The id of the patient to which the weight belons
+   * @author eddi 
+   * @return mixed
+   */
+  public function createWeight($patient_id)
+  {
+    if(!ApiHelper::isPatient($patient_id))
+    {
+      return response('Wrong id provided.', 403);
+    }
+    return 'createWeight:: NotImplemented';
+  }
+
+
+
+
+  /**
+  * These functions delete records from the database.
+  */
+  
+  /**
+    * This function removes a schedule from the database.
+    * @param user_id The id of the patient for which to delete a schedile, needed for validation of the request.
+    * @param schedule_id The id of the schedule to delete.
+    * @return mixed
+    * @author eddi
+    */
+  public function deleteSchedule(Request $request, $user_id, $schedule_id)
+  {
+    if(!isPatient($user_id) 
+      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
+      return response("This schedule is not from a patient.", 403);
+  }
+    // fetch the schedule to delete
+  $schedule = Schedule::find($schedule_id);
+  return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
+
+  return 'sdfsdfsdfsdf';
+}
+
+
+public function deleteMedicine(Request $request, $user_id, $medicine_id)
+{
+  if(!ApiHelper::isPatient($user_id)
+    || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+  {
+    return response("This medicine is not from a patient.", 403);
+  }
+  // fetch the medicine to delete
+  $medicine = Medicine::find($medicine_id);
+  // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
+  // it's more important that a patient stops taking a medicine then a server having undeleted files.
+  $medicine->delete();
+
+  // delete the photo, if there is one 
+  if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
+    }
+  }
+  return 'Medicine deleted';
+}
 
 
   /**
@@ -312,69 +591,6 @@ class ApiController extends Controller
     }catch(ModelNotFoundException $ex){
       return response($ex->getMessage(), 401);
     }
-  }
-
-  // TODO: These functions should get their own file
-  /**
-   * This is a function to check if an id corresponds to an id of the authenticated user's patients.
-   *
-   * @param $patient_id
-   * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
-   * @author eddi
-   */
-  function isPatient($patient_id)
-  {
-    $user = $this->getAuthenticatedUser();
-    foreach ($user->patients as $patient) {
-      if($patient->id == $patient_id)
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * This function checks if a given address belongs to a patient of the buddy, or logged in user.
-   * 
-   * @param $address_id
-   * @return bool returns true if the given ID corresponds to an addres of a patient of the authenticated user.
-   * @author eddi
-   */
-  function isAddressOfPatient($address_id)
-  {
-    // the boolean that will be returned.
-    $isAddressOfPatient = false;
-    // fetch all users with the give address_id.
-    $users_with_address = User::where('address_id', '=', $address_id)->get();
-
-    // to be allowed to change the address, only 1 user can have it. 
-    if(sizeof($users_with_address) == 1)
-    {
-      // check if the user with that address is a patient or the buddy.
-      if($this->isPatient($users_with_address->first()->id) )
-      {
-        $isAddressOfPatient = true;
-      }  
-    }
-    return $isAddressOfPatient;
-  }
-
-  /**
-   * This is a function to get the authenticated user,
-   * in both the web and api cases.
-   * @return mixed
-   */
-  function getAuthenticatedUser()
-  {
-      // get the web-user
-    $user = Auth::guard()->user();
-
-      // get the api-user
-    if(!isset($user) && $user == null) {
-      $user = Auth::guard('api')->user();
-    }
-    return $user;
   }
 
 }

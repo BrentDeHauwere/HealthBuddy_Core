@@ -2,13 +2,11 @@
 
 namespace App\Http\Requests;
 
-use Auth;
 use App\Http\Requests\Request;
-use App\User;
-use App\address;
 use App\ApiHelper;
+use App\User;
 
-class UpdateAddressApiRequest extends Request
+class UpdateScheduleApiRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,13 +14,14 @@ class UpdateAddressApiRequest extends Request
      * @return bool
      */
     public function authorize()
-    {   
+    {
         $auth_user = ApiHelper::getAuthenticatedUser();
         $user_id = $this->route('user_id');
         $patient = User::find($user_id);
-        
+
         // check if the addresss belongs to the buddy or one of it's patients
-        if(ApiHelper::isPatient($user_id))
+        if(ApiHelper::isPatient($user_id) 
+            && ApiHelper::isScheduleOfPatientsMedicine($user_id, $this->route('schedule_id')))
         {
             return true;
         }
@@ -37,13 +36,9 @@ class UpdateAddressApiRequest extends Request
     public function rules()
     {
         return [
-        'street'        => 'min:2|max:255',
-        'streetNumber'  => 'numeric|between:1,10000',
-        'bus'           => 'numeric|between:1,1000',
-        'zipCode'       => 'min:2|max:255',
-        'city'          => 'min:2|max:255',
-        'country'       => 'min:2|max:255',
+        'dayOfWeek'     => 'numeric|between:1,7',
+        'time'          => 'date_format:H:i:s',
+        'amount'        => 'numeric',
         ];
     }
-    
 }

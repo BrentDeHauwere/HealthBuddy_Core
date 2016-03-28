@@ -21,7 +21,6 @@ class CreateAddressesTable extends Migration
             $table->string('city');
             $table->string('country');
             $table->timestamps(); // eloquent needs this: created_at && updated_at
-
         });
     }
 
