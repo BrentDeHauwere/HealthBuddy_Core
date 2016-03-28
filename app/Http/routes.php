@@ -81,23 +81,12 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // - pas medicatie aan FOTO FILE
 
     // Routes to create records
-    Route::post('weight/{patient_id}/create', 'ApiController@createWeight');
+    Route::post('user/{user_id}/medicine/create', 'ApiController@createMedicine');
     Route::post('user/{user_id}/schedule/create', 'ApiController@createSchedule');
-    // - voeg medicatie toe FOTO FILE
+    Route::post('user/{user_id}/weight/create', 'ApiController@createWeight');
 
     // routes to delete records
-    Route::post('user/{user_id}/schedule/{schedule_id}', 'ApiController@deleteSchedule');
-    // - verwijder medicatie 
-        // FOTO FILE mee verwijderen
-        // schedules mee verwijderen 
-    // - verwijder schedule
-
-
-
-    // info on files
-    // https://laravel.com/docs/5.2/requests#files
-    // http://api.symfony.com/3.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
-    Route::post('user/{patient_id}/medicine/upload', 'ApiController@fileUpload');
-
+    Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
+    Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine'); 
     
 });

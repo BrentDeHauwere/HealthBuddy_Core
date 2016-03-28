@@ -23,6 +23,8 @@ use App\Http\Requests\UpdateAddressApiRequest;
 use App\Http\Requests\UpdateMedicalInfoApiRequest;
 use App\Http\Requests\UpdateScheduleApiRequest;
 use App\Http\Requests\CreateScheduleApiRequest;
+use App\Http\Requests\CreateMedicineApiRequest;
+
 
 // api helper functions
 use App\ApiHelper;
@@ -321,28 +323,17 @@ class ApiController extends Controller
 
 
 
-  public function fileUpload(Request $request, $file_name)
-  {
-    if($request->hasFile('file'))
-    {
-      $request->file('file');
-    }else {
-      echo 'No file found.';
-    }
-
-    // $path = 'trashFolder/user_'.ApiHelper::getAuthenticatedUser()->id . '/medicines/';
-    // $request->file('file')->move($path, $request->file->getClientOriginalName());
-    // echo $request->file->getClientOriginalName();
-    echo "___" . $request->file->getMaxFilesize();
-    return response('___fileUpload:: NotImplemented yet..', 403);
-  }
-
-
-
   /*
    * These functions are for creating records in the database
    */
 
+  /**
+    * This function creates a schedule for a medicine, validating the user and the medicine before creation.
+    * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */
   public function createSchedule(CreateScheduleApiRequest $request, $user_id)
   {
     $schedule = new Schedule();
@@ -353,9 +344,41 @@ class ApiController extends Controller
         $schedule->$f = $request->$f;
       }
     }
-    return ($schedule->save())?"Schedule created":response("Schedule not created", 403);
+    return ($schedule->save())?$schedule:response("Schedule not created", 403);
   }
 
+
+  public function createMedicine(CreateMedicineApiRequest $request, $user_id)
+  {
+    $path = 'userdata/user_'. $user_id . '/medicines/';
+    // sanitize the filename given the name of the medication.
+    $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+    $fullPath = $path.$filename;
+
+    if($request->photo->move($path, 
+      $filename) != $fullPath)
+    {
+      return response('Saving the picture failed', 500);
+    }
+
+    // create the medicine object to store in DB
+    $medicine = new Medicine;
+    $medicine->user_id = $user_id;
+    $medicine->name = trim($request->name);
+    $medicine->info = trim($request->info);
+    $medicine->photoUrl = $fullPath;
+
+    // store the medicine in the DB.
+    if($medicine->save() != 1)
+    {
+      unlink($fullPath);
+      return response('Saving the medicine failed', 500);
+    }
+
+    return $medicine;
+  }
+
+  
 
   /**
    * This function adds a new weight to the patients records.
@@ -366,24 +389,61 @@ class ApiController extends Controller
    */
   public function createWeight($patient_id)
   {
-    if(ApiHelper::isPatient($patient_id))
+    if(!ApiHelper::isPatient($patient_id))
     {
-      return 'createWeight:: NotImplemented';
+      return response('Wrong id provided.', 403);
     }
-    return response('Wrong id provided.', 403);
+    return 'createWeight:: NotImplemented';
   }
 
 
   /**
   * These functions delete records from the database.
   */
+  
+  /**
+    * This function removes a schedule from the database.
+    * @param user_id The id of the patient for which to delete a schedile, needed for validation of the request.
+    * @param schedule_id The id of the schedule to delete.
+    * @return mixed
+    * @author eddi
+    */
   public function deleteSchedule(Request $request, $user_id, $schedule_id)
   {
-    if(!ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
+    if(!isPatient($user_id) 
+      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
       return response("This schedule is not from a patient.", 403);
-    }
-    return 'sdfsdfsdfsdf';
   }
+    // fetch the schedule to delete
+  $schedule = Schedule::find($schedule_id);
+  return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
+
+  return 'sdfsdfsdfsdf';
+}
+
+
+public function deleteMedicine(Request $request, $user_id, $medicine_id)
+{
+  if(!ApiHelper::isPatient($user_id)
+    || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+  {
+    return response("This medicine is not from a patient.", 403);
+  }
+  // fetch the medicine to delete
+  $medicine = Medicine::find($medicine_id);
+  // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
+  // it's more important that a patient stops taking a medicine then a server having undeleted files.
+  $medicine->delete();
+
+  // delete the photo, if there is one 
+  if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
+    }
+  }
+  return 'Medicine deleted';
+}
 
 
   /**

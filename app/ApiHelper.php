@@ -13,6 +13,31 @@ use \App\Schedule;
 
 class ApiHelper {
 	/**
+	 * This function takes in a filename and replaces all the special characters to becom a valid *nix filename
+	 * it replaces the slashes ('/') and spaces.
+	 * @param filename The original filename to make into a valid filename.
+	 * @param extension the extension of the file.
+	 * @author eddi
+	 * @return string the valid filename.
+	 */
+	public static function createValidFileName($filename, $extension)
+	{	
+		$validFilename = trim($filename);
+
+		// replace ' ' with _
+		$validFilename = str_replace(' ', '_', $validFilename);
+		// replace / with - 
+		$validFilename = str_replace('/',  '-', $validFilename);
+
+		// cleanup the extention.
+		$validExtension = trim($extension);
+		// add the extention to the filename.
+		$validExtension = '.' . $validExtension;
+
+		return $validFilename . $validExtension;
+	}
+
+	/**
 	 * This is a function to check if an id corresponds to an id of the authenticated user's patients.
 	 *
 	 * @param $patient_id
