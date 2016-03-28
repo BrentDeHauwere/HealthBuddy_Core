@@ -160,7 +160,7 @@ class ApiController extends Controller
 
     // fetch the medicine
     $medicine = Medicine::find($medicine_id);
-    
+
     return $medicine;
  }
 
@@ -178,6 +178,10 @@ class ApiController extends Controller
 
     $medicine = Medicine::find($medicine_id);
     
+    if($medicine->photoUrl == null || empty($medicine->photoUrl))
+    {
+      return response("This medicine has no photo", 404);
+    }
     $photo = "empty";
     // attach the photo if there is one.
     if($medicine->photoUrl != null && file_exists($medicine->photoUrl))

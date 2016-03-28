@@ -19,7 +19,7 @@ class MedicinesTableSeeder extends Seeder
             ]);
 
         DB::table('medicines')->insert([
-            'user_id'   => 3,
+            'user_id'   => 2,
             'name'      => 'Paracetamol',
             'info'      => 'Enkel nemen bij koorts of opkomende koorts',
             ]);
