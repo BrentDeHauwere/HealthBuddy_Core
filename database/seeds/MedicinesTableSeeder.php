@@ -13,14 +13,20 @@ class MedicinesTableSeeder extends Seeder
     {
         DB::table('medicines')->insert([
             'user_id'   => 2,
-            'name'      => 'Medrol',
+            'name'      => 'Medrol 30Mg',
             'info'      => 'Na de maaltijd, niet op een nuchtere maag. Niet combineren met alcohol',
-        ]);
+            ]);
 
         DB::table('medicines')->insert([
             'user_id'   => 3,
             'name'      => 'Paracetamol',
             'info'      => 'Enkel nemen bij koorts of opkomende koorts',
-        ]);
+            ]);
+
+        DB::table('medicines')->insert([
+            'user_id'   => 3,
+            'name'      => 'Paracetamol',
+            'info'      => 'Enkel nemen bij koorts of opkomende koorts. Niet in te nemen als boost tijdens een vermoeiende dag.',
+            ]);
     }
 }
