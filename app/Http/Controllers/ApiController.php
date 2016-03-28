@@ -134,12 +134,58 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if(ApiHelper::isPatient($patient_id)) {
-      $schedule = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-      return $schedule;
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
     }
-    return response('Wrong Patient_id provided.', 403);
+    $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+    return $medicine;
   }
+
+  /**
+  * This function retrieves a patients medicine.
+  * @param 
+  * @author eddi
+  */
+  public function showMedicine ($patient_id, $medicine_id)
+  {
+    // is this a buddy's patient? 
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+     return response('Wrong medicine_id provided.', 403); 
+    }
+
+    // fetch the medicine
+    $medicine = Medicine::find($medicine_id);
+    
+    return $medicine;
+ }
+
+ public function showMedicinePhoto($patient_id, $medicine_id)
+  {
+    // is this a buddy's patient? 
+    if(!ApiHelper::isPatient($patient_id)) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+     return response('Wrong medicine_id provided.', 403); 
+    }
+
+    $medicine = Medicine::find($medicine_id);
+    
+    $photo = "empty";
+    // attach the photo if there is one.
+    if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+    {
+      $photo = file_get_contents($medicine->photoUrl);
+    }
+    return $photo;
+ }
 
   /**
     * This function retrieves a patients schedule, when to take his medicines.
@@ -181,6 +227,7 @@ class ApiController extends Controller
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
 
 
 

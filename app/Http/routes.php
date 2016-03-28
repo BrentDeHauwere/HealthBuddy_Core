@@ -68,10 +68,11 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('patient/{patient_id}', 'ApiController@showPatient');
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
     Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
+    Route::post('user/{patient_id}/medicine/{medicine_id}', 'ApiController@showMedicine');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
-    // TODO : SHOWMEDICINE !!!!!! download the photo using the photoUrl
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
