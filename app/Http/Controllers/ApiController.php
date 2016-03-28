@@ -185,6 +185,8 @@ class ApiController extends Controller
 
 
 
+
+
   /**
    * These functions are for updating data in the db.
    */
@@ -323,7 +325,17 @@ class ApiController extends Controller
     return ($schedule->save())?$schedule:response("Schedule not updated", 500);
   }
 
-
+  /**
+   * This function is for updating a medicine, only if the medicine
+   * belongs to a patient of the buddy. If the name is changed the photo is deleted, to prevent wrong medication to be taken. 
+   * Optionally a new photo can be provided, this will update the photo. 
+   * It is recommended to use this function to update the photo alone.
+   * @param $request The parameters of the medicine to be changed.
+   * @param $user_id the id of the user to which the medicine belongs, this is needed to validate the request.
+   * @param $medicine_id the id of the medicine to be changed.
+   * @return mixed
+   * @author eddi
+   */
   public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
   {
     $medicine = Medicine::find($medicine_id);
