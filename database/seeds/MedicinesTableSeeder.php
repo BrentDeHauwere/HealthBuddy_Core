@@ -15,6 +15,7 @@ class MedicinesTableSeeder extends Seeder
             'user_id'   => 2,
             'name'      => 'Medrol 30Mg',
             'info'      => 'Na de maaltijd, niet op een nuchtere maag. Niet combineren met alcohol',
+            'photoUrl'  =>  'userdata/user_2/medicines/Medrol_30Mg.png',
             ]);
 
         DB::table('medicines')->insert([

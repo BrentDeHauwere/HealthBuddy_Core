@@ -71,14 +71,15 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
-
+    // TODO : SHOWMEDICINE !!!!!! download the photo using the photoUrl
 
     // Routes to update records
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
     Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
     Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
     Route::post('user/{user_id}/schedule/{schedule_id}/update', 'ApiController@updateSchedule');
-    // - pas medicatie aan FOTO FILE
+    Route::post('user/{user_id}/medicine/{medicine_id}/update', 'ApiController@updateMedicine');
+    // update medicine
 
     // Routes to create records
     Route::post('user/{user_id}/medicine/create', 'ApiController@createMedicine');
@@ -88,5 +89,4 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // routes to delete records
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine'); 
-    
 });

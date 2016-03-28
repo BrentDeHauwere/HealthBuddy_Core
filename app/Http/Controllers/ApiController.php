@@ -22,6 +22,7 @@ use App\Http\Requests\UpdateUserApiRequest;
 use App\Http\Requests\UpdateAddressApiRequest;
 use App\Http\Requests\UpdateMedicalInfoApiRequest;
 use App\Http\Requests\UpdateScheduleApiRequest;
+use App\Http\Requests\UpdateMedicineApiRequest;
 use App\Http\Requests\CreateScheduleApiRequest;
 use App\Http\Requests\CreateMedicineApiRequest;
 
@@ -183,6 +184,7 @@ class ApiController extends Controller
 
 
 
+
   /**
    * These functions are for updating data in the db.
    */
@@ -232,7 +234,7 @@ class ApiController extends Controller
       $user->save();
 
       // save the updated user to the db.
-      return ($user->save())?"User updated.":response("User not updated", 403);
+      return ($user->save())?$user:response("User not updated", 500);
     }
     return response('Wrong id provided.', 403);
   }
@@ -264,7 +266,7 @@ class ApiController extends Controller
     }
     
     // save the updated user to the db.
-    return ($address->save())?"Address updated":response("Address not updated", 403);
+    return ($address->save())?$address:response("Address not updated", 500);
   }
 
 
@@ -292,7 +294,7 @@ class ApiController extends Controller
         $medicalinfo->$f = $request->$f;
       }
     }    
-    return ($medicalinfo->save())?"MedicalInfo updated":response("MedicalInfo not updated", 403);
+    return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
   }
 
   /**
@@ -318,7 +320,50 @@ class ApiController extends Controller
         $schedule->$f = $request->$f;
       }
     }
-    return ($schedule->save())?"Schedule updated":response("Schedule not updated", 403);
+    return ($schedule->save())?$schedule:response("Schedule not updated", 500);
+  }
+
+
+  public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
+  {
+    $medicine = Medicine::find($medicine_id);
+
+    // if the name of the medicine changed, the photo is no longer valid!
+    if($request->name != $medicine->name)
+    {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+        $medicine->photoUrl = null;
+      }
+    }
+
+    // update the fields from the medicine
+    $fields = array('name','info');
+    foreach ($fields as $f) {
+      if(isset($request->$f) && !empty($request->$f))
+      {
+        $medicine->$f = $request->$f;
+      }
+    }
+
+    // if there is a photo attached -> update it.
+    if(isset($request->photo) && !empty($request->photo))
+    {
+      $path = 'userdata/user_'. $user_id . '/medicines/';
+      // sanitize the filename given the name of the medication.
+      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+      $fullPath = $path.$filename;
+
+      if($request->photo->move($path, 
+        $filename) != $fullPath)
+      {
+        return response('Saving the picture failed', 500);
+      }
+      // add the photoUrl to the medicine
+      $medicine->photoUrl = $fullPath;
+    }
+    return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
   }
 
 
@@ -348,6 +393,13 @@ class ApiController extends Controller
   }
 
 
+  /**
+    * This function creates a medicine for a patient, validating the user before creation.
+    * @param $request The fields with which to create the medicine, optionally containing a photo.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
     $path = 'userdata/user_'. $user_id . '/medicines/';
@@ -395,6 +447,8 @@ class ApiController extends Controller
     }
     return 'createWeight:: NotImplemented';
   }
+
+
 
 
   /**
