@@ -50,7 +50,7 @@ class ApiController extends Controller
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
       // retrieve the buddy's patients and their infos
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
-    ->with('medicalinfo')->get() ->with('address')->get();
+    ->with('medicalinfo')->get();
 	  
 
       // now add the medicines and schedules to the patients
