@@ -49,7 +49,7 @@ class UpdateUserApiRequest extends Request
         'phone'         => 'min:9|max:25',
         'gender'        => 'in:M,V',
         'dateOfBirth'   => 'before:today|after:1890-01-01',
-        'email'         => 'email|min:12|max:255'
+        'email'         => 'email|min:12|max:255',
         ];
     }
 

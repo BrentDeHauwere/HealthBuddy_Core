@@ -38,8 +38,8 @@ class UpdateAddressApiRequest extends Request
     {
         return [
         'street'        => 'min:2|max:255',
-        'streetNumber'  => 'numeric|between:1,10000',
-        'bus'           => 'numeric|between:1,1000',
+        'streetNumber'  => 'alpha_num|min:1|max:15',
+        'bus'           => 'alpha|min:1|max:5',
         'zipCode'       => 'min:2|max:255',
         'city'          => 'min:2|max:255',
         'country'       => 'min:2|max:255',
