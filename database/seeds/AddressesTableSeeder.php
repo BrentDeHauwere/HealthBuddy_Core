@@ -37,7 +37,8 @@ class AddressesTableSeeder extends Seeder
 
         DB::table('addresses')->insert([
             'street' => 'Brusselsestraat',
-            'streetNumber' => 27,
+            'streetNumber' => '27b',
+            'bus' => 'cba',
             'zipCode' => '1000',
             'city' => 'Brussel',
             'country' => 'België'
