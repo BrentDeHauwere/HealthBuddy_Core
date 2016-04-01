@@ -18,12 +18,9 @@ class ApiHelper {
 	public static function sanitizeIosFields($fields, $request)
 	{
 		foreach ($fields as $f) {
-			echo $request->$f;
-
 			if(isset($request->$f)
 				&& $request->$f == '<null>')
 			{
-				echo $request->$f;
 				$request->$f == null;
 			}
 		}
