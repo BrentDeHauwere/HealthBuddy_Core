@@ -61,7 +61,7 @@ class UserController extends Controller
     public function reset(Request $request){
         $id = $request->input('id');
         $user = \App\User::where('id','=',$id)->first();
-        $user->password = $request->input('password');
+        $user->password = bcrypt($request->input('password'));
         $saved = $user->save();
         if($saved){
           return redirect()->back()->with('success','Password was succesfully saved');
@@ -150,7 +150,7 @@ class UserController extends Controller
         $user = new User();
         $user->firstName = $request->session()->get('firstName');
         $user->lastName = $request->session()->get('lastName');
-        $user->password = $request->session()->get('password');
+        $user->password = bcrypt($request->session()->get('password'));
         $user->dateOfBirth = $request->session()->get('dateOfBirth');
         $user->email = $request->session()->get('email');
         $user->phone = $request->session()->get('phone');
