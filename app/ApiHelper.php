@@ -13,8 +13,7 @@ use \App\Schedule;
 
 class ApiHelper {
 
-	// ugly code; since iOs sends back <null> instead of null -> need to filter out these fields
-	// iOs library alamofire can't send normal nulls.
+	// iOS sends back <null> instead of null, replace this with a php null
 	public static function sanitizeIosFields($fields, $request)
 	{
 		foreach ($fields as $f) {
@@ -35,15 +34,8 @@ class ApiHelper {
 		
 		// fill the object with the fields
 		foreach ($fields as $f) {
-			if(isset($request->$f)
-				// && !empty($request->$f) // usecase says an empty field should update the database to contain null 
-				)
-			{
-				// fill the objects fields.
-				$object->$f = $request->$f;
-			}
+			$object->$f = $request->$f;
 		}
-
 		return $object;
 	}
 
