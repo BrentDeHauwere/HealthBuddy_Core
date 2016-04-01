@@ -51,7 +51,7 @@ class ApiController extends Controller
       // retrieve the buddy's patients and their infos
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
     ->with('medicalinfo', 'address')->get();
-	  
+
 
       // now add the medicines and schedules to the patients
     foreach ($patients_db as $patient) {
@@ -157,40 +157,40 @@ class ApiController extends Controller
     if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
     {
      return response('Wrong medicine_id provided.', 403); 
-    }
+   }
 
     // fetch the medicine
-    $medicine = Medicine::find($medicine_id);
+   $medicine = Medicine::find($medicine_id);
 
-    return $medicine;
+   return $medicine;
  }
 
  public function showMedicinePhoto($patient_id, $medicine_id)
-  {
+ {
     // is this a buddy's patient? 
-    if(!ApiHelper::isPatient($patient_id)) {
-      return response('Wrong Patient_id provided.', 403);
-    }
+  if(!ApiHelper::isPatient($patient_id)) {
+    return response('Wrong Patient_id provided.', 403);
+  }
     // is this a medicine of the patient?
-    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
-    {
-     return response('Wrong medicine_id provided.', 403); 
-    }
-
-    $medicine = Medicine::find($medicine_id);
-    
-    if($medicine->photoUrl == null || empty($medicine->photoUrl))
-    {
-      return response("This medicine has no photo", 404);
-    }
-    $photo = "empty";
-    // attach the photo if there is one.
-    if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
-    {
-      $photo = file_get_contents($medicine->photoUrl);
-    }
-    return $photo;
+  if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+  {
+   return response('Wrong medicine_id provided.', 403); 
  }
+
+ $medicine = Medicine::find($medicine_id);
+
+ if($medicine->photoUrl == null || empty($medicine->photoUrl))
+ {
+  return response("This medicine has no photo", 404);
+}
+$photo = "empty";
+    // attach the photo if there is one.
+if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+{
+  $photo = file_get_contents($medicine->photoUrl);
+}
+return $photo;
+}
 
   /**
     * This function retrieves a patients schedule, when to take his medicines.
@@ -277,16 +277,8 @@ class ApiController extends Controller
     if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
-
-      foreach ($fields as $f) {
-        if(isset($request->$f) && !empty($request->$f))
-        {
-          $user->$f = $request->$f;
-        }
-      }
-
-      $user->save();
-
+      $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
+      
       // save the updated user to the db.
       return ($user->save())?$user:response("User not updated", 500);
     }
@@ -311,13 +303,7 @@ class ApiController extends Controller
     $address = $patient->address;
     // these are the fields to be updated
     $fields = array('street', 'streetNumber', 'bus', 'zipCode', 'city', 'country');
-
-    foreach ($fields as $f) {
-      if(isset($request->$f) && !empty($request->$f))
-      {
-        $address->$f = $request->$f;
-      }
-    }
+    $address = ApiHelper::fillApiRequestFields($fields, $request, $address);
     
     // save the updated user to the db.
     return ($address->save())?$address:response("Address not updated", 500);
@@ -341,13 +327,7 @@ class ApiController extends Controller
     $medicalinfo = $patient->medicalinfo;
     // the updatable fields.
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
-    // fill in the updated fields.
-    foreach ($fields as $f) {
-      if(isset($request->$f) && !empty($request->$f))
-      {
-        $medicalinfo->$f = $request->$f;
-      }
-    }    
+    $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $medicalinfo);    
     return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
   }
 
@@ -367,13 +347,8 @@ class ApiController extends Controller
     $patient = User::find($user_id);   
     $schedule = Schedule::find($schedule_id);
     $fields = array('dayOfWeek','time','amount');
+    $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $Schedule);
 
-    foreach ($fields as $f) {
-      if(isset($request->$f) && !empty($request->$f))
-      {
-        $schedule->$f = $request->$f;
-      }
-    }
     return ($schedule->save())?$schedule:response("Schedule not updated", 500);
   }
 

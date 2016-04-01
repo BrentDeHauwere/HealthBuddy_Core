@@ -28,9 +28,21 @@ class UpdateUserApiRequest extends Request
         $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
         $user_id = $this->route('user_id');
         if($user_id == $auth_user->id || ApiHelper::isPatient($user_id)){
+
+            // ugly code; since iOs sends back <null> instead of null -> need to filter out these fields
+            $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
+            foreach ($fields as $f) {
+                if($f == '<null>'
+                  )
+                {
+                    echo $this->$f;
+                    $this->$f == null;
+                }
+            }
+
             return true;
         }
-        return true;
+        return false;
     }
 
     /**
