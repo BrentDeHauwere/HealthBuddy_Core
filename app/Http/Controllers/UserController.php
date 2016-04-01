@@ -151,6 +151,7 @@ class UserController extends Controller
         $user->firstName = $request->session()->get('firstName');
         $user->lastName = $request->session()->get('lastName');
         $user->password = bcrypt($request->session()->get('password'));
+        $user->api_token = str_random(60);
         $user->dateOfBirth = $request->session()->get('dateOfBirth');
         $user->email = $request->session()->get('email');
         $user->phone = $request->session()->get('phone');
