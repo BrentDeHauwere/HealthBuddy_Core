@@ -21,7 +21,7 @@ class ApiHelper {
 			if(isset($request->$f)
 				&& $request->$f == '<null>')
 			{
-				$request->$f == null;
+				$request->$f = null;
 			}
 		}
 		return $request;
@@ -35,8 +35,8 @@ class ApiHelper {
 		
 		// fill the object with the fields
 		foreach ($fields as $f) {
-			if(isset($request->$f) 
-				&& !empty($request->$f)
+			if(isset($request->$f)
+				// && !empty($request->$f) // usecase says an empty field should update the database to contain null 
 				)
 			{
 				// fill the objects fields.

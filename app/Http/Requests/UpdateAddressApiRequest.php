@@ -20,7 +20,7 @@ class UpdateAddressApiRequest extends Request
         $auth_user = ApiHelper::getAuthenticatedUser();
         $user_id = $this->route('user_id');
         $patient = User::find($user_id);
-        
+
         // check if the addresss belongs to the buddy or one of it's patients
         if(ApiHelper::isPatient($user_id))
         {
