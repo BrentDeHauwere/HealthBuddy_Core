@@ -12,6 +12,44 @@ use \App\Weight;
 use \App\Schedule;
 
 class ApiHelper {
+
+	// ugly code; since iOs sends back <null> instead of null -> need to filter out these fields
+	// iOs library alamofire can't send normal nulls.
+	public static function sanitizeIosFields($fields, $request)
+	{
+		foreach ($fields as $f) {
+			echo $request->$f;
+
+			if(isset($request->$f)
+				&& $request->$f == '<null>')
+			{
+				echo $request->$f;
+				$request->$f == null;
+			}
+		}
+		return $request;
+	}
+
+
+	public static function fillApiRequestFields($fields, $request, $object)
+	{
+		// clean up the request
+		$request = ApiHelper::sanitizeIosFields($fields, $request);
+		
+		// fill the object with the fields
+		foreach ($fields as $f) {
+			if(isset($request->$f) 
+				&& !empty($request->$f)
+				)
+			{
+				// fill the objects fields.
+				$object->$f = $request->$f;
+			}
+		}
+
+		return $object;
+	}
+
 	/**
 	 * This function takes in a filename and replaces all the special characters to becom a valid *nix filename
 	 * it replaces the slashes ('/') and spaces.
