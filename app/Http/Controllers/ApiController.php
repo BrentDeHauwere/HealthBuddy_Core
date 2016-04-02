@@ -295,7 +295,7 @@ return $photo;
    * @return mixed
    * @author eddi
    */
-  public function updateAddress(UpdateAddressApiRequest $request, $user_id)
+  public static function updateAddress(UpdateAddressApiRequest $request, $user_id)
   {
     $patient = User::find($user_id);
 

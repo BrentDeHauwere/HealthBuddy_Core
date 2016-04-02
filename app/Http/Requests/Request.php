@@ -6,6 +6,27 @@ use Illuminate\Foundation\Http\FormRequest;
 
 abstract class Request extends FormRequest
 {
+
+     /** 
+     * This is overriding the all function from Request, a way to remove <null> before the validation.
+     * Found this solution the least ugly: http://larabrain.com/tips/sanitizing-form-data-before-validating-in-a-laravel-5-form-request
+     * @author eddi
+     */
+    public function all()
+    {
+        $attributes = parent::all();
+        
+        foreach ($attributes as $key => $val) {
+            if($val == '<null>')
+            {
+                $attributes[$key] = null;
+            }   
+        }
+
+        $this->replace($attributes);
+        return parent::all();
+    }
+
     /**
     * Get the error messages for the defined validation rules.
     *
