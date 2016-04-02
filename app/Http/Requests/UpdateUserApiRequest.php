@@ -56,8 +56,8 @@ class UpdateUserApiRequest extends Request
         * This is the original way, expecting post params for each user value
         */
         return [
-        'firstName'     => 'min:2|max:255',
-        'lastName'      => 'min:2|max:255',
+        'firstName'     => 'required|min:2|max:255',
+        'lastName'      => 'required|min:2|max:255',
         'phone'         => 'min:9|max:25',
         'gender'        => 'in:M,V',
         'dateOfBirth'   => 'before:today|after:1890-01-01',
