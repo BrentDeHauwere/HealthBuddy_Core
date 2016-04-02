@@ -13,12 +13,18 @@ use \App\Schedule;
 
 class ApiHelper {
 
-	// iOS sends back <null> instead of null, replace this with a php null
+	/**
+	  * iOS sends back <null> instead of null, replace this with a php null.
+	  * @param fields the fields to check for <null> values.
+	  * @param request the request that needs to have <null> replaced with null.
+	  * @return request/object the updated request.
+	  * @author eddi 
+	  */
 	public static function sanitizeIosFields($fields, $request)
 	{
 		foreach ($fields as $f) {
 			if(isset($request->$f)
-				&& $request->$f == '<null>')
+				&& $request->$f == '<null>' )
 			{
 				$request->$f = null;
 			}
@@ -26,12 +32,16 @@ class ApiHelper {
 		return $request;
 	}
 
-
+	/**
+	  * This function fills an object's fillable fields from a given request.
+	  * @param fields an array with the fillable fields.
+	  * @param request the request containing the data to put in the object.
+	  * @param object an object for which certain fields will be updated using the data from the request/ 
+	  * @return object the updated object or object with filled fields.
+	  * @author eddi
+	  */
 	public static function fillApiRequestFields($fields, $request, $object)
 	{
-		// clean up the request
-		$request = ApiHelper::sanitizeIosFields($fields, $request);
-		
 		// fill the object with the fields
 		foreach ($fields as $f) {
 			$object->$f = $request->$f;
