@@ -40,9 +40,9 @@ class UpdateMedicalInfoApiRequest extends Request
     public function rules()
     {
         return [
-        'length'            => 'numeric|between:30,300',
-        'weight'            => 'numeric|between:25.0,450.1',
-        'bloodType'         => 'in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+        'length'            => 'numeric|between:0,300',
+        'weight'            => 'numeric|between:0,450.1',
+        'bloodType'         => 'in:A+,A-,B+,B-,AB+,AB-,O+,O-,onbekend',
         'medicalCondition'  => 'max:255',
         'allergies'         => 'max:255',
         ];
