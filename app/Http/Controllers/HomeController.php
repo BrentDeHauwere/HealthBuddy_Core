@@ -24,7 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $users = \App\User::get();
+        $users = \App\User::orderBy('role')->get();
         return view('gebruikerbeheer')->with('users',$users);
     }
 }
