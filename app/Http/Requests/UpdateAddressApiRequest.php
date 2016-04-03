@@ -2,21 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Request;
-use App\Http\Controllers\ApiController;
 use Auth;
-
+use App\Http\Requests\Request;
 use App\User;
+use App\address;
 use App\ApiHelper;
 
-/**
- * This is a Class created to Validate a Request and check userinput 
- * following a set of rules.
- * Gebaseerd op deze tutorial: http://slashnode.com/mastering-form-validation-laravel-5/
-  * en ook op de larabel documentatie https://laravel.com/docs/5.2/validation.
-  * @author: eddi.
-*/
-class UpdateUserApiRequest extends Request
+class UpdateAddressApiRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,25 +16,17 @@ class UpdateUserApiRequest extends Request
      * @return bool
      */
     public function authorize()
-    {
-      $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
-      $user_id = $this->route('user_id');
-      if($user_id == $auth_user->id || ApiHelper::isPatient($user_id)){
+    {   
+        $auth_user = ApiHelper::getAuthenticatedUser();
+        $user_id = $this->route('user_id');
+        $patient = User::find($user_id);
 
-            // ugly code; since iOs sends back <null> instead of null -> need to filter out these fields
-        $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
-        foreach ($fields as $f) {
-          if($f == '<null>'
-            )
-          {
-            echo $this->$f;
-            $this->$f == null;
-          }
+        // check if the addresss belongs to the buddy or one of it's patients
+        if(ApiHelper::isPatient($user_id))
+        {
+            return true;
         }
-
-        return true;
-      }
-      return false;
+        return false;
     }
 
     /**
@@ -52,19 +36,15 @@ class UpdateUserApiRequest extends Request
      */
     public function rules()
     {
-        /**
-        * This is the original way, expecting post params for each user value
-        */
         return [
-        'firstName'     => 'required|min:2|max:255',
-        'lastName'      => 'required|min:2|max:255',
-        'phone'         => 'min:9|max:25',
-        'gender'        => 'in:M,V',
-        'dateOfBirth'   => 'before:today|after:1890-01-01',
-        'email'         => 'email|min:12|max:255',
+        'street'        => 'min:2|max:255',
+        'streetNumber'  => 'alpha_num|min:1|max:15',
+        'bus'           => 'alpha|min:1|max:5',
+        'zipCode'       => 'min:2|max:255',
+        'city'          => 'min:2|max:255',
+        'country'       => 'min:2|max:255',
         ];
-      }
-
+    }
 
 
     /**
@@ -77,7 +57,7 @@ class UpdateUserApiRequest extends Request
       public function messages()
       {
 
-	$fields = array('firstName' => 'voornaam', 'lastName' => 'achternaam', 'phone' => 'telefoon', 'gender' => 'geslacht', 'dateOfBirth' => 'geboortedatum', 'email' => 'email');
+    $fields = array('street'=>'straat', 'streetNumber'=>'huisnummer', 'bus'=>'bus', 'zipCode'=>'postcode', 'city'=>'stad', 'country'=>'land');
         $msgs = array();
 
         foreach ($fields as $f => $k) {
@@ -98,6 +78,5 @@ class UpdateUserApiRequest extends Request
         }
 
         return $msgs;
-      }
-
-    }
+      }    
+}

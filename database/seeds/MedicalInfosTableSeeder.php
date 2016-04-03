@@ -15,7 +15,7 @@ class MedicalInfosTableSeeder extends Seeder
             'user_id' => 2,
             'length' => 182,
             'weight' => 63.50,
-            'bloodType' => 'A+'
+            'bloodType' => 'onbekend'
         ]);
 
         DB::table('medicalInfos')->insert([

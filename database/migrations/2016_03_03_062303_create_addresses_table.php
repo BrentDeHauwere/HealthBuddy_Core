@@ -10,16 +10,19 @@ class CreateAddressesTable extends Migration
      *
      * @return void
      */
+    //disable updated at and created at
+
     public function up()
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->increments('id');
             $table->string('street');
-            $table->integer('streetNumber')->unsigned();
-            $table->integer('bus')->unsigned()->nullable();
+            $table->string('streetNumber',15);
+            $table->string('bus', 5)->nullable();
             $table->string('zipCode');
             $table->string('city');
             $table->string('country');
+            $table->timestamps(); // eloquent needs this: created_at && updated_at
         });
     }
 

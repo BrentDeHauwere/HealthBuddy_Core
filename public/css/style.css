@@ -46,6 +46,10 @@ a:hover,.btn-link:hover{
   color:#739249;
 }
 
+.btn{
+  margin-bottom:2px;
+}
+
 .btn-primary{
   background-color:#9ccf58;
   border-color:#9ccf58;

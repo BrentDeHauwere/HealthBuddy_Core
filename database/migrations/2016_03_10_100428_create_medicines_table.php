@@ -16,7 +16,9 @@ class CreateMedicinesTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->string('name');
+            $table->text('info');
             $table->string('photoUrl')->nullable();
+            $table->timestamps(); // eloquent needs this: created_at && updated_at
         });
     }
 
