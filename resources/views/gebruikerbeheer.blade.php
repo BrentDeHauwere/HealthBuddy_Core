@@ -2,14 +2,43 @@
 @section('header')
   <meta id="token" content={{ csrf_token() }} />
   <!--<meta id="token" content="niks" />-->
+  <style>
+  .modal-backdrop
+  {
+      opacity:0 !important;
+  }
+  .alert{
+    animation: opa 1s;
+  }
+
+  @keyframes opa {
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:1;
+  }
+}
+  </style>
 @endsection
 @section('content')
 
 @if(session('response'))
-  <script type="text/javascript">alert('{{ session('response') }}')</script>
+<div class="col-md-6 col-md-offset-3">
+  <div class="alert alert-warning fade in">
+    <strong>Warning!</strong> {{ session('response') }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+</div>
 @elseif(session('success'))
-  <script type="text/javascript">alert('{{ session('success') }}')</script>
+<div class="col-md-6 col-md-offset-3">
+  <div class="alert alert-success fade in">
+    <strong>Success!</strong> {{ session('success') }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+</div>
 @endif
+
 <div class="container nowidth">
     <div class="col-md-10 col-md-offset-1">
       <legend><h3 class="text-center">Gebruikerbeheer</h3></legend>
@@ -31,6 +60,7 @@
               <td>M/V</td>
               <td>Date of birth</td>
               <td>Email</td>
+              <td>Telefoon</td>
               <td>Role</td>
               <td>Opties</td>
             </tr>
@@ -43,11 +73,15 @@
                   <td>{{ $user->gender }}</td>
                   <td>{{ $user->dateOfBirth }}</td>
                   <td>{{ $user->email }}</td>
+                  <td>{{ $user->phone }}</td>
                   <td>{{ $user->role }}</td>
                   <td>
                       <button type="button" class="btn btn-primary EditUser"  data-target="#EditModal">Edit</button>
                       <button type="button" class="btn btn-primary ResetPass"  data-target="#ResetModal">Password</button>
                       <button type="button" class="btn btn-primary LinkDev"  data-target="#LinkModal">Devices</button>
+                      @if ($user->role == 'Zorgmantel')
+                        <button type="button" class="btn btn-primary LinkBuddy">Buddy</button>
+                      @endif
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
                   </td>
                 </tr>
@@ -60,6 +94,38 @@
 @endsection
 @section('footer')
 <script type="text/javascript">
+  $(document).on('click', '#submitAdd', function() {
+    console.log('something');
+    var fm = $('#firstname').val();
+    var lm = $('#lastname').val();
+    var pw = $('#password').val();
+    console.log(pw);
+    var cf = $('#confirm').val();
+    var date = $('#date').val();
+    var email = $('#email').val();
+    var phone = $('#phone').val();
+    var gender = $('#gender').val();
+    var role = $('#role').val();
+    var data = {"firstname":fm,"lastname":lm,"password":pw,"confirm":cf,"date":date,"email":email,"phone":phone,"gender":gender,"role":role};
+    console.log(data);
+    ajaxCall(data,"/user/add");
+  });
+
+  $(document).on('click', '#submitEdit', function() {
+    console.log('something');
+    var fm = $('#firstname').val();
+    var lm = $('#lastname').val();
+    var date = $('#date').val();
+    var email = $('#email').val();
+    var phone = $('#phone').val();
+    var gender = $('#gender').val();
+    var role = $('#role').val();
+    var dataID = $('#id').val();
+    var data = {"id":dataID,"firstname":fm,"lastname":lm,"date":date,"email":email,"phone":phone,"gender":gender,"role":role};
+    console.log(data);
+    ajaxCall(data,"/user/editUser");
+  });
+
   $(document).ready(function(){
         $("#AddUser").on("click", function(e){
           console.log(this);
@@ -81,8 +147,14 @@
           var data = $(this).siblings('input').val();
           ajaxCall(data,"/linkmodal");
         });
+        $(".LinkBuddy").on("click", function(e){
+          console.log(this);
+          var data = $(this).siblings('input').val();
+          ajaxCall(data,"/buddymodal");
+        });
   });
-  function ajaxCall(data,url){
+
+  function ajaxCall(data,url,bool){
     var d = data;
     $.ajax({
       type: "POST",
@@ -91,20 +163,24 @@
             var token = $('#token').attr('content');
             console.log(token);
             if (token) {
-                  console.log("token");
+                  //console.log("token");
                   return xhr.setRequestHeader('X-CSRF-TOKEN', token);
             }
       },
       data: {data: d},
       cache: false,
       success: function(data){
-         $("#modal").html(data);
-         $('#modal').modal('show');
+          $('#modal').empty();
+          $("#modal").html(data);
+          $('#modal').modal('show');
       },
       error: function(error){
         console.log("error");
-        $("#modal").html("Something went wrong");
-        $('#modal').modal('show');
+        if(bool){
+          $('#modal').empty();
+          $("#modal").html("Something went wrong!");
+          $('#modal').modal('show');
+        }
       }
     });
 

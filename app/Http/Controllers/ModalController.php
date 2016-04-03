@@ -36,12 +36,12 @@ class ModalController extends Controller
           return view('modals/editmodal')->with('user',$user);
         }
         else{
-          return 'Something went wrong, No User was found with that id';
+          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
         }
 
       }
       else{
-        return 'Something went wrong!!!';
+        return view('/modals/errormodal')->with('error','Something went wrong!');
       }
 
     }
@@ -54,12 +54,12 @@ class ModalController extends Controller
           return view('modals/resetmodal')->with('user',$user);
         }
         else{
-          return 'Something went wrong, No User was found with that id';
+          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
         }
 
       }
       else{
-        return 'Something went wrong!!!';
+        return view('/modals/errormodal')->with('error','Something went wrong!');
       }
     }
 
@@ -68,15 +68,36 @@ class ModalController extends Controller
       if(Input::has('data')){
         $user = \App\User::find($request->input('data'));
         if(!empty($user)){
-          return view('modals/linkmodal')->with('user',$user);
+          $devices = \App\Device::whereNull('user_id')->get();
+          if(count($devices) >= 1){
+            return view('modals/linkmodal')->with('user',$user)->with('devices',$devices);
+          }
+          else {
+            return redirect('/home')->with('response','No devices found');
+          }
         }
         else{
-          return 'Something went wrong, No User was found with that id';
+          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
         }
 
       }
       else{
-        return 'Something went wrong!!!';
+        return view('/modals/errormodal')->with('error','Something went wrong!');
       }
     }
+
+    public function linkBuddy(Request $request)
+    {
+        $user = \App\User::where('id','=',$request->input('data'))->first();
+        if($user){
+          $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
+          $buddies = \App\User::where('buddy_id','=',$user->id)->get();
+          return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
+        }
+        else{
+          return view('/modals/errormodal')->with('error','No users found');
+        }
+
+    }
+
 }

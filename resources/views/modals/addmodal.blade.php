@@ -1,7 +1,7 @@
 <div class="modal-dialog">
   <!-- Modal content-->
-  <form class="form-horizontal" method="POST" action="user/add">
-  <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+  <form class="form-horizontal" id="AddForm" novalidate="novalidate" >
+  <!--<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">-->
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -46,9 +46,15 @@
           </div>
         </div>
         <div class="form-group">
+          <label for="email" class="col-sm-2 control-label">Telefoon</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Telefoon">
+          </div>
+        </div>
+        <div class="form-group">
           <label for="gender" class="col-sm-2 control-label">Gender</label>
           <div class="col-sm-10">
-            <select class="form-control" name="gender">
+            <select class="form-control" id="gender" name="gender">
               <option>M</option>
               <option>V</option>
             </select>
@@ -57,7 +63,7 @@
         <div class="form-group">
           <label for="role" class="col-sm-2 control-label">Role</label>
           <div class="col-sm-10">
-            <select class="form-control" name="role">
+            <select class="form-control" id="role" name="role">
               <option>Zorgbehoevende</option>
               <option>ZorgMantel</option>
             </select>
@@ -65,7 +71,7 @@
         </div>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn btn-primary" name="submit" value="Submit"/>
+      <button type="button" id="submitAdd" class="btn btn-primary">Next</button>
       <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
     </div>
   </div>

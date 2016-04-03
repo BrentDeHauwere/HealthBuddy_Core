@@ -16,13 +16,12 @@ Route::get('/login', function () {
     return view('auth');
 });
 
+Route::post('/api/login', 'ApiController@apiLogin');
+
 /**
  * The Login Route for the API.
  * After successfully authenticating the server responds with an api_token.
  */
-Route::post('/api/login', 'ApiController@apiLogin');
-
-
 
 /**
  * These are the routes one can visit after logging in on the website
@@ -38,8 +37,16 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/editmodal','ModalController@edit');
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
-
+    Route::post('/buddymodal','ModalController@linkBuddy');
     Route::post('user/add','UserController@addUser');
+    Route::post('user/addAddress','UserController@addUserAddress');
+    Route::post('user/editUser','UserController@editUser');
+    Route::post('user/editAddress','UserController@editAddress');
+    Route::post('user/link','UserController@linkDevice');
+    Route::post('user/linkBuddy','UserController@linkBuddy');
+    Route::post('user/reset','UserController@reset');
+    Route::post('user/unlink','UserController@unlink');
+    
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');
@@ -48,7 +55,6 @@ Route::group(['middleware' => 'web'], function () {
         return \App\User::with('latestWeight')->get();
     });
     Route::get('schedule/{user}', 'UserController@showSchedule');
-
     Route::get('apparaatbeheer/show', 'DeviceController@index');
     Route::get('apparaatbeheer/add', 'DeviceController@create');
     Route::post('apparaatbeheer/add', 'DeviceController@store');
@@ -89,5 +95,5 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
     // routes to delete records
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
-    Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine'); 
+    Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
 });
