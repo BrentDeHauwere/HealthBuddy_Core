@@ -73,7 +73,7 @@ class ModalController extends Controller
             return view('modals/linkmodal')->with('user',$user)->with('devices',$devices);
           }
           else {
-            return redirect('/home')->with('response','No devices found');
+            return view('/modals/errormodal')->with('error','No devices found');
           }
         }
         else{
@@ -92,7 +92,13 @@ class ModalController extends Controller
         if($user){
           $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
           $buddies = \App\User::where('buddy_id','=',$user->id)->get();
-          return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
+          if(!$users->isEmpty() || !$buddies->isEmpty()){
+            return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
+          }
+          else{
+            return view('modals/errormodal')->with('error','No buddies found');
+          }
+
         }
         else{
           return view('/modals/errormodal')->with('error','No users found');

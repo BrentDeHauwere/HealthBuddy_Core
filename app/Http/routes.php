@@ -46,7 +46,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('user/linkBuddy','UserController@linkBuddy');
     Route::post('user/reset','UserController@reset');
     Route::post('user/unlink','UserController@unlink');
-    
+    Route::post('user/delete','UserController@delete');
+
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');

@@ -58,6 +58,38 @@ class UserController extends Controller
         return $user;
     }
 
+    public function delete(Request $request){
+      $id = $request->input('ID');
+      $user = \App\User::where('id','=',$id)->first();
+      if($user){
+        $devices = \App\Device::where('user_id',$user->id)->get();
+        if(!$devices->isEmpty()){
+          foreach($devices as $device){
+            $device->user_id = NULL;
+            $device->save();
+          }
+        }
+        $buddies = \App\User::where('buddy_id',$user->id)->get();
+        if(!$buddies->isEmpty()){
+          foreach($buddies as $buddy){
+            $buddy->buddy_id = NULL;
+            $buddy->save();
+          }
+        }
+        $deleted = $user->delete();
+        if($deleted){
+          return redirect('/home')->with('success','User was deleted');
+        }
+        else{
+          return redirect('/home')->with('error','User was not deleted');
+        }
+      }
+      else{
+        return redirect('/home')->with('error','User was not found');
+      }
+
+    }
+
     public function unlink(Request $request){
         $id = $request->input('buddy');
         $user = \App\User::where('id','=',$id)->first();
