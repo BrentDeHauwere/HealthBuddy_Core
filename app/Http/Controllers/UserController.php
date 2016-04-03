@@ -58,6 +58,19 @@ class UserController extends Controller
         return $user;
     }
 
+    public function unlink(Request $request){
+        $id = $request->input('buddy');
+        $user = \App\User::where('id','=',$id)->first();
+        $user->buddy_id = NULL;
+        $saved = $user->save();
+        if($saved){
+          return redirect('/home')->with('success','Buddy was unlinked');
+        }
+        else{
+          return redirect('/home')->with('error','Buddy was not unlinked');
+        }
+    }
+
     public function reset(Request $request){
         $id = $request->input('id');
         $user = \App\User::where('id','=',$id)->first();
@@ -90,10 +103,10 @@ class UserController extends Controller
       $buddy->buddy_id = $userid;
       $savedAdd = $buddy->save();
       if($savedAdd){
-        return view('/modals/successmodal')->with('success','Buddy was linked');
+        return redirect()->back()->with('success','Buddy was linked');
       }
       else{
-        return view('/modals/errormodal')->with('error','Buddy could not be linked');
+        return redirect()->back()->with('error','Buddy could not be linked');
       }
     }
 
@@ -115,7 +128,7 @@ class UserController extends Controller
         return view('modals/editaddressmodal')->with('address',$addr);
       }
       else{
-        return view('/modals/errormodal')->with('error','User could not be edited');
+        return view('modals/errormodal')->with('error','User could not be edited');
       }
     }
 
@@ -190,7 +203,7 @@ class UserController extends Controller
           return view('modals/addaddressmodal');
         }
         else{
-          return view('/modals/errormodal')->with('error','Could not persist user data');
+          return view('modals/errormodal')->with('error','Could not persist user data');
         }
 
     }

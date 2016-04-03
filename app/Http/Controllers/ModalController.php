@@ -91,12 +91,8 @@ class ModalController extends Controller
         $user = \App\User::where('id','=',$request->input('data'))->first();
         if($user){
           $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
-          if(count($users) >= 1){
-            return view('modals/buddymodal')->with('user',$user)->with('users',$users);
-          }
-          else {
-            return view('/modals/errormodal')->with('error','No users found');
-          }
+          $buddies = \App\User::where('buddy_id','=',$user->id)->get();
+          return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
         }
         else{
           return view('/modals/errormodal')->with('error','No users found');
