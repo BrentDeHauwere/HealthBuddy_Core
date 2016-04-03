@@ -5,7 +5,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Add a new user</h4>
+      <h4 class="modal-title">Voeg een niewe gebruiker toe</h4>
     </div>
     <div class="modal-body">
          <div class="form-group">
@@ -47,7 +47,7 @@
     </div>
     <div class="modal-footer">
       <input type="submit" class="btn btn-primary" name="submit" value="Submit"/>
-      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Sluit</button>
     </div>
   </div>
   </form>

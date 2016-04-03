@@ -45,7 +45,7 @@
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-10">
-            <button id="AddUser" type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddModal">Add User</button>
+            <button id="AddUser" type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddModal">Voeg een user toe</button>
         </div>
     </div>
     <br>
@@ -53,15 +53,15 @@
         <div class="col-md-12">
           <table class="table table-bordered">
             <tr>
-              <td>Name</td>
-              <td>Address</td>
-              <td>Postal</td>
-              <td>Country</td>
+              <td>Naam</td>
+              <td>Adres</td>
+              <td>Postcode</td>
+              <td>Land</td>
               <td>M/V</td>
-              <td>Date of birth</td>
+              <td>Geboortedatum</td>
               <td>Email</td>
               <td>Telefoon</td>
-              <td>Role</td>
+              <td>Rol</td>
               <td>Opties</td>
             </tr>
             @foreach ($users as $user)
@@ -77,12 +77,17 @@
                   <td>{{ $user->role }}</td>
                   <td>
                       <button type="button" class="btn btn-primary EditUser"  data-target="#EditModal">Edit</button>
-                      <button type="button" class="btn btn-primary ResetPass"  data-target="#ResetModal">Password</button>
-                      <button type="button" class="btn btn-primary LinkDev"  data-target="#LinkModal">Devices</button>
+                      <button type="button" class="btn btn-primary ResetPass"  data-target="#ResetModal">Wachtwoord</button>
+                      <button type="button" class="btn btn-primary LinkDev"  data-target="#LinkModal">Toestellen</button>
                       @if ($user->role == 'Zorgmantel')
-                        <button type="button" class="btn btn-primary LinkBuddy">Buddy</button>
+                        <button type="button" class="btn btn-primary LinkBuddy">Buddies</button>
                       @endif
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
+                      <form method="POST" action="user/delete">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                        <input class="btn btn-primary" type="submit" name="delete" value="Verwijder"/>
+                        <input type="hidden" value="{{ $user->id }}" name="ID"/>
+                      </form>
                   </td>
                 </tr>
             @endforeach

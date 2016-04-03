@@ -6,13 +6,13 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Link a user to a device</h4>
+      <h4 class="modal-title">Link een gebruiker en een toestel</h4>
     </div>
     <div class="modal-body">
 
         <input type="hidden" name="id" value="{{ $user->id }}">
         <div class="form-group">
-          <label for="device" class="col-sm-2 control-label">Device</label>
+          <label for="device" class="col-sm-2 control-label">Toestel</label>
           <div class="col-sm-10">
             <select class="form-control" name="device">
               @foreach ($devices as $device)
@@ -25,7 +25,7 @@
     <div class="modal-footer">
       <input type="submit" class="btn btn-primary" name="submit" value="Submit"/>
 
-      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Sluit</button>
     </div>
   </div>
   </form>

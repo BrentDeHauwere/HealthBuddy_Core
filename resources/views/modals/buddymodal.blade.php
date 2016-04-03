@@ -3,7 +3,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Manage your buddies from a user</h4>
+      <h4 class="modal-title">Beheer de buddies van een gebruiker</h4>
     </div>
     <div class="modal-body">
         @if(!$buddies->isEmpty())
@@ -51,7 +51,7 @@
         @endif
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Sluit</button>
     </div>
   </div>
 

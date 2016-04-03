@@ -5,25 +5,25 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">Edit a user</h4>
+      <h4 class="modal-title">Edit een gebruiker</h4>
     </div>
     <div class="modal-body">
 
          <input type="hidden" name="id" id="id" value="{{ $user->id }}">
          <div class="form-group">
-          <label for="firstname" class="col-sm-2 control-label">First Name</label>
+          <label for="firstname" class="col-sm-2 control-label">Voornaam</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" id="firstname" name="firstname" value="{{ $user->firstName }}">
           </div>
         </div>
         <div class="form-group">
-          <label for="lastname" class="col-sm-2 control-label">Last Name</label>
+          <label for="lastname" class="col-sm-2 control-label">Achternaam</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" id="lastname" name="lastname" value="{{ $user->lastName }}">
           </div>
         </div>
         <div class="form-group">
-          <label for="date" class="col-sm-2 control-label">Date of birth</label>
+          <label for="date" class="col-sm-2 control-label">Geboortedatum</label>
           <div class="col-sm-10">
             <input type="date" class="form-control" id="date" name="date" value="{{ $user->dateOfBirth }}">
           </div>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="gender" class="col-sm-2 control-label">Gender</label>
+          <label for="gender" class="col-sm-2 control-label">Geslacht</label>
           <div class="col-sm-10">
             <select class="form-control" id="gender" name="gender">
               <option>{{ $user->gender }}</option>
@@ -51,7 +51,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="role" class="col-sm-2 control-label">Role</label>
+          <label for="role" class="col-sm-2 control-label">Rol</label>
           <div class="col-sm-10">
             <select class="form-control" id="role" name="role">
               <option>{{ $user->role }}</option>
@@ -64,7 +64,7 @@
     <div class="modal-footer">
       <input type="button" class="btn btn-primary" id="submitEdit" name="submitEdit" value="Submit"/>
 
-      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Sluit</button>
     </div>
   </div>
   </form>
