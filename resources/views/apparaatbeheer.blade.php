@@ -94,11 +94,11 @@ input:focus {
 @section('content')
     <div class="col-md-12" id="devices">
         <input class="search" placeholder="Search" />
-        <button class="sort" data-sort="deviceId">Soorteer op apparaat ID</button>
-        <button class="sort" data-sort="deviceType">Soorteer op apparaattype</button>
-        <button class="sort" data-sort="firstName">Soorteer op voornaam</button>
-        <button class="sort" data-sort="lastName">Soorteer op familienaam</button>
-        <button class="sort" data-sort="email">Soorteer op email</button>
+        <button class="sort" data-sort="deviceId">Sorteer op apparaat ID</button>
+        <button class="sort" data-sort="deviceType">Sorteer op apparaattype</button>
+        <button class="sort" data-sort="firstName">Sorteer op voornaam</button>
+        <button class="sort" data-sort="lastName">Sorteer op familienaam</button>
+        <button class="sort" data-sort="email">Sorteer op email</button>
         <table class="table table-bordered">
             <thead>
                 <tr>
