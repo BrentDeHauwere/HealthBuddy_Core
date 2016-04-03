@@ -78,14 +78,14 @@ class UserController extends Controller
         }
         $deleted = $user->delete();
         if($deleted){
-          return redirect('/home')->with('success','User was deleted');
+          return redirect('/home')->with('success','Gebruiker is verwijdert');
         }
         else{
-          return redirect('/home')->with('error','User was not deleted');
+          return redirect('/home')->with('error','Gebruiker is niet verwijdert');
         }
       }
       else{
-        return redirect('/home')->with('error','User was not found');
+        return redirect('/home')->with('error','Er bestaat geen gebruiker met dat ID');
       }
 
     }
@@ -93,92 +93,103 @@ class UserController extends Controller
     public function unlink(Request $request){
         $id = $request->input('buddy');
         $user = \App\User::where('id','=',$id)->first();
-        $user->buddy_id = NULL;
-        $saved = $user->save();
-        if($saved){
-          return redirect('/home')->with('success','Buddy was unlinked');
-        }
-        else{
-          return redirect('/home')->with('error','Buddy was not unlinked');
+        if($user){
+          $user->buddy_id = NULL;
+          $saved = $user->save();
+          if($saved){
+            return redirect('/home')->with('success','Buddy is gelinked');
+          }
+          else{
+            return redirect('/home')->with('error','Buddy is niet gelinked');
+          }
         }
     }
 
     public function reset(Request $request){
         $id = $request->input('id');
         $user = \App\User::where('id','=',$id)->first();
-        $user->password = bcrypt($request->input('password'));
-        $saved = $user->save();
-        if($saved){
-          return redirect()->back()->with('success','Password was succesfully saved');
-        }
-        else{
-          return redirect()->back()->with('error','Password was not saved');
+        if($user){
+          $user->password = bcrypt($request->input('password'));
+          $saved = $user->save();
+          if($saved){
+            return redirect()->back()->with('success','Wachtwoord is successvol verandert');
+          }
+          else{
+            return redirect()->back()->with('error','Wachtwoord kon niet aangepast worden');
+          }
         }
     }
 
     public function linkDevice(Request $request){
       $userid = $request->input('id');
       $device = \App\Device::Where('id','=',$request->input('device'))->first();
-      $device->user_id = $userid;
-      $savedAdd = $device->save();
-      if($savedAdd){
-        return redirect()->back()->with('success','Device was succesfully linked');
-      }
-      else{
-        return redirect()->back()->with('error','Deivce could not be linked');
+      if($device){
+        $device->user_id = $userid;
+        $savedAdd = $device->save();
+        if($savedAdd){
+          return redirect()->back()->with('success','Toestel is successvol gelinked');
+        }
+        else{
+          return redirect()->back()->with('error','Toestel is niet gelinked');
+        }
       }
     }
 
     public function linkBuddy(Request $request){
       $buddy = \App\User::where('id','=',$request->input('buddy'))->first();
       $userid = $request->input('user');
-      $buddy->buddy_id = $userid;
-      $savedAdd = $buddy->save();
-      if($savedAdd){
-        return redirect()->back()->with('success','Buddy was linked');
-      }
-      else{
-        return redirect()->back()->with('error','Buddy could not be linked');
+      if($buddy){
+        $buddy->buddy_id = $userid;
+        $savedAdd = $buddy->save();
+        if($savedAdd){
+          return redirect()->back()->with('success','Buddy is successvol gelinked');
+        }
+        else{
+          return redirect()->back()->with('error','Buddy is niet gelinked');
+        }
       }
     }
 
     public function editUser(Request $request){
-
       $id = $request->input('data.id');
       $user = \App\User::where('id','=',$id)->first();
-      $user->firstName = $request->input('data.firstname');
-      $user->lastName = $request->input('data.lastname');
-      $user->dateOfBirth = $request->input('data.date');
-      $user->email = $request->input('data.email');
-      $user->phone = $request->input('data.phone');
-      $user->gender = $request->input('data.gender');
-      $user->role = $request->input('data.role');
-      $saved = $user->save();
-      if($saved){
-        $addrID = $user->address_id;
-        $addr = \App\Address::where('id','=',$addrID)->first();
-        return view('modals/editaddressmodal')->with('address',$addr);
-      }
-      else{
-        return view('modals/errormodal')->with('error','User could not be edited');
+      if($user){
+        $user->firstName = $request->input('data.firstname');
+        $user->lastName = $request->input('data.lastname');
+        $user->dateOfBirth = $request->input('data.date');
+        $user->email = $request->input('data.email');
+        $user->phone = $request->input('data.phone');
+        $user->gender = $request->input('data.gender');
+        $user->role = $request->input('data.role');
+        $saved = $user->save();
+        if($saved){
+          $addrID = $user->address_id;
+          $addr = \App\Address::where('id','=',$addrID)->first();
+          return view('modals/editaddressmodal')->with('address',$addr);
+        }
+        else{
+          return view('modals/errormodal')->with('error','Gebruiker kon niet worden verandert');
+        }
       }
     }
 
     public function editAddress(Request $request){
 
       $address = \App\Address::where('id','=',$request->input('id'))->first();
-      $address->street = $request->input('street');
-      $address->streetNumber = $request->input('streetnumber');
-      $address->bus = $request->input('bus');
-      $address->zipCode = $request->input('zipcode');
-      $address->city = $request->input('city');
-      $address->country = $request->input('country');
-      $savedAdd = $address->save();
-      if($savedAdd){
-        return redirect()->back()->with('success','Update was succesfully saved');
-      }
-      else{
-        return redirect()->back()->with('error','Address could not be saved');
+      if($address){
+        $address->street = $request->input('street');
+        $address->streetNumber = $request->input('streetnumber');
+        $address->bus = $request->input('bus');
+        $address->zipCode = $request->input('zipcode');
+        $address->city = $request->input('city');
+        $address->country = $request->input('country');
+        $savedAdd = $address->save();
+        if($savedAdd){
+          return redirect()->back()->with('success','De update is voltooid');
+        }
+        else{
+          return redirect()->back()->with('error','Adres kon niet verandert worden');
+        }
       }
     }
 
@@ -205,15 +216,15 @@ class UserController extends Controller
         $savedUser = $user->save();
 
         if($savedUser){
-          return redirect()->back()->with('success','User was succesfully saved');
+          return redirect()->back()->with('success','Gebruiker is successvol opgeslagen');
         }
         else{
           $address->delete();
-          return redirect()->back()->with('error','User could not be saved');
+          return redirect()->back()->with('error','Gebruiker kon niet worden opgeslagen');
         }
       }
       else{
-        return redirect()->back()->with('error','Address could not be saved');
+        return redirect()->back()->with('error','Adres kon niet worden opgeslagen');
       }
     }
 
@@ -235,7 +246,7 @@ class UserController extends Controller
           return view('modals/addaddressmodal');
         }
         else{
-          return view('modals/errormodal')->with('error','Could not persist user data');
+          return view('modals/errormodal')->with('error','User data kon niet worden afgehandeld');
         }
 
     }

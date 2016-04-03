@@ -36,12 +36,12 @@ class ModalController extends Controller
           return view('modals/editmodal')->with('user',$user);
         }
         else{
-          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
+          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
       }
       else{
-        return view('/modals/errormodal')->with('error','Something went wrong!');
+        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
       }
 
     }
@@ -54,12 +54,12 @@ class ModalController extends Controller
           return view('modals/resetmodal')->with('user',$user);
         }
         else{
-          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
+          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
       }
       else{
-        return view('/modals/errormodal')->with('error','Something went wrong!');
+        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
       }
     }
 
@@ -73,16 +73,16 @@ class ModalController extends Controller
             return view('modals/linkmodal')->with('user',$user)->with('devices',$devices);
           }
           else {
-            return view('/modals/errormodal')->with('error','No devices found');
+            return view('/modals/errormodal')->with('error','Geen toestellen gevonden om mee te werken');
           }
         }
         else{
-          return view('/modals/errormodal')->with('error','Something went wrong, No User was found with that id');
+          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
       }
       else{
-        return view('/modals/errormodal')->with('error','Something went wrong!');
+        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
       }
     }
 
@@ -96,12 +96,12 @@ class ModalController extends Controller
             return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
           }
           else{
-            return view('modals/errormodal')->with('error','No buddies found');
+            return view('modals/errormodal')->with('error','Geen buddies gevonden');
           }
 
         }
         else{
-          return view('/modals/errormodal')->with('error','No users found');
+          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
     }
