@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use \App\User;
 use \App\Address;
 
+
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Input;
 use Hash;
 use Auth;
+use Validator;
 
 use \App\Medicine;
 
@@ -166,7 +168,26 @@ class UserController extends Controller
     }
 
     public function editUser(Request $request){
+      $validator = Validator::make($request->all(),[
+        'data.id' => 'required|exists:users,id',
+      ]);
+      if($validator->fails()){
+        return view('modals/errormodal')->with('error','Vul het formulier correct in! Vergeet niet dat de email moet bestaan of ook uniek moet zijn.');
+      }
       $id = $request->input('data.id');
+      $validator = Validator::make($request->all(),[
+        'data.id' => 'required|exists:users,id',
+        'data.firstname' => 'required',
+        'data.lastname' => 'required',
+        'data.date' => 'required|before:today',
+        'data.email' => 'required|unique:users,email,'.$id.'|regex:/.+\@.+\..+/',
+        'data.phone' => 'required',
+        'data.gender' => 'required|in:M,V',
+        'data.role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',
+      ]);
+      if($validator->fails()){
+        return view('modals/errormodal')->with('error','Vul het formulier correct in! Vergeet niet dat de email moet bestaan of ook uniek moet zijn.');
+      }
       $user = \App\User::where('id','=',$id)->first();
       if($user){
         $user->firstName = $request->input('data.firstname');
@@ -189,12 +210,24 @@ class UserController extends Controller
     }
 
     public function editAddress(Request $request){
-
+      $validator = Validator::make($request->all(),[
+        'id' => 'required|exists:addresses,id',
+        'street' => 'required',
+        'streetnumber' => 'required|digits_between:1,10',
+        'bus' => 'optional|digits_between:1,10',
+        'zipcode' => 'required',
+        'city' => 'required',
+        'country' => 'required',
+      ]);
+      if($validator->fails()){
+        return redirect()->back()->with('error','Vul het formulier correct in!');
+      }
       $address = \App\Address::where('id','=',$request->input('id'))->first();
       if($address){
         $address->street = $request->input('street');
         $address->streetNumber = $request->input('streetnumber');
-        $address->bus = $request->input('bus');
+        if($request->has('bus'))
+          $address->bus = $request->input('bus');
         $address->zipCode = $request->input('zipcode');
         $address->city = $request->input('city');
         $address->country = $request->input('country');
@@ -209,10 +242,22 @@ class UserController extends Controller
     }
 
     public function addUserAddress(Request $request){
+      $validator = Validator::make($request->all(),[
+        'street' => 'required',
+        'streetnumber' => 'required|digits_between:1,10',
+        'bus' => 'optional|digits_between:1,10',
+        'zipcode' => 'required',
+        'city' => 'required',
+        'country' => 'required',
+      ]);
+      if($validator->fails()){
+        return redirect()->back()->with('error','Vul het formulier correct in!');
+      }
       $address = new Address();
       $address->street = $request->input('street');
       $address->streetNumber = $request->input('streetnumber');
-      $address->bus = $request->input('bus');
+      if($request->has('bus'))
+        $address->bus = $request->input('bus');
       $address->zipCode = $request->input('zipcode');
       $address->city = $request->input('city');
       $address->country = $request->input('country');
@@ -244,7 +289,20 @@ class UserController extends Controller
     }
 
     public function addUser(Request $request){
-
+        $validator = Validator::make($request->all(),[
+          'data.firstname' => 'required',
+          'data.lastname' => 'required',
+          'data.password' => 'required|min:7|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/',
+          'data.confirm' => 'required|same:data.password',
+          'data.date' => 'required|before:today',
+          'data.email' => 'required|unique:users,email|regex:/.+\@.+\..+/',
+          'data.phone' => 'required',
+          'data.gender' => 'required|in:M,V',
+          'data.role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',
+        ]);
+        if($validator->fails()){
+          return view('modals/errormodal')->with('error','Vul het formulier correct in! Een wachtwoord moet minstens 7 characters lang zijn en 1 hoofdletter bevatten en 1 getal, De email moet ook uniek zijn.');
+        }
         $array = [
             "firstName" => $request->input('data.firstname'),
             "lastName" => $request->input('data.lastname'),

@@ -56,7 +56,7 @@
             <select class="form-control" id="role" name="role">
               <option>{{ $user->role }}</option>
               <option>Zorgbehoevende</option>
-              <option>ZorgMantel</option>
+              <option>Zorgmantel</option>
             </select>
           </div>
         </div>

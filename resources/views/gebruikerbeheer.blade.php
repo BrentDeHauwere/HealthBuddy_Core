@@ -65,20 +65,14 @@
             <button id="AddUser" type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddModal">Voeg een user toe</button>
         </div>
     </div>
-    <!--<div class="row">
-      <button class="sort" data-sort="deviceId">Soorteer op naam</button>
-      <button class="sort" data-sort="deviceType">Soorteer op Adres</button>
-      <button class="sort" data-sort="firstName">Soorteer op Postcode</button>
-      <button class="sort" data-sort="lastName">Soorteer op familienaam</button>
-      <button class="sort" data-sort="email">Soorteer op email</button>
-    </div>-->
     <br>
     <div class="row">
         <div class="col-md-12" id="users">
           <div class="col-md-6"> <input class="search" placeholder="Search" /> </div>
           <div class="col-md-4 col-md-offset-2">
-              <select id="role" class="form-control">
+              <select id="rolefilter" class="form-control">
                 <option>Alles</option>
+                <option>Zorgwinkel</option>
                 <option>Zorgbehoevende</option>
                 <option>Zorgmantel</option>
               </select>
@@ -143,7 +137,7 @@ var options = {
 };
 
 var userList = new List('users', options);
-$('#role').change(function () {
+$('#rolefilter').change(function () {
     var selection = this.value;
 
     // filter items in the list
