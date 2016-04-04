@@ -64,8 +64,8 @@
           <label for="role" class="col-sm-2 control-label">Rol</label>
           <div class="col-sm-10">
             <select class="form-control" id="role" name="role">
-              <option>ZorgBehoevende</option>
-              <option>ZorgMantel</option>
+              <option>Zorgbehoevende</option>
+              <option>Zorgmantel</option>
             </select>
           </div>
         </div>
