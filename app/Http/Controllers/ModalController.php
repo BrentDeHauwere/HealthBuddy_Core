@@ -105,5 +105,23 @@ class ModalController extends Controller
         }
 
     }
+    public function linkDokter(Request $request)
+    {
+        $user = \App\User::where('id','=',$request->input('data'))->first();
+        if($user){
+          $dokter = \App\User::where('id','=',$user->buddy_id)->first();
+          if($dokter){
+            return view('modals/doktermodal')->with('user',$user)->with('dokter',$dokter);
+          }
+          else{
+            return view('modals/errormodal')->with('error','Geen dokter gevonden');
+          }
+
+        }
+        else{
+          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+        }
+
+    }
 
 }

@@ -12,13 +12,30 @@
   }
 
   @keyframes opa {
-  0% {
-    opacity:0;
+    0% {
+      opacity:0;
+    }
+    100% {
+      opacity:1;
+    }
   }
-  100% {
-    opacity:1;
+  .sort{
+    cursor:pointer;
   }
-}
+  .search {
+    border-radius: 25px;
+    padding: 7px 14px;
+    background-color: transparent;
+    border: solid 1px rgba(255, 255, 255, 0.2);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 30px !important;
+    border-color:#aaa;
+  }
+  .search:focus {
+    outline:none;
+    border-color:#aaa;
+  }
   </style>
 @endsection
 @section('content')
@@ -48,39 +65,59 @@
             <button id="AddUser" type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddModal">Voeg een user toe</button>
         </div>
     </div>
+    <!--<div class="row">
+      <button class="sort" data-sort="deviceId">Soorteer op naam</button>
+      <button class="sort" data-sort="deviceType">Soorteer op Adres</button>
+      <button class="sort" data-sort="firstName">Soorteer op Postcode</button>
+      <button class="sort" data-sort="lastName">Soorteer op familienaam</button>
+      <button class="sort" data-sort="email">Soorteer op email</button>
+    </div>-->
     <br>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12" id="users">
+          <div class="col-md-6"> <input class="search" placeholder="Search" /> </div>
+          <div class="col-md-4 col-md-offset-2">
+              <select id="role" class="form-control">
+                <option>Alles</option>
+                <option>Zorgbehoevende</option>
+                <option>Zorgmantel</option>
+              </select>
+          </div>
           <table class="table table-bordered">
-            <tr>
-              <td>Naam</td>
-              <td>Adres</td>
-              <td>Postcode</td>
-              <td>Land</td>
-              <td>M/V</td>
-              <td>Geboortedatum</td>
-              <td>Email</td>
-              <td>Telefoon</td>
-              <td>Rol</td>
-              <td>Opties</td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Naam <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Name"></span></td>
+                <th>Adres <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Street"></span></th>
+                <th>Postcode <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="City"></span></th>
+                <th>Land <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Country"></span></th>
+                <th>M/V <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Gender"></span></th>
+                <th>Geboortedatum <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="DateOfBirth"></span></th>
+                <th>Email <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Email"></span></th>
+                <th>Telefoon <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Phone"></span></th>
+                <th>Rol <span type="button" class="sort glyphicon glyphicon-triangle-top" data-sort="Role"></span></th>
+                <th>Opties</th>
+              </tr>
+            <thead>
+            <tbody class="list">
             @foreach ($users as $user)
                 <tr>
-                  <td>{{ $user->firstName.' '.$user->lastName }}</td>
-                  <td>{{ $user->address->street." ".$user->address->streetNumber }}</td>
-                  <td>{{ $user->address->city." ".$user->address->zipCode  }}</td>
-                  <td>{{ $user->address->country }}</td>
-                  <td>{{ $user->gender }}</td>
-                  <td>{{ $user->dateOfBirth }}</td>
-                  <td>{{ $user->email }}</td>
-                  <td>{{ $user->phone }}</td>
-                  <td>{{ $user->role }}</td>
+                  <td class="Name">{{ $user->firstName.' '.$user->lastName }}</td>
+                  <td class="Street">{{ $user->address->street." ".$user->address->streetNumber }}</td>
+                  <td class="City">{{ $user->address->city." ".$user->address->zipCode  }}</td>
+                  <td class="Country">{{ $user->address->country }}</td>
+                  <td class="Gender">{{ $user->gender }}</td>
+                  <td class="DateOfBirth">{{ $user->dateOfBirth }}</td>
+                  <td class="Email">{{ $user->email }}</td>
+                  <td class="Phone">{{ $user->phone }}</td>
+                  <td class="Role">{{ $user->role }}</td>
                   <td>
                       <button type="button" class="btn btn-primary EditUser"  data-target="#EditModal">Edit</button>
                       <button type="button" class="btn btn-primary ResetPass"  data-target="#ResetModal">Wachtwoord</button>
                       <button type="button" class="btn btn-primary LinkDev"  data-target="#LinkModal">Toestellen</button>
                       @if ($user->role == 'Zorgmantel')
                         <button type="button" class="btn btn-primary LinkBuddy">Buddies</button>
+                      @elseif ($user->role == 'Zorgbehoevende')
+                        <button type="button" class="btn btn-primary LinkDokter">Dokter</button>
                       @endif
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
                       <form method="POST" action="user/delete">
@@ -91,6 +128,7 @@
                   </td>
                 </tr>
             @endforeach
+          </tbody>
           </table>
         </div>
     </div>
@@ -98,6 +136,27 @@
 <div id="modal" class="modal fade" role="dialog"></div>
 @endsection
 @section('footer')
+<script src="http://listjs.com/no-cdn/list.js"></script>
+<script type="text/javascript">
+var options = {
+    valueNames: [ 'Name','Street','City','Country','Gender','DateOfBirth','Email','Phone','Role' ]
+};
+
+var userList = new List('users', options);
+$('#role').change(function () {
+    var selection = this.value;
+
+    // filter items in the list
+    userList.filter(function (item) {
+        if (item.values().Role == selection || selection == "Alles") {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+});
+</script>
 <script type="text/javascript">
   $(document).on('click', '#submitAdd', function() {
     console.log('something');
@@ -132,6 +191,15 @@
   });
 
   $(document).ready(function(){
+        $(".sort").on("click",function(){
+          console.log("detected click....");
+          if($(this).hasClass('glyphicon glyphicon-triangle-bottom')){
+            $(this).removeClass('glyphicon glyphicon-triangle-bottom').addClass('glyphicon glyphicon-triangle-top');
+          }
+          else if($(this).hasClass('glyphicon glyphicon-triangle-top')){
+              $(this).removeClass('glyphicon glyphicon-triangle-top').addClass('glyphicon glyphicon-triangle-bottom');
+          }
+        });
         $("#AddUser").on("click", function(e){
           console.log(this);
           ajaxCall("","/addmodal");
@@ -156,6 +224,11 @@
           console.log(this);
           var data = $(this).siblings('input').val();
           ajaxCall(data,"/buddymodal");
+        });
+        $(".LinkDokter").on("click", function(e){
+          console.log(this);
+          var data = $(this).siblings('input').val();
+          ajaxCall(data,"/doktermodal");
         });
   });
 

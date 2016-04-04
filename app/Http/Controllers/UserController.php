@@ -90,6 +90,21 @@ class UserController extends Controller
 
     }
 
+    public function unlinkDokter(Request $request){
+        $id = $request->input('buddy');
+        $user = \App\User::where('id','=',$id)->first();
+        if($user){
+          $user->buddy_id = NULL;
+          $saved = $user->save();
+          if($saved){
+            return redirect('/home')->with('success','Dokter is geunlinked');
+          }
+          else{
+            return redirect('/home')->with('error','Dokter is niet geunlinked');
+          }
+        }
+    }
+
     public function unlink(Request $request){
         $id = $request->input('buddy');
         $user = \App\User::where('id','=',$id)->first();
@@ -97,10 +112,10 @@ class UserController extends Controller
           $user->buddy_id = NULL;
           $saved = $user->save();
           if($saved){
-            return redirect('/home')->with('success','Buddy is gelinked');
+            return redirect('/home')->with('success','Buddy is geunlinked');
           }
           else{
-            return redirect('/home')->with('error','Buddy is niet gelinked');
+            return redirect('/home')->with('error','Buddy is niet geunlinked');
           }
         }
     }

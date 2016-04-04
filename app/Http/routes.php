@@ -38,6 +38,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
     Route::post('/buddymodal','ModalController@linkBuddy');
+    Route::post('/doktermodal','ModalController@linkDokter');
     Route::post('user/add','UserController@addUser');
     Route::post('user/addAddress','UserController@addUserAddress');
     Route::post('user/editUser','UserController@editUser');
@@ -46,6 +47,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('user/linkBuddy','UserController@linkBuddy');
     Route::post('user/reset','UserController@reset');
     Route::post('user/unlink','UserController@unlink');
+    Route::post('user/unlinkDokter','UserController@unlinkDokter');
     Route::post('user/delete','UserController@delete');
 
     Route::get('user/{user}', 'UserController@showProfile');
