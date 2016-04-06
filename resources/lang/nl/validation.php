@@ -110,6 +110,8 @@ return [
 	'attributes' => [
 		// terugkomende kolommen
 		'user_id'			=> 'gebruikers id',
+		'created_at'		=> 'creatie datum',
+		
 		// de address kolommen
 		'street' 			=> 'straat'
 		'streetNumber'		=> 'huisnummer',
@@ -150,6 +152,10 @@ return [
 		'password'			=> 'wachtwoord',
 		'role'				=> 'rol',
 		'buddy_id'			=> 'buddy id',
+
+		// de gewicht kolommen
+		//'weight' // dit zit reeds in de medicalinfo
+		// 'created_at'		=> 'creatie datum',
 	]
 
 ];
