@@ -107,7 +107,49 @@ return [
 	| of "email". This simply helps us make messages a little cleaner.
 	|
 	*/
+	'attributes' => [
+		// terugkomende kolommen
+		'user_id'			=> 'gebruikers id',
+		// de address kolommen
+		'street' 			=> 'straat'
+		'streetNumber'		=> 'huisnummer',
+		'bus'				=> 'bus',
+		'zipCode'			=> 'postcode',
+		'city'				=> 'stad',
+		'country'			=> 'land',
 
-	'attributes' => []
+		// De devices kolommen
+		'type'				=> 'type',
+
+		// de medicalinfo kolommen
+		'length'			=> 'lengte',
+		'weight'			=> 'gewicht',
+		'bloodType'			=> 'bloedgroep',
+		'medicalCondition'	=> 'medische aandoening',
+		'allergies'			=> 'allergieën',
+
+		// medicijn kolommen
+		'name'				=> 'naam',
+		'info'				=> 'informatie',
+		'photoUrl'			=> 'foto url',
+
+		// schedule kolommen
+		'medicine_id'		=> 'medicijn id',
+		'dayOfWeek'			=> 'weekdag',
+		'time'				=> 'tijdstip',
+		'amount'			=> 'hoeveelheid',
+
+		// de gebruikers kolommen
+		'firstName' 		=> 'voornaam',
+		'lastName'			=> 'achternaam',
+		'address_id'		=> 'adres id',
+		'phone'				=> 'telefoonnummer',
+		'gender'			=> 'geslacht',
+		'dateOfBirth'		=> 'geboortedatum',
+		'email'				=> 'email adres',
+		'password'			=> 'wachtwoord',
+		'role'				=> 'rol',
+		'buddy_id'			=> 'buddy id',
+	]
 
 ];
