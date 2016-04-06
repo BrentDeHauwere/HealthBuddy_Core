@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This is the dutch translation for passwords.
+ * @author Yen Jacobs
+ */
 return [
 
     /*

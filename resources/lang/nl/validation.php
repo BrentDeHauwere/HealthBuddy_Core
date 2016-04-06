@@ -4,7 +4,8 @@
 /** 
  * This is a Dutch transalation file.
  * It provides translations for the validation messages.
- * Found this on https://gist.github.com/johnhout/055d2c039cfb7574d657
+ * Yen found this on https://gist.github.com/johnhout/055d2c039cfb7574d657
+ * @author eddi
  */
 return [
 
@@ -111,7 +112,7 @@ return [
 		// terugkomende kolommen
 		'user_id'			=> 'gebruikers id',
 		'created_at'		=> 'creatie datum',
-		
+
 		// de address kolommen
 		'street' 			=> 'straat'
 		'streetNumber'		=> 'huisnummer',
