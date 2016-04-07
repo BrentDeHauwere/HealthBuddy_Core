@@ -114,7 +114,7 @@ return [
 		'created_at'		=> 'creatie datum',
 
 		// de address kolommen
-		'street' 			=> 'straat'
+		'street' 			=> 'straat',
 		'streetNumber'		=> 'huisnummer',
 		'bus'				=> 'bus',
 		'zipCode'			=> 'postcode',

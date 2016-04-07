@@ -74,10 +74,10 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('buddyprofile', 'ApiController@showBuddyProfile');
     Route::post('user/{user_id}/address', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
-    Route::post('patient/{patient_id}', 'ApiController@showPatient');
+    Route::post('patient/{patient_id}/show', 'ApiController@showPatient');
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
     Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
-    Route::post('user/{patient_id}/medicine/{medicine_id}', 'ApiController@showMedicine');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');

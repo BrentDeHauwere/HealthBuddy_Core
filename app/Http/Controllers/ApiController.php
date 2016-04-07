@@ -441,15 +441,21 @@ return $photo;
     */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
-    $path = 'userdata/user_'. $user_id . '/medicines/';
-    // sanitize the filename given the name of the medication.
-    $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
-    $fullPath = $path.$filename;
+    $fullPath = null;
 
-    if($request->photo->move($path, 
-      $filename) != $fullPath)
+    // if there is a photo attached -> update it.
+    if(isset($request->photo) && !empty($request->photo))
     {
-      return response('Saving the picture failed', 500);
+      $path = 'userdata/user_'. $user_id . '/medicines/';
+      // sanitize the filename given the name of the medication.
+      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+      $fullPath = $path.$filename;
+
+      if($request->photo->move($path, 
+        $filename) != $fullPath)
+      {
+        return response('Saving the picture failed', 500);
+      }
     }
 
     // create the medicine object to store in DB
