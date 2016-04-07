@@ -366,6 +366,7 @@ return $photo;
   public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
   {
     $medicine = Medicine::find($medicine_id);
+    $fullPath = null;
 
     // if the name of the medicine changed, the photo is no longer valid!
     if($request->name != $medicine->name)
@@ -516,34 +517,65 @@ return $photo;
     // fetch the schedule to delete
   $schedule = Schedule::find($schedule_id);
   return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
-
-  return 'sdfsdfsdfsdf';
 }
 
-
-public function deleteMedicine(Request $request, $user_id, $medicine_id)
-{
-  if(!ApiHelper::isPatient($user_id)
-    || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+  /**
+ * This function deletes a medicine , and deletes it's photo
+ * @param medicine id the id of the medicine 
+ * @param user_id the id of the patient
+ * @author eddi
+ */
+  public function deleteMedicine(Request $request, $user_id, $medicine_id)
   {
-    return response("This medicine is not from a patient.", 403);
-  }
+    if(!ApiHelper::isPatient($user_id)
+      || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+    {
+      return response("This medicine is not from a patient.", 403);
+    }
   // fetch the medicine to delete
-  $medicine = Medicine::find($medicine_id);
+    $medicine = Medicine::find($medicine_id);
   // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
   // it's more important that a patient stops taking a medicine then a server having undeleted files.
-  $medicine->delete();
+    $medicine->delete();
 
   // delete the photo, if there is one 
-  if ($medicine->photoUrl != null) {
-    if( file_exists($medicine->photoUrl))
-    {
-      unlink($medicine->photoUrl);
+    if ($medicine->photoUrl != null) {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+      }
     }
+    return 'Medicine deleted';
   }
-  return 'Medicine deleted';
-}
 
+  /**
+   * This function deletes a photo attached to a medicine, and updates the medicine's photoUrl
+   * @param medicine id the id of the medicine 
+   * @param user_id the id of the patient
+   * @author eddi
+   */
+  public function deleteMedicinePhoto(Request $request, $user_id, $medicine_id)
+  {
+    if(!ApiHelper::isPatient($user_id)
+      || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+    {
+      return response("This medicine is not from a patient.", 403);
+    }
+  // fetch the medicine to delete
+    $medicine = Medicine::find($medicine_id);
+
+  // delete the photo, if there is one 
+    if ($medicine->photoUrl != null) {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+      }
+    }
+
+  // tell the medicine there is no photo anymore
+    $medicine->photoUrl = null;
+    return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':'Medicine photoUrl not updated';
+  }
 
   /**
    *  The login function for the API

@@ -99,4 +99,5 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // routes to delete records
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
 });
