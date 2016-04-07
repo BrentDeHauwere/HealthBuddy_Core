@@ -1,7 +1,7 @@
 <?php
 
 
-/** 
+/**
  * This is a Dutch transalation file.
  * It provides translations for the validation messages.
  * Yen found this on https://gist.github.com/johnhout/055d2c039cfb7574d657
