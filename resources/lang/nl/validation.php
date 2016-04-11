@@ -112,6 +112,7 @@ return [
 		// terugkomende kolommen
 		'user_id'			=> 'gebruikers id',
 		'created_at'		=> 'creatie datum',
+		'today'				=> 'vandaag',
 
 		// de address kolommen
 		'street' 			=> 'straat',
