@@ -72,6 +72,8 @@ Route::group(['middleware' => 'web'], function () {
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Routes to get records
     Route::post('buddyprofile', 'ApiController@showBuddyProfile');
+    Route::post('patientprofile', 'ApiController@showPatientProfile');
+
     Route::post('user/{user_id}/address', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
     Route::post('patient/{patient_id}/show', 'ApiController@showPatient');
@@ -80,6 +82,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
+    Route::post('user/{patient_id}/shedule/today', 'ApiController@showTodaysSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 
