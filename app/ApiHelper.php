@@ -74,24 +74,6 @@ class ApiHelper {
 		return $validFilename . $validExtension;
 	}
 
-	/**
-	 * This is a function to check if an id corresponds to an id of the authenticated user's patients.
-	 *
-	 * @param $patient_id
-	 * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
-	 * @author eddi
-	 */
-	public static function isPatient($patient_id)
-	{
-		$user = ApiHelper::getAuthenticatedUser();
-		foreach ($user->patients as $patient) {
-			if($patient->id == $patient_id)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * This function checks if a given address belongs to a patient of the buddy, or logged in user.
@@ -159,6 +141,36 @@ class ApiHelper {
 	{
 		$medicines = Medicine::where('user_id','=',$user_id)->where('id','=',$medicine_id)->get();
 		return (sizeof($medicines) == 1)?true:false;
+	}
+
+	/**
+	 * This is a function to check if an id corresponds to an id of the authenticated user's patients.
+	 *
+	 * @param $patient_id
+	 * @return bool returns true if the given ID corresponds to a patient of the authenticated user.
+	 * @author eddi
+	 */
+	public static function isPatient($patient_id)
+	{
+		$user = ApiHelper::getAuthenticatedUser();
+		foreach ($user->patients as $patient) {
+			if($patient->id == $patient_id)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * This is a function to check if an id corresponds to an id of a patient.
+	 *
+	 * @param $patient_id
+	 * @return bool returns true if the given ID corresponds to a patient .
+	 * @author eddi
+	 */
+	public static function isLoggedInUserPatient($user){
+		return ($user->buddy_id != null && $user->role == 'Zorgbehoevende')?true:false;
 	}
 
 	/**

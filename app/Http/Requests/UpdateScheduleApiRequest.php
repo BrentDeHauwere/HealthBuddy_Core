@@ -38,7 +38,7 @@ class UpdateScheduleApiRequest extends Request
         return [
         'dayOfWeek'     => 'numeric|between:1,7',
         'time'          => 'date_format:H:i:s',
-        'amount'        => 'numeric',
+        'amount'        => 'alpha_num|min:3',
         ];
     }
 }

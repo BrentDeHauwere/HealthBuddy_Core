@@ -70,6 +70,37 @@ class ApiController extends Controller
     return $auth_user;
   }
 
+ /**
+  *   This function returns the budddy and his info + the buddy's patients and their info.
+  * The address and patients are retrieved seperately since we need maximum flexibility.
+  *   @author eddi
+  */
+ public function showPatientProfile()
+ {
+    // retrieve the patient
+  $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
+  if(!ApiHelper::isLoggedInUserPatient($auth_user)){
+    return response('Not a patient.', 403);
+  }
+
+
+  // retrieve the patients's address
+  $address = Address::where('id', '=' ,$auth_user->address_id)->first();
+  // retrieve the patients madicines and schedules
+  $medicines = Medicine::with('schedule')->get();
+  // retrieve medicalinfo for the user
+  $medicalInfo =  MedicalInfo::where('user_id', '=', $auth_user->id)->first();
+
+  // append the patients to the buddy-object
+  $auth_user->address = $address;
+  $auth_user->medicalinfo = $medicalInfo;
+  $auth_user->medicines = $medicines;
+  // return the buddy
+  return $auth_user;
+}
+
+
+
   /**
    * This function retrieves the address of a user.
    * If that user is either the buddy OR a patient of the buddy. 
@@ -589,19 +620,27 @@ return $photo;
       // find the user in the database.
       $user = User::where('email','=',$request->email)->firstOrFail();
 
-      if(Hash::check($request->password, $user->password)){
-              // on each login, regenerate the api_token.
-        $user->api_token = str_random(60);
-        $user->save();
+      // check if the user may login to the app
+      if(
+        $user->role == 'Zorgbehoevende'
+        || $user->role == 'Zorgmantel'
+        ){
+        if(Hash::check($request->password, $user->password)){
+        // on each login, regenerate the api_token.
+          $user->api_token = str_random(60);
+          $user->save();
 
-              // return the api_token.
-        $api_token = $user->api_token; 
-        return response()->json(array('api_token' => $api_token));
+        // return the api_token.
+          $api_token = $user->api_token; 
+          return response()->json(array('api_token' => $api_token));
+        }
+        else{
+          throw new ModelNotFoundException('Wrong password');
+        }
       }
       else{
-        throw new ModelNotFoundException('Wrong password');
+        throw new ModelNotFoundException('Wrong role'); 
       }
-
     }catch(ModelNotFoundException $ex){
       return response($ex->getMessage(), 401);
     }
