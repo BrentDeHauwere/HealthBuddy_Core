@@ -82,7 +82,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
-    Route::post('user/{patient_id}/shedule/today', 'ApiController@showTodaysSchedule');
+    Route::post('user/{patient_id}/schedule/today', 'ApiController@showTodaysSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 

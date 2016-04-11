@@ -235,6 +235,30 @@ return $photo;
     return response('Wrong Patient_id provided.', 403);
   }
 
+
+  /**
+    * This function retrieves a patients schedule for today.
+    * @author eddi
+    */
+  public function showTodaysSchedule($patient_id){
+    $dbMedicines = Medicine::with('schedule')
+    ->where('user_id', '=', $patient_id) 
+    ->get();
+    $medicines = array();
+
+    foreach ($dbMedicines as $m) {
+      if(date('w') == date("w", $m->dayOfWeek))
+      {
+        array_push($medicines, $m);
+      }
+
+    }
+
+    dd($medicines);
+    return response('Wrong Patient_id provided.', 403);
+
+  }
+
   /**
       * This function retrieves a patients medicalInfo.
       * @author eddi
