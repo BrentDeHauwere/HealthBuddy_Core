@@ -43,30 +43,30 @@ class ApiController extends Controller
   */
   public function showBuddyProfile()
   {
-      // retrieve the buddy
+    // retrieve the buddy
     $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
 
-      // retrieve the buddy's address
+    // retrieve the buddy's address
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
-      // retrieve the buddy's patients and their infos
+    // retrieve the buddy's patients and their infos
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
     ->with('medicalinfo', 'address')->get();
 
 
-      // now add the medicines and schedules to the patients
+    // now add the medicines and schedules to the patients
     foreach ($patients_db as $patient) {
       $patient->patients = null;
       $patient->medicines = Medicine::with('schedule')->get();
     }
 
-      // append the patients to the buddy-object
+    // append the patients to the buddy-object
     $auth_user->address = $address;
     $auth_user->patients = $patients_db;
     $auth_user->medicalinfo = null;
     $auth_user->medicines = null;
-      // $auth_user->weight = null;
+    // $auth_user->weight = null;
 
-      // return the buddy
+    // return the buddy
     return $auth_user;
   }
 
@@ -115,7 +115,7 @@ class ApiController extends Controller
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif (ApiHelper::isPatient($user_id)) {
+    elseif (ApiHelper::isPatient($user_id) || ApiHelper::isLoggedInUserPatient()) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -181,7 +181,7 @@ class ApiController extends Controller
   public function showMedicine ($patient_id, $medicine_id)
   {
     // is this a buddy's patient? 
-    if(!ApiHelper::isPatient($patient_id)) {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
       return response('Wrong Patient_id provided.', 403);
     }
     // is this a medicine of the patient?
@@ -198,8 +198,8 @@ class ApiController extends Controller
 
  public function showMedicinePhoto($patient_id, $medicine_id)
  {
-    // is this a buddy's patient? 
-  if(!ApiHelper::isPatient($patient_id)) {
+    // is this a patient? 
+  if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
     return response('Wrong Patient_id provided.', 403);
   }
     // is this a medicine of the patient?
@@ -229,7 +229,7 @@ return $photo;
     */
   public function showSchedule($patient_id){
         // send the requested patient info
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
       return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -241,22 +241,22 @@ return $photo;
     * @author eddi
     */
   public function showTodaysSchedule($patient_id){
-    $dbMedicines = Medicine::with('schedule')
-    ->where('user_id', '=', $patient_id) 
-    ->get();
-    $medicines = array();
+    if(ApiHelper::isLoggedInUserPatient())
+    {
+      $dbMedicines = Medicine::with('schedule')
+      ->where('user_id', '=', $patient_id) 
+      ->get();
+      $medicines = array();
 
-    foreach ($dbMedicines as $m) {
-      if(date('w') == date("w", $m->dayOfWeek))
-      {
-        array_push($medicines, $m);
+      foreach ($dbMedicines as $m) {
+        if(date('w') == date("w", $m->dayOfWeek))
+        {
+          array_push($medicines, $m);
+        }
       }
-
+      return $medicines;
     }
-
-    dd($medicines);
     return response('Wrong Patient_id provided.', 403);
-
   }
 
   /**
@@ -265,7 +265,7 @@ return $photo;
       */
   public function showMedicalInfo($patient_id){
           // send the requested patient info
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
       return MedicalInfo::where('user_id', '=', $patient_id)->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -274,7 +274,7 @@ return $photo;
 
   public function showWeights($patient_id)
   {
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
       return Weight::where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -282,7 +282,7 @@ return $photo;
 
   public function showLastWeight($patient_id)
   {
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()){
       return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -542,7 +542,7 @@ return $photo;
    */
   public function createWeight($patient_id)
   {
-    if(!ApiHelper::isPatient($patient_id))
+    if(!ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient())
     {
       return response('Wrong id provided.', 403);
     }

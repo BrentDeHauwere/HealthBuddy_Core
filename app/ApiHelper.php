@@ -163,13 +163,13 @@ class ApiHelper {
 	}
 
 	/**
-	 * This is a function to check if an id corresponds to an id of a patient.
+	 * This is a function to check if the logged in user is a patient.
 	 *
-	 * @param $patient_id
-	 * @return bool returns true if the given ID corresponds to a patient .
+	 * @return bool returns true if the logged in user is a patient.
 	 * @author eddi
 	 */
-	public static function isLoggedInUserPatient($user){
+	public static function isLoggedInUserPatient(){
+		$user = ApiHelper::getAuthenticatedUser();
 		return ($user->buddy_id != null && $user->role == 'Zorgbehoevende')?true:false;
 	}
 
