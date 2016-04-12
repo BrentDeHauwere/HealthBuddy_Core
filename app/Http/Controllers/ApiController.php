@@ -41,64 +41,47 @@ class ApiController extends Controller
   * The address and patients are retrieved seperately since we need maximum flexibility.
   *   @author eddi
   */
-  public function showBuddyProfile()
+  public function showProfile()
   {
-    // retrieve the buddy
+    // retrieve the user
     $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
 
-    // retrieve the buddy's address
+    
+    // retrieve the address
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
-    // retrieve the buddy's patients and their infos
-    $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
-    ->with('medicalinfo', 'address')->get();
+    $auth_user->address = $address;
 
+    // if a budy get patients
+    if(!ApiHelper::isLoggedInUserPatient()){
+      // retrieve the buddy's patients and their infos
+      $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
+      ->with('medicalinfo', 'address')->get();
 
-    // now add the medicines and schedules to the patients
-    foreach ($patients_db as $patient) {
-      $patient->patients = null;
-      $patient->medicines = Medicine::with('schedule')->get();
+      $auth_user->medicalinfo = null;
+      $auth_user->medicines = null;
+
+      // now add the medicines and schedules to the patients
+      foreach ($patients_db as $patient) {
+        $patient->patients = null;
+        $patient->medicines = Medicine::where('user_id', '=', $patient->id)->with('schedule')->get();
+        $auth_user->patients = $patients_db;
+      }
+    }elseif (ApiHelper::isLoggedInUserPatient()) {
+      // retrieve the patients madicines and schedules
+      $medicines = Medicine::where('user_id', '=', $auth_user->id)->with('schedule')->get();
+      // retrieve medicalinfo for the user
+      $medicalInfo =  MedicalInfo::where('user_id', '=', $auth_user->id)->first();
+
+      $auth_user->medicalinfo = $medicalInfo;
+      $auth_user->medicines = $medicines;
+
+      // $auth_user->weight = null;
     }
 
-    // append the patients to the buddy-object
-    $auth_user->address = $address;
-    $auth_user->patients = $patients_db;
-    $auth_user->medicalinfo = null;
-    $auth_user->medicines = null;
-    // $auth_user->weight = null;
 
-    // return the buddy
+    // return the user
     return $auth_user;
   }
-
- /**
-  *   This function returns the budddy and his info + the buddy's patients and their info.
-  * The address and patients are retrieved seperately since we need maximum flexibility.
-  *   @author eddi
-  */
- public function showPatientProfile()
- {
-    // retrieve the patient
-  $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
-  if(!ApiHelper::isLoggedInUserPatient($auth_user)){
-    return response('Not a patient.', 403);
-  }
-
-
-  // retrieve the patients's address
-  $address = Address::where('id', '=' ,$auth_user->address_id)->first();
-  // retrieve the patients madicines and schedules
-  $medicines = Medicine::with('schedule')->get();
-  // retrieve medicalinfo for the user
-  $medicalInfo =  MedicalInfo::where('user_id', '=', $auth_user->id)->first();
-
-  // append the patients to the buddy-object
-  $auth_user->address = $address;
-  $auth_user->medicalinfo = $medicalInfo;
-  $auth_user->medicines = $medicines;
-  // return the buddy
-  return $auth_user;
-}
-
 
 
   /**
