@@ -3,6 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
+use App\Http\Controllers\ApiController;
+use Auth;
+
+use App\User;
+use App\ApiHelper;
 
 /**
  * This is a Class created to Validate a Request and check userinput 
@@ -20,8 +25,24 @@ class UpdateUserApiRequest extends Request
      */
     public function authorize()
     {
+      $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
+      $user_id = $this->route('user_id');
+      if($user_id == $auth_user->id || ApiHelper::isPatient($user_id)){
+
+            // ugly code; since iOs sends back <null> instead of null -> need to filter out these fields
+        $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
+        foreach ($fields as $f) {
+          if($f == '<null>'
+            )
+          {
+            echo $this->$f;
+            $this->$f == null;
+          }
+        }
+
         return true;
-        // return false;
+      }
+      return false;
     }
 
     /**
@@ -31,11 +52,16 @@ class UpdateUserApiRequest extends Request
      */
     public function rules()
     {
+        /**
+        * This is the original way, expecting post params for each user value
+        */
         return [
-            'email' => 'bail|email|unique:users,email',
-            'password' => 'bail|min:8',
-            'firstName' => 'bail|min:2|max:255',
-            'lastName' => 'bail|min:2|max:255',
+        'firstName'     => 'required|min:2|max:255',
+        'lastName'      => 'required|min:2|max:255',
+        'phone'         => 'min:9|max:25',
+        'gender'        => 'in:M,V',
+        'dateOfBirth'   => 'before:today|after:1890-01-01',
+        'email'         => 'email|min:12|max:255',
         ];
+      }
     }
-}
