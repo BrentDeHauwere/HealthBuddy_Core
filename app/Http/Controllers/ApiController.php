@@ -264,9 +264,12 @@ return $photo;
       * @author eddi
       */
   public function showMedicalInfo($patient_id){
-          // send the requested patient info
-    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
+    $auth_user = ApiHelper::getAuthenticatedUser();
+    // send the requested patient info
+    if(ApiHelper::isPatient($patient_id)) {
       return MedicalInfo::where('user_id', '=', $patient_id)->first();
+    }elseif (ApiHelper::isLoggedInUserPatient() && $patient_id == $auth_user->id) {
+      return MedicalInfo::where('user_id', '=', $auth_user->id)->first();
     }
     return response('Wrong Patient_id provided.', 403);
   }
