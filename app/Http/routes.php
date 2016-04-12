@@ -71,8 +71,7 @@ Route::group(['middleware' => 'web'], function () {
 */
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Routes to get records
-    Route::post('buddyprofile', 'ApiController@showBuddyProfile');
-    Route::post('patientprofile', 'ApiController@showPatientProfile');
+    Route::post('profile', 'ApiController@showProfile');
 
     Route::post('user/{user_id}/address', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
