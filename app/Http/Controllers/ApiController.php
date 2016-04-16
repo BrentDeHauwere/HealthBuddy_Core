@@ -16,6 +16,7 @@ use \App\Address;
 use \App\Medicine;
 use \App\Weight;
 use \App\Schedule;
+use \App\Intake;
 
 // use App\Http\Requests\Request;
 use App\Http\Requests\UpdateUserApiRequest;
@@ -25,6 +26,7 @@ use App\Http\Requests\UpdateScheduleApiRequest;
 use App\Http\Requests\UpdateMedicineApiRequest;
 use App\Http\Requests\CreateScheduleApiRequest;
 use App\Http\Requests\CreateMedicineApiRequest;
+use App\Http\Requests\CreateIntakeApiRequest;
 
 
 // api helper functions
@@ -78,7 +80,6 @@ class ApiController extends Controller
       // $auth_user->weight = null;
     }
 
-
     // return the user
     return $auth_user;
   }
@@ -98,7 +99,7 @@ class ApiController extends Controller
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif (ApiHelper::isPatient($user_id) || ApiHelper::isLoggedInUserPatient()) {
+    elseif (ApiHelper::isPatient($user_id)) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -113,7 +114,9 @@ class ApiController extends Controller
   public function showPatients()
   {
     $auth_user = ApiHelper::getAuthenticatedUser();
-
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Unauthorized, not a buddy', 403);
+    }
     // retrieve the buddy's patients and their medicalinfo.
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
     ->with('medicalinfo', 'address')->get();
@@ -135,6 +138,9 @@ class ApiController extends Controller
    */
   public function showPatient($patient_id)
   {
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Not a buddy.', 403);
+    }
     if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
       $patient->medicines = Medicine::with('schedule')->get();
@@ -149,11 +155,18 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if(!ApiHelper::isPatient($patient_id)) {
+    if(!ApiHelper::isPatient($patient_id)&& !ApiHelper::isLoggedInUserPatient()) {
       return response('Wrong Patient_id provided.', 403);
     }
-    $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-    return $medicine;
+
+    if(!ApiHelper::isLoggedInUserPatient()){
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }elseif ($patient_id == ApiHelper::getAuthenticatedUser()->id) {
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }
+    return response('Wrong Patient_id provided.', 403);
   }
 
   /**
@@ -168,42 +181,43 @@ class ApiController extends Controller
       return response('Wrong Patient_id provided.', 403);
     }
     // is this a medicine of the patient?
+    if(ApiHelper::isMedicineOfPatient($patient_id, $medicine_id)
+      || (ApiHelper::isLoggedInUserPatient() 
+        && $patient_id == ApiHelper::getAuthenticatedUser()-id))
+    {
+      // fetch the medicine
+      $medicine = Medicine::find($medicine_id);
+      return $medicine;
+    }
+
+    return response('Wrong medicine_id provided.', 403); 
+  }
+
+  public function showMedicinePhoto($patient_id, $medicine_id)
+  {
+    // is this a patient? 
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
     if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
     {
      return response('Wrong medicine_id provided.', 403); 
    }
 
-    // fetch the medicine
    $medicine = Medicine::find($medicine_id);
 
-   return $medicine;
- }
-
- public function showMedicinePhoto($patient_id, $medicine_id)
- {
-    // is this a patient? 
-  if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
-    return response('Wrong Patient_id provided.', 403);
+   if($medicine->photoUrl == null || empty($medicine->photoUrl))
+   {
+    return response("This medicine has no photo", 404);
   }
-    // is this a medicine of the patient?
-  if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
-  {
-   return response('Wrong medicine_id provided.', 403); 
- }
-
- $medicine = Medicine::find($medicine_id);
-
- if($medicine->photoUrl == null || empty($medicine->photoUrl))
- {
-  return response("This medicine has no photo", 404);
-}
-$photo = "empty";
+  $photo = "empty";
     // attach the photo if there is one.
-if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
-{
-  $photo = file_get_contents($medicine->photoUrl);
-}
-return $photo;
+  if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+  {
+    $photo = file_get_contents($medicine->photoUrl);
+  }
+  return $photo;
 }
 
   /**
@@ -224,23 +238,214 @@ return $photo;
     * @author eddi
     */
   public function showTodaysSchedule($patient_id){
-    if(ApiHelper::isLoggedInUserPatient())
+    // check if user is valid
+    if(!ApiHelper::isLoggedInUserPatient())
     {
-      $dbMedicines = Medicine::with('schedule')
-      ->where('user_id', '=', $patient_id) 
-      ->get();
-      $medicines = array();
+      return response('Wrong Patient_id provided.', 403);
+    }
 
-      foreach ($dbMedicines as $m) {
-        if(date('w') == date("w", $m->dayOfWeek))
-        {
-          array_push($medicines, $m);
+    // fetch the patients medicines with schedules
+    $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+    ->get();
+    // the medicines to be taken today.
+    $medicines = array();
+
+    // check all medicines for this patient
+    foreach ($dbMedicines as $m) {
+      $medToday = false;
+      $schedToday = array();
+      $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+      ->get();
+
+      // check all schedules of this medicine
+      foreach ($dbSchedules as $schedule) {
+
+        if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+          if(!empty($schedule->dayOfWeek) 
+            && date('w') == date("w", $schedule->dayOfWeek))
+          {
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+          else if(!empty($schedule->start_date) 
+            && (strtotime($schedule->start_date) < strtotime('now')))
+          {
+          // check if the medicine should still be taken.
+            if( (!empty($schedule->end_date) 
+              && (strtotime($schedule->end_date) > strtotime('now')))
+              || empty($schedule->end_date)
+              )
+            {
+              $medToday = true;
+              array_push($schedToday, $schedule);
+            }
+          }
         }
       }
-      return $medicines;
+      if($medToday)
+      {
+        $m->schedule = $schedToday;
+        array_push($medicines, $m);
+        $medToday = false;
+      }
     }
+    return $medicines;    
+  }
+
+
+ /**
+    * This function retrieves a patients schedule for today.
+    * @author eddi
+    */
+ public function showTodaysScheduleWithIntakes($patient_id){
+    // check if user is valid
+  if(!ApiHelper::isLoggedInUserPatient())
+  {
     return response('Wrong Patient_id provided.', 403);
   }
+
+  $date = date_create();
+
+  // fetch the patients medicines with schedules
+  $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+  ->get();
+  // the medicines to be taken today.
+  $medicines = array();
+
+    // check all medicines for this patient
+  foreach ($dbMedicines as $m) {
+    $medToday = false;
+    $schedToday = array();
+    $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+    ->get();
+
+      // check all schedules of this medicine
+    foreach ($dbSchedules as $schedule) {
+
+      if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+        if(!empty($schedule->dayOfWeek) 
+          && date('w') == date("w", $schedule->dayOfWeek))
+        {
+          $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+          ->whereNotNull('created_at')
+          ->where('created_at', '=', date('Y-m-d', time()))
+          ->orderBy('created_at', 'desc')
+          ->get();
+
+          $medToday = true;
+          array_push($schedToday, $schedule);
+        }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+        else if(!empty($schedule->start_date) 
+          && (strtotime($schedule->start_date) < strtotime('now')))
+        {
+          // check if the medicine should still be taken.
+          if( (!empty($schedule->end_date) 
+            && (strtotime($schedule->end_date) > strtotime('now')))
+            || empty($schedule->end_date)
+            )
+          {
+            $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+            ->whereNotNull('created_at')
+            ->where('created_at', '=', date('Y-m-d', time()))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+        }
+      }
+    }
+    if($medToday)
+    {
+      $m->schedule = $schedToday;
+      array_push($medicines, $m);
+      $medToday = false;
+    }
+  }
+  return $medicines;    
+}
+
+  /**
+   * Show the intakes for a given medicine
+   * @return returns the schedules and its intakes.
+   * @author eddi
+   */
+  public function showIntakesForMedicineLastxWeeks($patient_id, $medicine_id, $count)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+      return response('Wrong medicine_id provided.', 403);
+    }
+    if($count < 1){
+      return response('Wrong count provided.', 403); 
+    }
+
+    $date = date_sub(date_create(),date_interval_create_from_date_string( $count . " weeks"));
+    
+
+    $schedules = Schedule::where('medicine_id','=', $medicine_id)->get();
+
+    foreach ($schedules as $schedule) {
+
+      $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+      ->whereNotNull('created_at')
+      ->where('created_at', '<', $date)
+      ->orderBy('created_at', 'desc')
+      ->first();
+    }
+    return $schedules;
+  }
+
+  /**
+   * Show the intakes for today of a given medicine
+   * @return returns the schedule and its intakes for today.
+   * @author eddi
+   */
+  public function showIntakesForToday($patient_id)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+
+    $date = date_create();
+    
+    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    ->with('schedule')
+    ->get();
+
+    $intakes = array();
+    
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+
+        $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+        ->whereNotNull('created_at')
+        ->where('created_at', '=', date('Y-m-d', time()))
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        if(!empty($schedule->intakes))
+        {
+          array_push($intakes, $schedule->intakes);
+        }
+      }
+    }
+
+    return $intakes;
+  }
+
 
   /**
       * This function retrieves a patients medicalInfo.
@@ -258,6 +463,8 @@ return $photo;
   }
 
 
+
+
   public function showWeights($patient_id)
   {
     if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
@@ -273,6 +480,7 @@ return $photo;
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
 
 
 
@@ -452,6 +660,21 @@ return $photo;
   /*
    * These functions are for creating records in the database
    */
+
+  /**
+    * This function creates a Intake for a medicine, validating the user and the schedule before creation.
+    * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */  
+  public function createIntake(CreateIntakeApiRequest $request, $user_id, $schedule_id)
+  {
+    $intake = new Intake();
+    $fields = array('schedule_id');
+    $intake->schedule_id = $schedule_id;
+    return ($intake->save())?$intake:response("Intake not created", 403);
+  }
 
   /**
     * This function creates a schedule for a medicine, validating the user and the medicine before creation.

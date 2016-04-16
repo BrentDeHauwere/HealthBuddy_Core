@@ -79,9 +79,17 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
     Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
     Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
-    Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 
+        'ApiController@showMedicinePhoto');
+
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
     Route::post('user/{patient_id}/schedule/today', 'ApiController@showTodaysSchedule');
+    
+    Route::post('user/{patient_id}/intake/show/today', 
+        'ApiController@showTodaysScheduleWithIntakes');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/intakes/last/{count}/weeks', 
+        'ApiController@showIntakesForMedicineLastxWeeks');
+
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 
@@ -96,10 +104,28 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Routes to create records
     Route::post('user/{user_id}/medicine/create', 'ApiController@createMedicine');
     Route::post('user/{user_id}/schedule/create', 'ApiController@createSchedule');
+    Route::post('user/{user_id}/schedule/{schedule_id}/intake/create', 'ApiController@createIntake');
     Route::post('user/{user_id}/weight/create', 'ApiController@createWeight');
 
     // routes to delete records
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
+
+
+
+
+    // Routes for intakes :
+    // --------------------
+    // show all
+    // show last week
+    // show last month
+    // show for medicine_id
+    // 
+    // create
+    //
+    // delete?
+    // update?
+
 });
+
