@@ -104,6 +104,21 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
 
 
+
+
+    // Change to schedules :
+    // ---------------------
+    // - add start_date
+    // - add end_date 
+    // - add interval (om de hoeveel dagen)
+
+    // Routes for schedules :
+    // ----------------------
+    // schedules today
+    // schedules die gebruik maakt van om de X dagen
+
+
+
     // Routes for intakes :
     // --------------------
     // show all
@@ -117,10 +132,8 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // update?
 
 
-    // Routes for schedules :
-    // ----------------------
-    // schedules today
-    // schedules die gebruik maakt van om de X dagen
+
+
 
 });
 
