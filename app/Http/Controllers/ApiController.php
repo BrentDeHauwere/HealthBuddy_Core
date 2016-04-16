@@ -78,7 +78,6 @@ class ApiController extends Controller
       // $auth_user->weight = null;
     }
 
-
     // return the user
     return $auth_user;
   }
@@ -98,7 +97,7 @@ class ApiController extends Controller
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif (ApiHelper::isPatient($user_id) || ApiHelper::isLoggedInUserPatient()) {
+    elseif (ApiHelper::isPatient($user_id)) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -113,7 +112,9 @@ class ApiController extends Controller
   public function showPatients()
   {
     $auth_user = ApiHelper::getAuthenticatedUser();
-
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Unauthorized, not a buddy', 403);
+    }
     // retrieve the buddy's patients and their medicalinfo.
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
     ->with('medicalinfo', 'address')->get();
@@ -135,6 +136,9 @@ class ApiController extends Controller
    */
   public function showPatient($patient_id)
   {
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Not a buddy.', 403);
+    }
     if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
       $patient->medicines = Medicine::with('schedule')->get();
@@ -149,11 +153,18 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if(!ApiHelper::isPatient($patient_id)) {
+    if(!ApiHelper::isPatient($patient_id)&& !ApiHelper::isLoggedInUserPatient()) {
       return response('Wrong Patient_id provided.', 403);
     }
-    $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-    return $medicine;
+
+    if(!ApiHelper::isLoggedInUserPatient()){
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }elseif ($patient_id == ApiHelper::getAuthenticatedUser()->id) {
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }
+    return response('Wrong Patient_id provided.', 403);
   }
 
   /**
@@ -168,42 +179,43 @@ class ApiController extends Controller
       return response('Wrong Patient_id provided.', 403);
     }
     // is this a medicine of the patient?
+    if(ApiHelper::isMedicineOfPatient($patient_id, $medicine_id)
+      || (ApiHelper::isLoggedInUserPatient() 
+        && $patient_id == ApiHelper::getAuthenticatedUser()-id))
+    {
+      // fetch the medicine
+      $medicine = Medicine::find($medicine_id);
+      return $medicine;
+    }
+
+    return response('Wrong medicine_id provided.', 403); 
+  }
+
+  public function showMedicinePhoto($patient_id, $medicine_id)
+  {
+    // is this a patient? 
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
+      return response('Wrong Patient_id provided.', 403);
+    }
+    // is this a medicine of the patient?
     if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
     {
      return response('Wrong medicine_id provided.', 403); 
    }
 
-    // fetch the medicine
    $medicine = Medicine::find($medicine_id);
 
-   return $medicine;
- }
-
- public function showMedicinePhoto($patient_id, $medicine_id)
- {
-    // is this a patient? 
-  if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
-    return response('Wrong Patient_id provided.', 403);
+   if($medicine->photoUrl == null || empty($medicine->photoUrl))
+   {
+    return response("This medicine has no photo", 404);
   }
-    // is this a medicine of the patient?
-  if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
-  {
-   return response('Wrong medicine_id provided.', 403); 
- }
-
- $medicine = Medicine::find($medicine_id);
-
- if($medicine->photoUrl == null || empty($medicine->photoUrl))
- {
-  return response("This medicine has no photo", 404);
-}
-$photo = "empty";
+  $photo = "empty";
     // attach the photo if there is one.
-if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
-{
-  $photo = file_get_contents($medicine->photoUrl);
-}
-return $photo;
+  if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+  {
+    $photo = file_get_contents($medicine->photoUrl);
+  }
+  return $photo;
 }
 
   /**
