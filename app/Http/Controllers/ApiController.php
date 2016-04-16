@@ -236,22 +236,62 @@ class ApiController extends Controller
     * @author eddi
     */
   public function showTodaysSchedule($patient_id){
-    if(ApiHelper::isLoggedInUserPatient())
+    // check if user is valid
+    if(!ApiHelper::isLoggedInUserPatient())
     {
-      $dbMedicines = Medicine::with('schedule')
-      ->where('user_id', '=', $patient_id) 
-      ->get();
-      $medicines = array();
+      return response('Wrong Patient_id provided.', 403);
+    }
 
-      foreach ($dbMedicines as $m) {
-        if(date('w') == date("w", $m->dayOfWeek))
-        {
-          array_push($medicines, $m);
+    // fetch the patients medicines with schedules
+    $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+    ->get();
+    // the medicines to be taken today.
+    $medicines = array();
+
+    // check all medicines for this patient
+    foreach ($dbMedicines as $m) {
+      $medToday = false;
+      $schedToday = array();
+      $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+      ->get();
+
+      // check all schedules of this medicine
+      foreach ($dbSchedules as $schedule) {
+
+        if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+          if(!empty($schedule->dayOfWeek) 
+            && date('w') == date("w", $schedule->dayOfWeek))
+          {
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+          else if(!empty($schedule->start_date) 
+            && (strtotime($schedule->start_date) < strtotime('now')))
+          {
+          // check if the medicine should still be taken.
+            if( (!empty($schedule->end_date) 
+              && (strtotime($schedule->end_date) > strtotime('now')))
+              || empty($schedule->end_date)
+              )
+            {
+              $medToday = true;
+              array_push($schedToday, $schedule);
+            }
+          }
         }
       }
-      return $medicines;
+      if($medToday)
+      {
+        $m->schedule = $schedToday;
+        array_push($medicines, $m);
+        $medToday = false;
+      }
     }
-    return response('Wrong Patient_id provided.', 403);
+    return $medicines;    
   }
 
   /**
