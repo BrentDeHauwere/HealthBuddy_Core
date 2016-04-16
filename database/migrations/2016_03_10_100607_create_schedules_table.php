@@ -15,9 +15,19 @@ class CreateSchedulesTable extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('medicine_id')->unsigned();
-            $table->integer('dayOfWeek')->unsigned();
+
+            // Basic info
             $table->time('time');
             $table->string('amount');
+            
+            // take this medicint at exactely this time.
+            $table->integer('dayOfWeek')->unsigned()->nullable();
+
+            // Take this medicine each X days.
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->integer('interval')->nullable();
+
             $table->timestamps(); // eloquent needs this: created_at && updated_at
         });
     }

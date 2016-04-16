@@ -11,58 +11,40 @@ class IntakesTableSeeder extends Seeder
      */
     public function run()
     {
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-01 08:00',
-    		]);  
-   
+    	// Update this after updathin the Schedule model
 
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-01 18:00',
-    		]);  
-
-
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-03 07:10',
-    		]);  
-   
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-03 17:31',
-    		]);  
-
-
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-05 08:00',
-    		]);  
-   
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-05 18:00',
-    		]);  
-
-
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-08 07:51',
-    		]);  
-   
-
-    	DB::table('intakes')->insert([
-    		'schedule_id'   => 1,
-    		'created_at' => '2016-04-08 18:23',
-    		]);  
-
-
-
+    	// // intakes for user eddi 
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 1,
+    	// 	'created_at' => '2016-04-01 08:00',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 3,
+    	// 	'created_at' => '2016-04-01 18:00',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 1,
+    	// 	'created_at' => '2016-04-03 07:10',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 3,
+    	// 	'created_at' => '2016-04-03 17:31',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 1,
+    	// 	'created_at' => '2016-04-05 08:00',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 3,
+    	// 	'created_at' => '2016-04-05 18:00',
+    	// 	]);
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 1,
+    	// 	'created_at' => '2016-04-08 07:51',
+    	// 	]);  
+    	// DB::table('intakes')->insert([
+    	// 	'schedule_id'   => 3,
+    	// 	'created_at' => '2016-04-08 18:23',
+    	// 	]);
     }
-
 }
