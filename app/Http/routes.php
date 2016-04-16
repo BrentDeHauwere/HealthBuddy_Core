@@ -102,4 +102,25 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
+
+
+    // Routes for intakes :
+    // --------------------
+    // show all
+    // show last week
+    // show last month
+    // show for medicine_id
+    // 
+    // create
+    //
+    // delete?
+    // update?
+
+
+    // Routes for schedules :
+    // ----------------------
+    // schedules today
+    // schedules die gebruik maakt van om de X dagen
+
 });
+

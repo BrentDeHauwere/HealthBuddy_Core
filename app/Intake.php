@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Intake extends Model
 {
-	
+
 
 	/**
-     * Get the medicine that owns the schedule.
+     * Get the schedule that owns this intake.
      */
 	public function schedule()
 	{
