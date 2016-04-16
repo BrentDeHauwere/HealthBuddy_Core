@@ -26,6 +26,7 @@ use App\Http\Requests\UpdateScheduleApiRequest;
 use App\Http\Requests\UpdateMedicineApiRequest;
 use App\Http\Requests\CreateScheduleApiRequest;
 use App\Http\Requests\CreateMedicineApiRequest;
+use App\Http\Requests\CreateIntakeApiRequest;
 
 
 // api helper functions
@@ -335,7 +336,7 @@ class ApiController extends Controller
           ->where('created_at', '=', date('Y-m-d', time()))
           ->orderBy('created_at', 'desc')
           ->get();
-          
+
           $medToday = true;
           array_push($schedToday, $schedule);
         }
@@ -659,6 +660,21 @@ class ApiController extends Controller
   /*
    * These functions are for creating records in the database
    */
+
+  /**
+    * This function creates a Intake for a medicine, validating the user and the schedule before creation.
+    * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */  
+  public function createIntake(CreateIntakeApiRequest $request, $user_id, $schedule_id)
+  {
+    $intake = new Intake();
+    $fields = array('schedule_id');
+    $intake->schedule_id = $schedule_id;
+    return ($intake->save())?$intake:response("Intake not created", 403);
+  }
 
   /**
     * This function creates a schedule for a medicine, validating the user and the medicine before creation.

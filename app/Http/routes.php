@@ -87,7 +87,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     
     Route::post('user/{patient_id}/intake/show/today', 
         'ApiController@showTodaysScheduleWithIntakes');
-        Route::post('user/{patient_id}/medicine/{medicine_id}/intakes/last/{count}/weeks', 
+    Route::post('user/{patient_id}/medicine/{medicine_id}/intakes/last/{count}/weeks', 
         'ApiController@showIntakesForMedicineLastxWeeks');
 
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
@@ -104,6 +104,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Routes to create records
     Route::post('user/{user_id}/medicine/create', 'ApiController@createMedicine');
     Route::post('user/{user_id}/schedule/create', 'ApiController@createSchedule');
+    Route::post('user/{user_id}/schedule/{schedule_id}/intake/create', 'ApiController@createIntake');
     Route::post('user/{user_id}/weight/create', 'ApiController@createWeight');
 
     // routes to delete records
