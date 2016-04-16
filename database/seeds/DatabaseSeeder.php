@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(WeightsTableSeeder::class);
         $this->call(MedicinesTableSeeder::class);
         $this->call(SchedulesTableSeeder::class);
+        $this->call(IntakesTableSeeder::class);
     }
 }

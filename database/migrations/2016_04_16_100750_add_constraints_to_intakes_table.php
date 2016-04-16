@@ -25,6 +25,6 @@ class AddConstraintsToIntakesTable extends Migration
     public function down()
     {
         Schema::table('intakes', function (Blueprint $table) {
-        $table->dropForeign('intakes_schedules_id_foreign');
+        $table->dropForeign('intakes_schedule_id_foreign');
     });    }
    }
