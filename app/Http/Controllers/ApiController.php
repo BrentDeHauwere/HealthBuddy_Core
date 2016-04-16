@@ -296,6 +296,83 @@ class ApiController extends Controller
   }
 
 
+ /**
+    * This function retrieves a patients schedule for today.
+    * @author eddi
+    */
+ public function showTodaysScheduleWithIntakes($patient_id){
+    // check if user is valid
+  if(!ApiHelper::isLoggedInUserPatient())
+  {
+    return response('Wrong Patient_id provided.', 403);
+  }
+
+  $date = date_create();
+
+  // fetch the patients medicines with schedules
+  $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+  ->get();
+  // the medicines to be taken today.
+  $medicines = array();
+
+    // check all medicines for this patient
+  foreach ($dbMedicines as $m) {
+    $medToday = false;
+    $schedToday = array();
+    $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+    ->get();
+
+      // check all schedules of this medicine
+    foreach ($dbSchedules as $schedule) {
+
+      if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+        if(!empty($schedule->dayOfWeek) 
+          && date('w') == date("w", $schedule->dayOfWeek))
+        {
+          $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+          ->whereNotNull('created_at')
+          ->where('created_at', '=', date('Y-m-d', time()))
+          ->orderBy('created_at', 'desc')
+          ->get();
+          
+          $medToday = true;
+          array_push($schedToday, $schedule);
+        }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+        else if(!empty($schedule->start_date) 
+          && (strtotime($schedule->start_date) < strtotime('now')))
+        {
+          // check if the medicine should still be taken.
+          if( (!empty($schedule->end_date) 
+            && (strtotime($schedule->end_date) > strtotime('now')))
+            || empty($schedule->end_date)
+            )
+          {
+            $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+            ->whereNotNull('created_at')
+            ->where('created_at', '=', date('Y-m-d', time()))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+        }
+      }
+    }
+    if($medToday)
+    {
+      $m->schedule = $schedToday;
+      array_push($medicines, $m);
+      $medToday = false;
+    }
+  }
+  return $medicines;    
+}
+
   /**
    * Show the intakes for a given medicine
    * @return returns the schedules and its intakes.
@@ -314,22 +391,58 @@ class ApiController extends Controller
       return response('Wrong count provided.', 403); 
     }
 
-    // dd(date_create());
-    // $date = date('Y-m-d', strtotime('-'. $count .' week', strtotime(date(time()))  ));
     $date = date_sub(date_create(),date_interval_create_from_date_string( $count . " weeks"));
     
 
     $schedules = Schedule::where('medicine_id','=', $medicine_id)->get();
 
     foreach ($schedules as $schedule) {
-    
+
       $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
       ->whereNotNull('created_at')
-      // ->where('created_at', '<', $date)
+      ->where('created_at', '<', $date)
       ->orderBy('created_at', 'desc')
       ->first();
     }
     return $schedules;
+  }
+
+  /**
+   * Show the intakes for today of a given medicine
+   * @return returns the schedule and its intakes for today.
+   * @author eddi
+   */
+  public function showIntakesForToday($patient_id)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+
+    $date = date_create();
+    
+    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    ->with('schedule')
+    ->get();
+
+    $intakes = array();
+    
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+
+        $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+        ->whereNotNull('created_at')
+        ->where('created_at', '=', date('Y-m-d', time()))
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        if(!empty($schedule->intakes))
+        {
+          array_push($intakes, $schedule->intakes);
+        }
+      }
+    }
+
+    return $intakes;
   }
 
 

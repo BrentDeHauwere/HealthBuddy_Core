@@ -30,36 +30,5 @@ class IntakesTableSeeder extends Seeder
               'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*3 . ' days')),
               ]);
         }
-
-
-        // // intakes for user eddi 
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 3,
-    	// 	'created_at' => '2016-04-01 18:00',
-    	// 	]);
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 1,
-    	// 	'created_at' => '2016-04-03 07:10',
-    	// 	]);
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 3,
-    	// 	'created_at' => '2016-04-03 17:31',
-    	// 	]);
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 1,
-    	// 	'created_at' => '2016-04-05 08:00',
-    	// 	]);
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 3,
-    	// 	'created_at' => '2016-04-05 18:00',
-    	// 	]);
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 1,
-    	// 	'created_at' => '2016-04-08 07:51',
-    	// 	]);  
-    	// DB::table('intakes')->insert([
-    	// 	'schedule_id'   => 3,
-    	// 	'created_at' => '2016-04-08 18:23',
-    	// 	]);
     }
 }
