@@ -79,9 +79,15 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
     Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
     Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
-    Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 
+        'ApiController@showMedicinePhoto');
+
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
     Route::post('user/{patient_id}/schedule/today', 'ApiController@showTodaysSchedule');
+    
+    Route::post('user/{patient_id}/medicine/{medicine_id}/intakes/last/{count}/weeks', 
+        'ApiController@showIntakesForMedicineLastxWeeks');
+
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 
@@ -106,19 +112,6 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
 
 
 
-    // Change to schedules :
-    // ---------------------
-    // - add start_date
-    // - add end_date 
-    // - add interval (om de hoeveel dagen)
-
-    // Routes for schedules :
-    // ----------------------
-    // schedules today
-    // schedules die gebruik maakt van om de X dagen
-
-
-
     // Routes for intakes :
     // --------------------
     // show all
@@ -130,10 +123,6 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     //
     // delete?
     // update?
-
-
-
-
 
 });
 

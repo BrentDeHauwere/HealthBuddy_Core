@@ -16,6 +16,7 @@ use \App\Address;
 use \App\Medicine;
 use \App\Weight;
 use \App\Schedule;
+use \App\Intake;
 
 // use App\Http\Requests\Request;
 use App\Http\Requests\UpdateUserApiRequest;
@@ -294,6 +295,44 @@ class ApiController extends Controller
     return $medicines;    
   }
 
+
+  /**
+   * Show the intakes for a given medicine
+   * @return returns the schedules and its intakes.
+   * @author eddi
+   */
+  public function showIntakesForMedicineLastxWeeks($patient_id, $medicine_id, $count)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+      return response('Wrong medicine_id provided.', 403);
+    }
+    if($count < 1){
+      return response('Wrong count provided.', 403); 
+    }
+
+    // dd(date_create());
+    // $date = date('Y-m-d', strtotime('-'. $count .' week', strtotime(date(time()))  ));
+    $date = date_sub(date_create(),date_interval_create_from_date_string( $count . " weeks"));
+    
+
+    $schedules = Schedule::where('medicine_id','=', $medicine_id)->get();
+
+    foreach ($schedules as $schedule) {
+    
+      $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+      ->whereNotNull('created_at')
+      // ->where('created_at', '<', $date)
+      ->orderBy('created_at', 'desc')
+      ->first();
+    }
+    return $schedules;
+  }
+
+
   /**
       * This function retrieves a patients medicalInfo.
       * @author eddi
@@ -308,6 +347,8 @@ class ApiController extends Controller
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
+
 
 
   public function showWeights($patient_id)
@@ -325,6 +366,7 @@ class ApiController extends Controller
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
 
 
 
