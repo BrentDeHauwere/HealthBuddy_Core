@@ -20,9 +20,6 @@ class CreateSchedulesTable extends Migration
             $table->time('time');
             $table->string('amount');
             
-            // take this medicint at exactely this time.
-            $table->integer('dayOfWeek')->unsigned()->nullable();
-
             // Take this medicine each X days.
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
