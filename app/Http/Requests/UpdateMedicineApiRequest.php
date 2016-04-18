@@ -33,7 +33,6 @@ class UpdateMedicineApiRequest extends Request
         return [
         'name'  => 'min:3|max:255',
         'info'  => 'min:3|max:1500',
-        // 'photo' => 'image|max:5000', // Max 5MB pictures        
         ];
     }
 }
