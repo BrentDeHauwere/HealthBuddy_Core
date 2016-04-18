@@ -38,8 +38,8 @@ class UpdateScheduleApiRequest extends Request
     {
         return [
         // 'medicine_id'   => 'required|numeric|exists:medicines,id',
-        'time'          => 'required|date_format:H:i:s',
-        'amount'        => 'required|min:1',
+        'time'          => 'date_format:H:i:s',
+        'amount'        => 'min:1',
         'start_date'    => 'after:today',
         'interval'      => 'required|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
