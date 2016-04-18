@@ -21,4 +21,13 @@ class Schedule extends Model
     {
         return $this->hasMany('App\Intakes');
     }
+
+
+    /** 
+     * 
+     */
+    public static function getPossibleIntervals()
+    {
+        return [1, 2, 3, 7, 14];
+    }
 }
