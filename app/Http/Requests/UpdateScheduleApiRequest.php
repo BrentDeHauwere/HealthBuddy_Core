@@ -37,9 +37,9 @@ class UpdateScheduleApiRequest extends Request
     public function rules()
     {
         return [
-        'medicine_id'   => 'required|numeric|exists:medicines,id',
+        // 'medicine_id'   => 'required|numeric|exists:medicines,id',
         'time'          => 'required|date_format:H:i:s',
-        'amount'        => 'required|numeric',
+        'amount'        => 'required|min:1',
         'start_date'    => 'after:today',
         'interval'      => 'required|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
