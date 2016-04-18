@@ -718,9 +718,6 @@ class ApiController extends Controller
 
 
       $photo = base64_decode($request->photo);
-      
-      print($photo);
-
 
 
       $path = 'userdata/user_'. $user_id . '/medicines/';
