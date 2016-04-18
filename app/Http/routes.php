@@ -97,18 +97,18 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     Route::post('user/{user_id}/update', 'ApiController@updateUser');
     Route::post('user/{user_id}/address/update', 'ApiController@updateAddress');
     Route::post('user/{user_id}/medicalinfo/update', 'ApiController@updateMedicalInfo');
-    Route::post('user/{user_id}/schedule/{schedule_id}/update', 'ApiController@updateSchedule');
+    Route::post('user/{user_id}/medicine/{medicine_id}/schedule/{schedule_id}/update', 'ApiController@updateSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/update', 'ApiController@updateMedicine');
     // update medicine
 
     // Routes to create records
     Route::post('user/{user_id}/medicine/create', 'ApiController@createMedicine');
-    Route::post('user/{user_id}/schedule/create', 'ApiController@createSchedule');
+    Route::post('user/{user_id}/medicine/{medicine_id}/schedule/create', 'ApiController@createSchedule');
     Route::post('user/{user_id}/schedule/{schedule_id}/intake/create', 'ApiController@createIntake');
     Route::post('user/{user_id}/weight/create', 'ApiController@createWeight');
 
     // routes to delete records
-    Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
+    Route::post('user/{user_id}/medicine/{medicine_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
 
