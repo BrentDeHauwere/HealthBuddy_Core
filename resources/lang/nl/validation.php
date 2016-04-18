@@ -96,6 +96,10 @@ return [
 		'attribute-name' => [
 			'rule-name' => 'custom-message',
 		],
+		'today'		=> 'vandaag', 
+		'before' => [
+			'today' => 'vandaag',
+		],
 	],
 
 	/*
@@ -155,9 +159,6 @@ return [
 		'role'				=> 'rol',
 		'buddy_id'			=> 'buddy id',
 
-		// de gewicht kolommen
-		//'weight' // dit zit reeds in de medicalinfo
-		// 'created_at'		=> 'creatie datum',
 	]
 
 ];
