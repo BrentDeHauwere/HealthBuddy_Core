@@ -616,7 +616,6 @@ class ApiController extends Controller
   public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
   {
     $medicine = Medicine::find($medicine_id);
-    $fullPath = null;
 
     // if the name of the medicine changed, the photo is no longer valid!
     if($request->name != $medicine->name)
@@ -637,22 +636,20 @@ class ApiController extends Controller
       }
     }
 
+   $photo_url = null;
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
-      $path = 'userdata/user_'. $user_id . '/medicines/';
-      // sanitize the filename given the name of the medication.
-      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
-      $fullPath = $path.$filename;
-
-      if($request->photo->move($path, 
-        $filename) != $fullPath)
+      $path = 'userdata/user_'. $user_id . '/medicines/' . $request->name;
+      // create the photo from the base64 param
+      $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+      if($photo_url == -1)
       {
-        return response('Saving the picture failed', 500);
+        return response('Saving the photo failed', 500); 
       }
-      // add the photoUrl to the medicine
-      $medicine->photoUrl = $fullPath;
     }
+    $medicine->photoUrl = $photo_url;
+
     return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
   }
 
