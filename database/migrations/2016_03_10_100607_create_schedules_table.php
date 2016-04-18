@@ -24,7 +24,7 @@ class CreateSchedulesTable extends Migration
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             // $table->integer('interval')->nullable();
-            $table->enum('interval', [1, 2, 3, 7, 14]);
+            $table->enum('interval', \App\Schedule::getPossibleIntervals());
 
 
             $table->timestamps(); // eloquent needs this: created_at && updated_at

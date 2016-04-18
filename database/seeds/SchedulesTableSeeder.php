@@ -42,7 +42,7 @@ class SchedulesTableSeeder extends Seeder
             'start_date'    => '2016-03-12 05:10',
             'end_date'      => '2018-03-08 01:03',
             'interval'      => '7', 
-            'time'          => '12:11',
+            'time'          => '12:00',
             'amount'        => '1 ampule in de ochtend innemen.',
             ]); 
         
@@ -51,7 +51,7 @@ class SchedulesTableSeeder extends Seeder
             'start_date'    => '2016-03-12 05:10',
             'end_date'      => '2018-03-08 01:03',
             'interval'      => '14', 
-            'time'          => '12:11',
+            'time'          => '12:00',
             'amount'        => "1 ampule oplossen in water of dergelijke. 's Ochtends",
             ]); 
     }
