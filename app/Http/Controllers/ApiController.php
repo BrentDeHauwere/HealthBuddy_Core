@@ -716,15 +716,19 @@ class ApiController extends Controller
     if(isset($request->photo) && !empty($request->photo))
     {
 
-      dd(base64_decode($request->photo));
+
+      $photo = base64_decode($request->photo);
+      
+      print($photo);
+
 
 
       $path = 'userdata/user_'. $user_id . '/medicines/';
       // sanitize the filename given the name of the medication.
-      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+      $filename = ApiHelper::createValidFileName($request->name, $photo->guessClientExtension());
       $fullPath = $path.$filename;
 
-      if($request->photo->move($path, 
+      if($photo->move($path, 
         $filename) != $fullPath)
       {
         return response('Saving the picture failed', 500);
