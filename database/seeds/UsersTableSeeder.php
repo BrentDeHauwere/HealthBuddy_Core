@@ -28,7 +28,7 @@ class UsersTableSeeder extends Seeder
             'lastName' => 'DeLanghe',
             'address_id' => 4,
             'gender' => 'M',
-            'dateOfBirth' => '1790-08-23',
+            'dateOfBirth' => '1990-08-23',
             'email' => 'eddi_wallie@gmail.com',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
