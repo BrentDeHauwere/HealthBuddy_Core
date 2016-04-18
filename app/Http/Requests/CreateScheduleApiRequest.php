@@ -41,7 +41,7 @@ class CreateScheduleApiRequest extends Request
         'time'          => 'required|date_format:H:i:s',
         'amount'        => 'required|numeric',
         'start_date'    => 'required|after:today',
-        'interval'      => 'required|in:'.join(',', Schedule::getPossibleInterval()),
+        'interval'      => 'required|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
     }
 }
