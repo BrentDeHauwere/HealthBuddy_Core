@@ -596,7 +596,7 @@ class ApiController extends Controller
     $patient = User::find($user_id);   
     $schedule = Schedule::find($schedule_id);
     $fields = array('time','amount', 'start_date', 'end_date', 'interval');
-    $schedule = ApiHelper::fillApiRequestFields($fields, $request, $Schedule);
+    $schedule = ApiHelper::fillApiRequestFields($fields, $request, $schedule);
     $schedule->medicine_id  = $medicine_id;
 
     return ($schedule->save())?$schedule:response("Schedule not updated", 500);
