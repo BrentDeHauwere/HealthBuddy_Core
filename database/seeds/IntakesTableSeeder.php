@@ -18,7 +18,7 @@ class IntakesTableSeeder extends Seeder
             $date = date('2016-03-08');
             DB::table('intakes')->insert([
               'schedule_id'   => 1,
-              'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*2 . ' days')),
+              'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*1 . ' days')),
               ]);
         }
 
@@ -27,8 +27,37 @@ class IntakesTableSeeder extends Seeder
             $date = date('2016-03-08');
             DB::table('intakes')->insert([
               'schedule_id'   => 2,
+              'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*2 . ' days')),
+              ]);
+        }
+
+        // schedule 3
+        for ($i=0; $i < 20; $i++) { 
+            $date = date('2016-03-08');
+            DB::table('intakes')->insert([
+              'schedule_id'   => 3,
               'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*3 . ' days')),
               ]);
         }
+
+        // schedule 4
+        for ($i=0; $i < 20; $i++) { 
+            $date = date('2016-03-08');
+            DB::table('intakes')->insert([
+              'schedule_id'   => 4,
+              'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*7 . ' days')),
+              ]);
+        }
+
+
+        // schedule 5: Week
+        for ($i=0; $i < 20; $i++) { 
+            $date = date('2016-03-08');
+            DB::table('intakes')->insert([
+              'schedule_id'   => 5,
+              'created_at' => date_add(date_create($date), date_interval_create_from_date_string($i*14 . ' days')),
+              ]);
+        }
+
     }
 }
