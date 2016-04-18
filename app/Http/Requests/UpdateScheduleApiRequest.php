@@ -41,7 +41,7 @@ class UpdateScheduleApiRequest extends Request
         'time'          => 'date_format:H:i:s',
         'amount'        => 'min:1',
         'start_date'    => 'after:today',
-        'interval'      => 'required|in:'.join(',', Schedule::getPossibleIntervals()),
+        'interval'      => 'in:'.join(',', Schedule::getPossibleIntervals()),
         ];
     }
 }
