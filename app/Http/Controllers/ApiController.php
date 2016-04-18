@@ -686,7 +686,7 @@ class ApiController extends Controller
   public function createSchedule(CreateScheduleApiRequest $request, $user_id)
   {
     $schedule = new Schedule();
-    $fields = array('medicine_id','dayOfWeek','time','amount');
+    $fields = array('medicine_id','time','amount', 'start_date', 'end_date', 'interval');
     foreach ($fields as $f) {
       if(isset($request->$f) && !empty($request->$f))
       {
