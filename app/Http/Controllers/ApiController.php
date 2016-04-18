@@ -778,7 +778,7 @@ class ApiController extends Controller
     */
   public function deleteSchedule(Request $request, $user_id, $medicine_id, $schedule_id)
   {
-    if(!isPatient($user_id) 
+    if(!ApiHelper::isPatient($user_id) 
       || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id))
     {
       return response("This schedule is not from a patient.", 403);
