@@ -19,7 +19,7 @@ return [
 	| as the size rules. Feel free to tweak each of these messages here.
 	|
 	*/
-
+	"today"				   => "vandaag", // test de today die lager staat werkt niet (by eddi).
 	"accepted"             => ":attribute dient te worden geaccepteerd.",
 	"active_url"           => ":attribute is geen geldige URL.",
 	"after"                => ":attribute dient een datum te zijn na :date.",

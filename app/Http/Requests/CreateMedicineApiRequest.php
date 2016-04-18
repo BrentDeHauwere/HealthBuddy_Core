@@ -33,9 +33,8 @@ class CreateMedicineApiRequest extends Request
     public function rules()
     {
         return [
-            'name'  => 'required|unique:medicines,name|min:3|max:255',
+            'name'  => 'required|min:3|max:255',
             'info'  => 'min:3|max:1500',
-            // 'photo' => 'image|max:5000', // Max 5MB pictures
         ];
     }
 }
