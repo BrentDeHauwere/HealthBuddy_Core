@@ -710,25 +710,16 @@ class ApiController extends Controller
     */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
-    $fullPath = null;
-
+    $photo_url = null;
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
-
-
-      $photo = base64_decode($request->photo);
-
-
-      $path = 'userdata/user_'. $user_id . '/medicines/';
-      // sanitize the filename given the name of the medication.
-      $filename = ApiHelper::createValidFileName($request->name, $photo->guessClientExtension());
-      $fullPath = $path.$filename;
-
-      if($photo->move($path, 
-        $filename) != $fullPath)
+      $path = 'userdata/user_'. $user_id . '/medicines/' . $request->name;
+      // create the photo from the base64 param
+      $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+      if($photo_url == -1)
       {
-        return response('Saving the picture failed', 500);
+        return response('Saving the photo failed', 500); 
       }
     }
 
@@ -737,7 +728,7 @@ class ApiController extends Controller
     $medicine->user_id = $user_id;
     $medicine->name = trim($request->name);
     $medicine->info = trim($request->info);
-    $medicine->photoUrl = $fullPath;
+    $medicine->photoUrl = $photo_url;
 
     // store the medicine in the DB.
     if($medicine->save() != 1)
