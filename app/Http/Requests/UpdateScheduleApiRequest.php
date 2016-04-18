@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Request;
 use App\ApiHelper;
 use App\User;
+use App\Schedule;
 
 class UpdateScheduleApiRequest extends Request
 {

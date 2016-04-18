@@ -591,12 +591,13 @@ class ApiController extends Controller
    * @return mixed
    * @author eddi
    */
-  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $schedule_id)
+  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $medicine_id, $schedule_id)
   {
     $patient = User::find($user_id);   
     $schedule = Schedule::find($schedule_id);
-    $fields = array('dayOfWeek','time','amount');
-    $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $Schedule);
+    $fields = array('time','amount', 'start_date', 'end_date', 'interval');
+    $schedule = ApiHelper::fillApiRequestFields($fields, $request, $Schedule);
+    $schedule->medicine_id  = $medicine_id;
 
     return ($schedule->save())?$schedule:response("Schedule not updated", 500);
   }
@@ -683,16 +684,19 @@ class ApiController extends Controller
     * @return mixed
     * @author eddi
     */
-  public function createSchedule(CreateScheduleApiRequest $request, $user_id)
+  public function createSchedule(CreateScheduleApiRequest $request, $user_id, $medicine_id)
   {
     $schedule = new Schedule();
-    $fields = array('medicine_id','time','amount', 'start_date', 'end_date', 'interval');
+    $fields = array('time','amount', 'start_date', 'end_date', 'interval');
     foreach ($fields as $f) {
       if(isset($request->$f) && !empty($request->$f))
       {
         $schedule->$f = $request->$f;
       }
     }
+    $schedule->medicine_id  = $medicine_id;
+
+
     return ($schedule->save())?$schedule:response("Schedule not created", 403);
   }
 
@@ -772,16 +776,17 @@ class ApiController extends Controller
     * @return mixed
     * @author eddi
     */
-  public function deleteSchedule(Request $request, $user_id, $schedule_id)
+  public function deleteSchedule(Request $request, $user_id, $medicine_id, $schedule_id)
   {
     if(!isPatient($user_id) 
-      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
+      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id))
+    {
       return response("This schedule is not from a patient.", 403);
-  }
+    }
     // fetch the schedule to delete
-  $schedule = Schedule::find($schedule_id);
-  return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
-}
+    $schedule = Schedule::find($schedule_id);
+    return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
+  }
 
   /**
  * This function deletes a medicine , and deletes it's photo
