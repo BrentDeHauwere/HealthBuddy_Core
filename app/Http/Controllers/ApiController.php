@@ -715,6 +715,10 @@ class ApiController extends Controller
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
+
+      dd(base64_decode($request->photo));
+
+
       $path = 'userdata/user_'. $user_id . '/medicines/';
       // sanitize the filename given the name of the medication.
       $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
