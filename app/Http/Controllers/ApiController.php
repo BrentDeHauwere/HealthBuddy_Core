@@ -642,7 +642,9 @@ class ApiController extends Controller
     {
       $directory = 'userdata/user_'. $user_id . '/medicines/';
       // create the directory:
-      mkdir($directory, 0755, true);
+      if(!file_exists($directory)){
+            mkdir($directory, 0755, true);
+      }
 
       $path = $directory . $request->name;
       // create the photo from the base64 param
@@ -717,7 +719,9 @@ class ApiController extends Controller
     {
       $directory = 'userdata/user_'. $user_id . '/medicines/';
       // create the directory:
-      mkdir($directory, 0755, true);
+      if(!file_exists($directory)){
+	mkdir($directory, 0755, true);
+      }
 
       $path = $directory . $request->name;
 
