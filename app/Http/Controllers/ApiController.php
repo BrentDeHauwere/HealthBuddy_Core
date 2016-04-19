@@ -654,9 +654,10 @@ class ApiController extends Controller
     if(isset($request->photo) && !empty($request->photo))
     {
       $directory = 'userdata/user_'. $user_id . '/medicines/';
+
+      // create the directory:
       if(!file_exists($directory)){
-        // create the directory:
-        mkdir($directory, 0755, true);
+            mkdir($directory, 0755, true);
       }
 
       $path = $directory . $request->name;
@@ -732,7 +733,9 @@ class ApiController extends Controller
     {
       $directory = 'userdata/user_'. $user_id . '/medicines/';
       // create the directory:
-      mkdir($directory, 0755, true);
+      if(!file_exists($directory)){
+	mkdir($directory, 0755, true);
+      }
 
       $path = $directory . $request->name;
 
