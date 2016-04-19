@@ -187,38 +187,51 @@ class ApiController extends Controller
     {
       // fetch the medicine
       $medicine = Medicine::find($medicine_id);
+
+
+      // attach the photo if it exists
+      $medicine->photo = ''; 
+      $photo = "empty";
+      // attach the photo if there is one.
+      if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+      {
+        $photo = base64_encode(file_get_contents($medicine->photoUrl));
+        $medicine->photo = $photo;
+      }
+      unset($medicine->photoUrl);
+
       return $medicine;
     }
 
     return response('Wrong medicine_id provided.', 403); 
   }
 
-  public function showMedicinePhoto($patient_id, $medicine_id)
-  {
-    // is this a patient? 
-    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
-      return response('Wrong Patient_id provided.', 403);
-    }
-    // is this a medicine of the patient?
-    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
-    {
-     return response('Wrong medicine_id provided.', 403); 
-   }
+//   public function showMedicinePhoto($patient_id, $medicine_id)
+//   {
+//     // is this a patient? 
+//     if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
+//       return response('Wrong Patient_id provided.', 403);
+//     }
+//     // is this a medicine of the patient?
+//     if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+//     {
+//      return response('Wrong medicine_id provided.', 403); 
+//    }
 
-   $medicine = Medicine::find($medicine_id);
+//    $medicine = Medicine::find($medicine_id);
 
-   if($medicine->photoUrl == null || empty($medicine->photoUrl))
-   {
-    return response("This medicine has no photo", 404);
-  }
-  $photo = "empty";
-    // attach the photo if there is one.
-  if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
-  {
-    $photo = file_get_contents($medicine->photoUrl);
-  }
-  return $photo;
-}
+//     // attach the photo if it exists
+//     $medicine->photo = ''; 
+//     $photo = "empty";
+//     // attach the photo if there is one.
+//     if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+//     {
+//       $photo = base64_encode(file_get_contents($medicine->photoUrl));
+//       $medicine->photo = $photo;
+//     }
+      
+//   return $photo;
+// }
 
   /**
     * This function retrieves a patients schedule, when to take his medicines.
@@ -641,8 +654,10 @@ class ApiController extends Controller
     if(isset($request->photo) && !empty($request->photo))
     {
       $directory = 'userdata/user_'. $user_id . '/medicines/';
-      // create the directory:
-      mkdir($directory, 0755, true);
+      if(!file_exists($directory)){
+        // create the directory:
+        mkdir($directory, 0755, true);
+      }
 
       $path = $directory . $request->name;
       // create the photo from the base64 param
