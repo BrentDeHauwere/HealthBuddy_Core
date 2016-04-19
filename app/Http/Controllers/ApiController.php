@@ -636,11 +636,15 @@ class ApiController extends Controller
       }
     }
 
-   $photo_url = null;
+    $photo_url = null;
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
-      $path = 'userdata/user_'. $user_id . '/medicines/' . $request->name;
+      $directory = 'userdata/user_'. $user_id . '/medicines/';
+      // create the directory:
+      mkdir($directory, 0755, true);
+
+      $path = $directory . $request->name;
       // create the photo from the base64 param
       $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
       if($photo_url == -1)
@@ -711,9 +715,16 @@ class ApiController extends Controller
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
-      $path = 'userdata/user_'. $user_id . '/medicines/' . $request->name;
+      $directory = 'userdata/user_'. $user_id . '/medicines/';
+      // create the directory:
+      mkdir($directory, 0755, true);
+
+      $path = $directory . $request->name;
+
       // create the photo from the base64 param
       $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+      
+      // check if the foto is saved
       if($photo_url == -1)
       {
         return response('Saving the photo failed', 500); 
