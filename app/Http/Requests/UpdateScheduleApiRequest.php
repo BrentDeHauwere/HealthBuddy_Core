@@ -40,7 +40,7 @@ class UpdateScheduleApiRequest extends Request
         // 'medicine_id'   => 'required|numeric|exists:medicines,id',
         'time'          => 'date_format:H:i:s',
         'amount'        => 'min:1',
-        'start_date'    => 'after:today',
+        // 'start_date'    => 'after:today',
         'interval'      => 'filled|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
     }
