@@ -34,12 +34,12 @@ class MedicinesTableSeeder extends Seeder
         
         DB::table('medicines')->insert([
             'user_id'   => 2,
-            'name'      => 'Paracetamol',
-            'info'      => "Tegen ",
+            'name'      => 'Linazine',
+            'info'      => "Voor extra energie in de namiddag",
             ]);
       
 
-        
+
 
         // elke 2 dagen
         DB::table('medicines')->insert([
