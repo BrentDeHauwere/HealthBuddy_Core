@@ -46,7 +46,7 @@ class SchedulesTableSeeder extends Seeder
 
 
         DB::table('schedules')->insert([
-            'medicine_id'   => 1,
+            'medicine_id'   => 4,
             'start_date'    => '2016-03-08 08:00',
             'end_date'      => '2018-03-08 08:00',
             'interval'      => '1', 
