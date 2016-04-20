@@ -688,10 +688,17 @@ class ApiController extends Controller
     */  
   public function createIntake(CreateIntakeApiRequest $request, $user_id, $schedule_id)
   {
+
+    // for brent
+    $schedule_updated = Schedule::find($schedule_id);
+    $schedule_updated->updated_at = date('Y-m-d h:m:s');
+    $schedule_updated->save();
+
     $intake = new Intake();
     $fields = array('schedule_id');
     $intake->schedule_id = $schedule_id;
-    return ($intake->save())?$intake:response("Intake not created", 403);
+    return ($intake->save())?$intake:response(array('422' => array('De inname werd niet opgeslaan')), 422);
+    ;
   }
 
   /**
@@ -714,7 +721,8 @@ class ApiController extends Controller
     $schedule->medicine_id  = $medicine_id;
 
 
-    return ($schedule->save())?$schedule:response("Schedule not created", 403);
+    return ($schedule->save())?$schedule:response(array('422' => array('De schedule werd niet opgeslaan.')), 422);
+
   }
 
 
@@ -731,7 +739,7 @@ class ApiController extends Controller
    // check if the mdicine is unique
     $medicine_exists = Medicine::where('user_id', '=', $user_id)->where('name', '=', $request->name)->first();
     if($medicine_exists != null){
-      return array(403 =>'Het medicijn moet uniek zijn.');
+     return response(array('422' => array('Het medicijn moet uniek zijn.')), 422);
    }
 
 
@@ -811,11 +819,12 @@ return $medicine;
     if(!ApiHelper::isPatient($user_id) 
       || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id))
     {
-      return response("This schedule is not from a patient.", 403);
+      return response(array('422' => array('Het schedule is niet van een patient.')), 422);
+
     }
     // fetch the schedule to delete
     $schedule = Schedule::find($schedule_id);
-    return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
+    return ($schedule->delete())?response(array('200' => array('schedule werd verwijderd.')), 200):response(array('422' => array('Het schedule werd niet verwijderd.')), 422);
   }
 
   /**
@@ -829,23 +838,24 @@ return $medicine;
     if(!ApiHelper::isPatient($user_id)
       || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
     {
-      return response("This medicine is not from a patient.", 403);
-    }
+     return response(array('422' => array('Het medicijn is niet van een patient.')), 422);
+
+   }
   // fetch the medicine to delete
-    $medicine = Medicine::find($medicine_id);
+   $medicine = Medicine::find($medicine_id);
   // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
   // it's more important that a patient stops taking a medicine then a server having undeleted files.
-    $medicine->delete();
+   $medicine->delete();
 
   // delete the photo, if there is one 
-    if ($medicine->photoUrl != null) {
-      if( file_exists($medicine->photoUrl))
-      {
-        unlink($medicine->photoUrl);
-      }
+   if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
     }
-    return 'Medicine deleted';
   }
+  return 'Medicine deleted';
+}
 
   /**
    * This function deletes a photo attached to a medicine, and updates the medicine's photoUrl
@@ -858,23 +868,23 @@ return $medicine;
     if(!ApiHelper::isPatient($user_id)
       || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
     {
-      return response("This medicine is not from a patient.", 403);
-    }
+     return response(array('422' => array('Het medicijn is niet van een patient.')), 422);
+   }
   // fetch the medicine to delete
-    $medicine = Medicine::find($medicine_id);
+   $medicine = Medicine::find($medicine_id);
 
   // delete the photo, if there is one 
-    if ($medicine->photoUrl != null) {
-      if( file_exists($medicine->photoUrl))
-      {
-        unlink($medicine->photoUrl);
-      }
+   if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
     }
+  }
 
   // tell the medicine there is no photo anymore
-    $medicine->photoUrl = null;
-    return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':'Medicine photoUrl not updated';
-  }
+  $medicine->photoUrl = null;
+  return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':response(array('422' => array('De foto werd niet verwijderd.')), 422);
+}
 
   /**
    *  The login function for the API
