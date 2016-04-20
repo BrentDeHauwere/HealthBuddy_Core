@@ -229,7 +229,7 @@ class ApiController extends Controller
 //       $photo = base64_encode(file_get_contents($medicine->photoUrl));
 //       $medicine->photo = $photo;
 //     }
-      
+
 //   return $photo;
 // }
 
@@ -657,7 +657,7 @@ class ApiController extends Controller
 
       // create the directory:
       if(!file_exists($directory)){
-            mkdir($directory, 0755, true);
+        mkdir($directory, 0755, true);
       }
 
       $path = $directory . $request->name;
@@ -727,46 +727,54 @@ class ApiController extends Controller
     */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
-    $photo_url = null;
-    // if there is a photo attached -> update it.
-    if(isset($request->photo) && !empty($request->photo))
-    {
-      $directory = 'userdata/user_'. $user_id . '/medicines/';
-      // create the directory:
-      if(!file_exists($directory)){
-	mkdir($directory, 0755, true);
-      }
 
-      $path = $directory . $request->name;
+   // check if the mdicine is unique
+    $medicine_exists = Medicine::where('user_id', '=', $user_id)->where('name', '=', $request->name)->first();
+    if($medicine_exists != null){
+      return array(403 =>'Het medicijn moet uniek zijn.');
+   }
+
+
+   $photo_url = null;
+    // if there is a photo attached -> update it.
+   if(isset($request->photo) && !empty($request->photo))
+   {
+    $directory = 'userdata/user_'. $user_id . '/medicines/';
+      // create the directory:
+    if(!file_exists($directory)){
+     mkdir($directory, 0755, true);
+   }
+
+   $path = $directory . $request->name;
 
       // create the photo from the base64 param
-      $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
-      
+   $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+
       // check if the foto is saved
-      if($photo_url == -1)
-      {
-        return response('Saving the photo failed', 500); 
-      }
-    }
+   if($photo_url == -1)
+   {
+    return array('Saving the photo failed', 500); 
+  }
+}
 
     // create the medicine object to store in DB
-    $medicine = new Medicine;
-    $medicine->user_id = $user_id;
-    $medicine->name = trim($request->name);
-    $medicine->info = trim($request->info);
-    $medicine->photoUrl = $photo_url;
+$medicine = new Medicine;
+$medicine->user_id = $user_id;
+$medicine->name = trim($request->name);
+$medicine->info = trim($request->info);
+$medicine->photoUrl = $photo_url;
 
     // store the medicine in the DB.
-    if($medicine->save() != 1)
-    {
-      unlink($fullPath);
-      return response('Saving the medicine failed', 500);
-    }
+if($medicine->save() != 1)
+{
+  unlink($fullPath);
+  return response('Saving the medicine failed', 500);
+}
 
-    return $medicine;
-  }
+return $medicine;
+}
 
-  
+
 
   /**
    * This function adds a new weight to the patients records.
