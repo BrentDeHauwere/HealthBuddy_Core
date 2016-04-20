@@ -143,7 +143,7 @@ class ApiController extends Controller
     }
     if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
-      $patient->medicines = Medicine::with('schedule')->get();
+      $patient->medicines = Medicine::where('user_id', '=', $patient_id)->with('schedule')->get();
       $patient->patients = null;
       return $patient;
     }
