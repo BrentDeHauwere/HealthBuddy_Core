@@ -25,6 +25,30 @@ class MedicinesTableSeeder extends Seeder
             'info'      => 'Na de maaltijd, niet op een nuchtere maag. Niet combineren met alcohol',
             'photoUrl'  =>  'userdata/user_2/medicines/Medrol_30Mg.png',
             ]);
+
+        DB::table('medicines')->insert([
+            'user_id'   => 2,
+            'name'      => 'immodium',
+            'info'      => "indien mottig 1 tabletje innemen",
+            ]);
+        
+        DB::table('medicines')->insert([
+            'user_id'   => 2,
+            'name'      => 'Paracetamol',
+            'info'      => "Tegen ",
+            ]);
+      
+
+        
+
+        // elke 2 dagen
+        DB::table('medicines')->insert([
+            'user_id'   => 2,
+            'name'      => 'Spasmomen',
+            'info'      => "Bij hevige krampen.",
+            ]);
+        
+
         // elke 3 dagen
         DB::table('medicines')->insert([
             'user_id'   => 2,
@@ -44,6 +68,7 @@ class MedicinesTableSeeder extends Seeder
             'name'      => 'Vitamine D',
             'info'      => 'Elke 2 weken een ampule sochtends.',
             ]);
+
 
 
         // Medicatie Eli
