@@ -29,7 +29,7 @@ class SchedulesTableSeeder extends Seeder
             'start_date'    => '2016-03-08 08:00',
             'end_date'      => '2018-03-08 08:00',
             'interval'      => '1',
-            'time'          => '08:00',
+            'time'          => '12:00',
             'amount'        => '1 en half, pilletje in twee breken',
             'updated_at'    => date('Y-m-d h:m:s'),
             ]); 
@@ -40,7 +40,7 @@ class SchedulesTableSeeder extends Seeder
             'start_date'    => '2016-03-08 08:00',
             'end_date'      => '2018-03-08 08:00',
             'interval'      => '1', 
-            'time'          => '08:00',
+            'time'          => '16:00',
             'amount'        => '1 en half, pilletje in twee breken',
             ]); 
 
@@ -50,7 +50,7 @@ class SchedulesTableSeeder extends Seeder
             'start_date'    => '2016-03-08 08:00',
             'end_date'      => '2018-03-08 08:00',
             'interval'      => '1', 
-            'time'          => '08:00',
+            'time'          => '20:00',
             'amount'        => '1 en half, pilletje in twee breken',
             'updated_at'    => date('Y-m-d h:m:s', time()-(60*60*24) ),
             ]); 
