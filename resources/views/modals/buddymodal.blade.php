@@ -14,7 +14,7 @@
                 <td>{{ $buddy->email }}</td>
                 <td>{{ $buddy->firstName.' '.$buddy->lastName }}</td>
                 <td>
-                  <form method="POST" action="{{ url('user/unlink') }}">
+                  <form method="POST" action="{{ url('/user/unlink') }}">
                     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
                     <input type="hidden" name="buddy" value="{{ $buddy->id }}"/>
                     <input class="btn btn-primary" type="submit" name="submit" value="Unlink"/>
@@ -26,7 +26,7 @@
       @endif
       @if(!$users->isEmpty())
       <br/>
-      <form class="form-horizontal" method="POST" action="user/linkBuddy">
+      <form class="form-horizontal" method="POST" action="/user/linkBuddy">
       <input type="hidden" name="user" value="{{ $user->id }}">
       <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
       <div class="form-group">

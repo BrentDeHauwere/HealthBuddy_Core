@@ -28,7 +28,7 @@ class EditUserRequest extends Request
           'firstname' => 'required',
           'lastname' => 'required',
           'date' => 'required|before:today',
-          'email' => 'required|unique:users,email,'.$this->get('id').'|regex:/.+\@.+\..+/',
+          'email' => 'required|unique:users,email,'.$this->get('id').',id|regex:/.+\@.+\..+/',
           'phone' => 'required',
           'gender' => 'required|in:M,V',
           'role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',

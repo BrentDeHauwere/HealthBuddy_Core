@@ -115,7 +115,7 @@ class UserController extends Controller
     public function linkDokter(Request $request){
         $id = $request->input('user');
         $user = \App\User::where('id','=',$id)->first();
-        $dokterid = $request->input('user');
+        $dokterid = $request->input('dokter');
         $dokter = \App\User::where('id','=',$dokterid)->first();
         if($user && $dokter){
           $user->buddy_id = $dokter->id;
@@ -197,7 +197,7 @@ class UserController extends Controller
       if($exists){
         return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
       }
-      
+
       if($user){
         $user->firstName = $request->input('firstname');
         $user->lastName = $request->input('lastname');
