@@ -459,6 +459,76 @@ class ApiController extends Controller
     return $intakes;
   }
 
+  public function showIntakesForMedicineProgress ($user_id, $medicine_id) 
+  {
+    if (!ApiHelper::isLoggedInUserPatient()){
+      return response(array('422' => array("Het id is niet van een patient")), 422);
+    }
+
+    // fetch the medicines with schedules
+    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    ->with('schedule')
+    ->get();
+    $scheduleIds = array();
+    // fetch the intakes for each schedule
+    $intakes = array();
+    // fetch the intakes
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+        array_push($scheduleIds, $schedule->id);
+      }
+    }
+    $intakes = Intake::whereIn('schedule_id', $scheduleIds)->get()->toArray();
+    
+
+    $date = date_create();  
+    $endDate = strtotime($schedule->start_date);
+    
+    // the response message
+    $progress = array();
+    
+    while($date->getTimeStamp() > $schedule->start_date)
+    {
+      $entry = array(
+        'day' => date_format($date, 'Y-m-d'),
+        'taken' => 0,
+        'toTake' => 0,
+        );
+      // check the medicines schedule for that day
+      foreach ($medicines as $m) {
+        foreach ($m->schedule as $schedule) {
+
+          if(ApiHelper::takeMedicineOnThisDate($schedule, $date))
+          {
+            // update toTake:
+            $entry['toTake'] = $entry['toTake'] + 1;
+            
+            foreach ($intakes as $intake) {
+              $intakeDate = substr($intake['created_at'], 0, strpos($intake['created_at'],' '));
+              // update taken:
+              if($intakeDate == date_format($date, 'Y-m-d') 
+                && $intake['schedule_id'] == $schedule->id)
+              {
+                $entry['taken'] = $entry['taken'] + 1;
+              }
+            }
+          }
+        }
+      }
+      if($entry['toTake'] > 0)
+      {
+        array_push($progress, $entry);
+      }
+
+      // go back one day
+      $date = date_sub($date, date_interval_create_from_date_string('1 day'));
+    }
+
+
+
+    return $progress;
+  }
+
 
   /**
       * This function retrieves a patients medicalInfo.
@@ -540,6 +610,7 @@ class ApiController extends Controller
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
       $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
+      dd($user);
       
       // save the updated user to the db.
       return ($user->save())?$user:response(array('422' => array("User not updated")), 500);
