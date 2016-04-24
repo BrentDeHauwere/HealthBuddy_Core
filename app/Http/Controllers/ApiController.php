@@ -459,7 +459,7 @@ class ApiController extends Controller
     return $intakes;
   }
 
-  public function showIntakesForMedicineProgress ($user_id, $medicine_id) 
+  public function showIntakesForMedicineProgress ($user_id) 
   {
 
     if (!ApiHelper::isPatient($user_id)){
