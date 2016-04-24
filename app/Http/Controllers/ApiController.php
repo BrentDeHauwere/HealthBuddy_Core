@@ -459,6 +459,76 @@ class ApiController extends Controller
     return $intakes;
   }
 
+  public function showIntakesForMedicineProgress ($user_id, $medicine_id) 
+  {
+    if (!ApiHelper::isLoggedInUserPatient()){
+      return response(array('422' => array("Het id is niet van een patient")), 422);
+    }
+
+    // fetch the medicines with schedules
+    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    ->with('schedule')
+    ->get();
+    $scheduleIds = array();
+    // fetch the intakes for each schedule
+    $intakes = array();
+    // fetch the intakes
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+        array_push($scheduleIds, $schedule->id);
+      }
+    }
+    $intakes = Intake::whereIn('schedule_id', $scheduleIds)->get()->toArray();
+    
+
+    $date = date_create();  
+    $endDate = strtotime($schedule->start_date);
+    
+    // the response message
+    $progress = array();
+    
+    while($date->getTimeStamp() > $schedule->start_date)
+    {
+      $entry = array(
+        'day' => date_format($date, 'Y-m-d'),
+        'taken' => 0,
+        'toTake' => 0,
+        );
+      // check the medicines schedule for that day
+      foreach ($medicines as $m) {
+        foreach ($m->schedule as $schedule) {
+
+          if(ApiHelper::takeMedicineOnThisDate($schedule, $date))
+          {
+            // update toTake:
+            $entry['toTake'] = $entry['toTake'] + 1;
+            
+            foreach ($intakes as $intake) {
+              $intakeDate = substr($intake['created_at'], 0, strpos($intake['created_at'],' '));
+              // update taken:
+              if($intakeDate == date_format($date, 'Y-m-d') 
+                && $intake['schedule_id'] == $schedule->id)
+              {
+                $entry['taken'] = $entry['taken'] + 1;
+              }
+            }
+          }
+        }
+      }
+      if($entry['toTake'] > 0)
+      {
+        array_push($progress, $entry);
+      }
+
+      // go back one day
+      $date = date_sub($date, date_interval_create_from_date_string('1 day'));
+    }
+
+
+
+    return $progress;
+  }
+
 
   /**
       * This function retrieves a patients medicalInfo.
@@ -524,7 +594,7 @@ class ApiController extends Controller
       && !empty($request->buddy_id)
       && $request->buddy_id != $user->buddy_id)
     {
-      return response('Not allowed to change the buddy itself.', 403);
+      return response(array('422' => array('Not allowed to change the buddy itself.')), 422);
     }
 
     // check if the request wants to change the email of the buddy
@@ -533,18 +603,19 @@ class ApiController extends Controller
       && !empty($request->email)
       && $request->email != $user->email)
     {
-      return response('Not allowed to change the buddy email.', 403);
+      return response(array('422' => array('Not allowed to change the buddy email.')), 403);
     }
 
     if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
       $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
+      dd($user);
       
       // save the updated user to the db.
-      return ($user->save())?$user:response("User not updated", 500);
+      return ($user->save())?$user:response(array('422' => array("User not updated")), 500);
     }
-    return response('Wrong id provided.', 403);
+    return response(array('422' => array('Wrong id provided.')),422);
   }
 
   /**
@@ -568,7 +639,7 @@ class ApiController extends Controller
     $address = ApiHelper::fillApiRequestFields($fields, $request, $address);
     
     // save the updated user to the db.
-    return ($address->save())?$address:response("Address not updated", 500);
+    return ($address->save())?$address:response(array('422'=> array("Address not updated")), 500);
   }
 
 
@@ -590,7 +661,7 @@ class ApiController extends Controller
     // the updatable fields.
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
     $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $medicalinfo);    
-    return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
+    return ($medicalinfo->save())?$medicalinfo:response(array('422' => array("MedicalInfo not updated")), 422);
   }
 
   /**
@@ -612,7 +683,7 @@ class ApiController extends Controller
     $schedule = ApiHelper::fillApiRequestFields($fields, $request, $schedule);
     $schedule->medicine_id  = $medicine_id;
 
-    return ($schedule->save())?$schedule:response("Schedule not updated", 500);
+    return ($schedule->save())?$schedule:response(array('422' => array("Schedule not updated")), 422);
   }
 
   /**
@@ -665,12 +736,12 @@ class ApiController extends Controller
       $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
       if($photo_url == -1)
       {
-        return response('Saving the photo failed', 500); 
+        return response(array('422' => array('Saving the photo failed')), 422); 
       }
     }
     $medicine->photoUrl = $photo_url;
 
-    return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
+    return ($medicine->save() == 1)? $medicine:response(array('422'=> array('The medicine was not updated')), 422);
   }
 
 
