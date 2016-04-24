@@ -524,7 +524,7 @@ class ApiController extends Controller
       && !empty($request->buddy_id)
       && $request->buddy_id != $user->buddy_id)
     {
-      return response('Not allowed to change the buddy itself.', 403);
+      return response(array('422' => array('Not allowed to change the buddy itself.')), 422);
     }
 
     // check if the request wants to change the email of the buddy
@@ -533,7 +533,7 @@ class ApiController extends Controller
       && !empty($request->email)
       && $request->email != $user->email)
     {
-      return response('Not allowed to change the buddy email.', 403);
+      return response(array('422' => array('Not allowed to change the buddy email.')), 403);
     }
 
     if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
@@ -542,9 +542,9 @@ class ApiController extends Controller
       $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
       
       // save the updated user to the db.
-      return ($user->save())?$user:response("User not updated", 500);
+      return ($user->save())?$user:response(array('422' => array("User not updated")), 500);
     }
-    return response('Wrong id provided.', 403);
+    return response(array('422' => array('Wrong id provided.')),422);
   }
 
   /**
@@ -568,7 +568,7 @@ class ApiController extends Controller
     $address = ApiHelper::fillApiRequestFields($fields, $request, $address);
     
     // save the updated user to the db.
-    return ($address->save())?$address:response("Address not updated", 500);
+    return ($address->save())?$address:response(array('422'=> array("Address not updated")), 500);
   }
 
 
@@ -590,7 +590,7 @@ class ApiController extends Controller
     // the updatable fields.
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
     $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $medicalinfo);    
-    return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
+    return ($medicalinfo->save())?$medicalinfo:response(array('422' => array("MedicalInfo not updated")), 422);
   }
 
   /**
@@ -612,7 +612,7 @@ class ApiController extends Controller
     $schedule = ApiHelper::fillApiRequestFields($fields, $request, $schedule);
     $schedule->medicine_id  = $medicine_id;
 
-    return ($schedule->save())?$schedule:response("Schedule not updated", 500);
+    return ($schedule->save())?$schedule:response(array('422' => array("Schedule not updated")), 422);
   }
 
   /**
@@ -665,12 +665,12 @@ class ApiController extends Controller
       $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
       if($photo_url == -1)
       {
-        return response('Saving the photo failed', 500); 
+        return response(array('422' => array('Saving the photo failed')), 422); 
       }
     }
     $medicine->photoUrl = $photo_url;
 
-    return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
+    return ($medicine->save() == 1)? $medicine:response(array('422'=> array('The medicine was not updated')), 422);
   }
 
 
