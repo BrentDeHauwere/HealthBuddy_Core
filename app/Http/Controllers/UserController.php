@@ -16,8 +16,10 @@ use Validator;
 use \App\Medicine;
 use \App\Http\Requests\AddUserRequest;
 use \App\Http\Requests\EditUserRequest;
+use \App\Http\Requests\EditUserRequestv2;
 use \App\Http\Requests\AddAddressUserRequest;
 use \App\Http\Requests\EditAddressUserRequest;
+use \App\Http\Requests\PasswordResetRequest;
 
 class UserController extends Controller
 {
@@ -142,7 +144,7 @@ class UserController extends Controller
         }
     }
 
-    public function reset(Request $request){
+    public function reset(PasswordResetRequest $request){
         $id = $request->input('id');
         $user = \App\User::where('id','=',$id)->first();
         if($user){
@@ -187,10 +189,15 @@ class UserController extends Controller
       }
     }
 
-    public function editUser(EditUserRequest $request){
+    public function editUser(EditUserRequestv2 $request){
 
       $id = $request->input('id');
       $user = \App\User::where('id','=',$id)->first();
+      $exists = \App\User::where('email',$request->input('email'))->first();
+      if($exists){
+        return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
+      }
+      
       if($user){
         $user->firstName = $request->input('firstname');
         $user->lastName = $request->input('lastname');
@@ -225,15 +232,6 @@ class UserController extends Controller
           return redirect()->to('/home')->with('error','Gebruiker kon niet worden verandert');
         }
       }
-    }
-
-    public function editAddress(EditAddressUserRequest $request){
-
-    }
-
-    public function addUserAddress(AddAddressUserRequest $request){
-
-      //todelete
     }
 
     public function addUser(AddUserRequest $request){

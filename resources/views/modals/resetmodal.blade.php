@@ -2,7 +2,7 @@
 @section('content')
 <div class="container">
   <!-- Modal content-->
-  <form class="form-horizontal" method="POST" action="user/reset">
+  <form class="form-horizontal" method="POST" action="/user/reset">
   <input type="hidden" name="id" value="{{$user->id}}">
   <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
   <center><h4 class="col-sm-10 col-sm-offset-2">Verander het wachtwoord van een gebruiker</h4></center>
@@ -16,13 +16,20 @@
                 <span class="help-block">
                     <strong>{{ $errors->first('password') }}</strong>
                 </span>
+
             @endif
           </div>
         </div>
         <div class="form-group">
           <label for="confirm" class="col-sm-2 control-label">Herhaal</label>
           <div class="col-sm-10">
-            <input type="password" class="form-control" id="confirm" name="confirm" placeholder="Wachtwoord">
+            <input type="password" class="form-control" id="confirm" name="confirm" placeholder="Wachtwoord" value="{{ old('confirm') }}">
+            @if ($errors->has('confirm'))
+                <span class="help-block">
+                    <strong>{{ $errors->first('confirm') }}</strong>
+                </span>
+
+            @endif
           </div>
         </div>
       <div class="form-group">
