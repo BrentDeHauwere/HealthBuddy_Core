@@ -461,12 +461,13 @@ class ApiController extends Controller
 
   public function showIntakesForMedicineProgress ($user_id, $medicine_id) 
   {
-    if (!ApiHelper::isLoggedInUserPatient()){
+
+    if (!ApiHelper::isPatient($user_id)){
       return response(array('422' => array("Het id is niet van een patient")), 422);
     }
 
     // fetch the medicines with schedules
-    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    $medicines = Medicine::where('user_id', '=', $user_id)
     ->with('schedule')
     ->get();
     $scheduleIds = array();
