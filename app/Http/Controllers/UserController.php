@@ -14,7 +14,10 @@ use Auth;
 use Validator;
 
 use \App\Medicine;
-
+use \App\Http\Requests\AddUserRequest;
+use \App\Http\Requests\EditUserRequest;
+use \App\Http\Requests\AddAddressUserRequest;
+use \App\Http\Requests\EditAddressUserRequest;
 
 class UserController extends Controller
 {
@@ -107,6 +110,23 @@ class UserController extends Controller
         }
     }
 
+    public function linkDokter(Request $request){
+        $id = $request->input('user');
+        $user = \App\User::where('id','=',$id)->first();
+        $dokterid = $request->input('user');
+        $dokter = \App\User::where('id','=',$dokterid)->first();
+        if($user && $dokter){
+          $user->buddy_id = $dokter->id;
+          $saved = $user->save();
+          if($saved){
+            return redirect('/home')->with('success','Dokter is gelinked');
+          }
+          else{
+            return redirect('/home')->with('error','Dokter is niet gelinked');
+          }
+        }
+    }
+
     public function unlink(Request $request){
         $id = $request->input('buddy');
         $user = \App\User::where('id','=',$id)->first();
@@ -129,10 +149,10 @@ class UserController extends Controller
           $user->password = bcrypt($request->input('password'));
           $saved = $user->save();
           if($saved){
-            return redirect()->back()->with('success','Wachtwoord is successvol verandert');
+            return redirect()->to('/home')->with('success','Wachtwoord is successvol verandert');
           }
           else{
-            return redirect()->back()->with('error','Wachtwoord kon niet aangepast worden');
+            return redirect()->to('/home')->with('error','Wachtwoord kon niet aangepast worden');
           }
         }
     }
@@ -144,10 +164,10 @@ class UserController extends Controller
         $device->user_id = $userid;
         $savedAdd = $device->save();
         if($savedAdd){
-          return redirect()->back()->with('success','Toestel is successvol gelinked');
+          return redirect()->to('/home')->with('success','Toestel is successvol gelinked');
         }
         else{
-          return redirect()->back()->with('error','Toestel is niet gelinked');
+          return redirect()->to('/home')->with('error','Toestel is niet gelinked');
         }
       }
     }
@@ -159,168 +179,116 @@ class UserController extends Controller
         $buddy->buddy_id = $userid;
         $savedAdd = $buddy->save();
         if($savedAdd){
-          return redirect()->back()->with('success','Buddy is successvol gelinked');
+          return redirect()->to('/home')->with('success','Buddy is successvol gelinked');
         }
         else{
-          return redirect()->back()->with('error','Buddy is niet gelinked');
+          return redirect()->to('/home')->with('error','Buddy is niet gelinked');
         }
       }
     }
 
-    public function editUser(Request $request){
-      $validator = Validator::make($request->all(),[
-        'data.id' => 'required|exists:users,id',
-      ]);
-      if($validator->fails()){
-        return view('modals/errormodal')->with('error','Vul het formulier correct in! Vergeet niet dat de email moet bestaan of ook uniek moet zijn.');
-      }
-      $id = $request->input('data.id');
-      $validator = Validator::make($request->all(),[
-        'data.id' => 'required|exists:users,id',
-        'data.firstname' => 'required',
-        'data.lastname' => 'required',
-        'data.date' => 'required|before:today',
-        'data.email' => 'required|unique:users,email,'.$id.'|regex:/.+\@.+\..+/',
-        'data.phone' => 'required',
-        'data.gender' => 'required|in:M,V',
-        'data.role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',
-      ]);
-      if($validator->fails()){
-        return view('modals/errormodal')->with('error','Vul het formulier correct in! Vergeet niet dat de email moet bestaan of ook uniek moet zijn.');
-      }
+    public function editUser(EditUserRequest $request){
+
+      $id = $request->input('id');
       $user = \App\User::where('id','=',$id)->first();
       if($user){
-        $user->firstName = $request->input('data.firstname');
-        $user->lastName = $request->input('data.lastname');
-        $user->dateOfBirth = $request->input('data.date');
-        $user->email = $request->input('data.email');
-        $user->phone = $request->input('data.phone');
-        $user->gender = $request->input('data.gender');
-        $user->role = $request->input('data.role');
+        $user->firstName = $request->input('firstname');
+        $user->lastName = $request->input('lastname');
+        $user->dateOfBirth = $request->input('date');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+        $user->gender = $request->input('gender');
+        $user->role = $request->input('role');
         $saved = $user->save();
         if($saved){
           $addrID = $user->address_id;
-          $addr = \App\Address::where('id','=',$addrID)->first();
-          return view('modals/editaddressmodal')->with('address',$addr);
+
+          $address = \App\Address::where('id','=',$addrID)->first();
+          if($address){
+            $address->street = $request->input('street');
+            $address->streetNumber = $request->input('streetnumber');
+            if($request->has('bus'))
+              $address->bus = $request->input('bus');
+            $address->zipCode = $request->input('zipcode');
+            $address->city = $request->input('city');
+            $address->country = $request->input('country');
+            $savedAdd = $address->save();
+            if($savedAdd){
+              return redirect()->to('/home')->with('success','De update is voltooid');
+            }
+            else{
+              return redirect()->to('/home')->with('error','Adres kon niet verandert worden');
+            }
+          }
         }
         else{
-          return view('modals/errormodal')->with('error','Gebruiker kon niet worden verandert');
+          return redirect()->to('/home')->with('error','Gebruiker kon niet worden verandert');
         }
       }
     }
 
-    public function editAddress(Request $request){
-      $validator = Validator::make($request->all(),[
-        'id' => 'required|exists:addresses,id',
-        'street' => 'required',
-        'streetnumber' => 'required|digits_between:1,10',
-        'bus' => 'optional|digits_between:1,10',
-        'zipcode' => 'required',
-        'city' => 'required',
-        'country' => 'required',
-      ]);
-      if($validator->fails()){
-        return redirect()->back()->with('error','Vul het formulier correct in!');
-      }
-      $address = \App\Address::where('id','=',$request->input('id'))->first();
-      if($address){
-        $address->street = $request->input('street');
-        $address->streetNumber = $request->input('streetnumber');
-        if($request->has('bus'))
-          $address->bus = $request->input('bus');
-        $address->zipCode = $request->input('zipcode');
-        $address->city = $request->input('city');
-        $address->country = $request->input('country');
-        $savedAdd = $address->save();
-        if($savedAdd){
-          return redirect()->back()->with('success','De update is voltooid');
-        }
-        else{
-          return redirect()->back()->with('error','Adres kon niet verandert worden');
-        }
-      }
+    public function editAddress(EditAddressUserRequest $request){
+
     }
 
-    public function addUserAddress(Request $request){
-      $validator = Validator::make($request->all(),[
-        'street' => 'required',
-        'streetnumber' => 'required|digits_between:1,10',
-        'bus' => 'optional|digits_between:1,10',
-        'zipcode' => 'required',
-        'city' => 'required',
-        'country' => 'required',
-      ]);
-      if($validator->fails()){
-        return redirect()->back()->with('error','Vul het formulier correct in!');
-      }
-      $address = new Address();
-      $address->street = $request->input('street');
-      $address->streetNumber = $request->input('streetnumber');
-      if($request->has('bus'))
-        $address->bus = $request->input('bus');
-      $address->zipCode = $request->input('zipcode');
-      $address->city = $request->input('city');
-      $address->country = $request->input('country');
-      $savedAdd = $address->save();
-      if($savedAdd){
-        $user = new User();
-        $user->firstName = $request->session()->get('firstName');
-        $user->lastName = $request->session()->get('lastName');
-        $user->password = bcrypt($request->session()->get('password'));
-        $user->api_token = str_random(60);
-        $user->dateOfBirth = $request->session()->get('dateOfBirth');
-        $user->email = $request->session()->get('email');
-        $user->phone = $request->session()->get('phone');
-        $user->role = $request->session()->get('role');
-        $user->address_id = $address->id;
-        $savedUser = $user->save();
+    public function addUserAddress(AddAddressUserRequest $request){
 
-        if($savedUser){
-          return redirect()->back()->with('success','Gebruiker is successvol opgeslagen');
-        }
-        else{
-          $address->delete();
-          return redirect()->back()->with('error','Gebruiker kon niet worden opgeslagen');
-        }
-      }
-      else{
-        return redirect()->back()->with('error','Adres kon niet worden opgeslagen');
-      }
+      //todelete
     }
 
-    public function addUser(Request $request){
-        $validator = Validator::make($request->all(),[
-          'data.firstname' => 'required',
-          'data.lastname' => 'required',
-          'data.password' => 'required|min:7|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/',
-          'data.confirm' => 'required|same:data.password',
-          'data.date' => 'required|before:today',
-          'data.email' => 'required|unique:users,email|regex:/.+\@.+\..+/',
-          'data.phone' => 'required',
-          'data.gender' => 'required|in:M,V',
-          'data.role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',
-        ]);
-        if($validator->fails()){
-          return view('modals/errormodal')->with('error','Vul het formulier correct in! Een wachtwoord moet minstens 7 characters lang zijn en 1 hoofdletter bevatten en 1 getal, De email moet ook uniek zijn.');
-        }
+    public function addUser(AddUserRequest $request){
         $array = [
-            "firstName" => $request->input('data.firstname'),
-            "lastName" => $request->input('data.lastname'),
-            "password" => $request->input('data.password'),
-            "dateOfBirth" => $request->input('data.date'),
-            "email" => $request->input('data.email'),
-            "phone" => $request->input('data.phone'),
-            "gender" => $request->input('data.gender'),
-            "role" => $request->input('data.role'),
+            "firstName" => $request->input('firstname'),
+            "lastName" => $request->input('lastname'),
+            "password" => $request->input('password'),
+            "dateOfBirth" => $request->input('date'),
+            "email" => $request->input('email'),
+            "phone" => $request->input('phone'),
+            "gender" => $request->input('gender'),
+            "role" => $request->input('role'),
         ];
 
         $request->session()->put($array);
         if($request->session()->has('firstName')){
-          return view('modals/addaddressmodal');
+          $address = new Address();
+          $address->street = $request->input('street');
+          $address->streetNumber = $request->input('streetnumber');
+          if($request->has('bus'))
+          $address->bus = $request->input('bus');
+          $address->zipCode = $request->input('zipcode');
+          $address->city = $request->input('city');
+          $address->country = $request->input('country');
+          $savedAdd = $address->save();
+          if($savedAdd){
+            $user = new User();
+            $user->firstName = $request->session()->get('firstName');
+            $user->lastName = $request->session()->get('lastName');
+            $user->password = bcrypt($request->session()->get('password'));
+            $user->api_token = str_random(60);
+            $user->dateOfBirth = $request->session()->get('dateOfBirth');
+            $user->email = $request->session()->get('email');
+            $user->phone = $request->session()->get('phone');
+            $user->role = $request->session()->get('role');
+            $user->address_id = $address->id;
+            $savedUser = $user->save();
+
+            if($savedUser){
+              return redirect()->to('/home')->with('success','Gebruiker is successvol opgeslagen');
+            }
+            else{
+              $address->delete();
+              return redirect()->to('/home')->with('error','Gebruiker kon niet worden opgeslagen');
+            }
+          }
+          else{
+            return redirect()->to('/home')->with('error','Adres kon niet worden opgeslagen');
+          }
         }
         else{
           return view('modals/errormodal')->with('error','User data kon niet worden afgehandeld');
         }
+
+
 
     }
 }
