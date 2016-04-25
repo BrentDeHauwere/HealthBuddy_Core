@@ -23,72 +23,62 @@ class ModalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function add(Request $request)
+    public function add()
     {
         return view('modals/addmodal');
     }
 
-    public function edit(Request $request)
+    public function edit($id)
     {
-      if(Input::has('data')){
-        $user = \App\User::find($request->input('data'));
+
+        $user = \App\User::find($id);
         if(!empty($user)){
-          return view('modals/editmodal')->with('user',$user);
+          $address = \App\Address::where('id',$user->address_id)->first();
+          return view('modals/editmodal')->with('user',$user)->with('address',$address);
         }
         else{
-          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+          return redirect()->back()->with('error','Er bestaat geen gebruiker met dat ID');
         }
-
-      }
-      else{
-        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
-      }
 
     }
 
-    public function reset(Request $request)
+    public function reset($id)
     {
-      if(Input::has('data')){
-        $user = \App\User::find($request->input('data'));
+
+        $user = \App\User::find($id);
         if(!empty($user)){
           return view('modals/resetmodal')->with('user',$user);
         }
         else{
-          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+          return redirect()->back()->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
-      }
-      else{
-        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
-      }
+
     }
 
-    public function link(Request $request)
+    public function link($id)
     {
-      if(Input::has('data')){
-        $user = \App\User::find($request->input('data'));
+
+        $user = \App\User::find($id);
         if(!empty($user)){
           $devices = \App\Device::whereNull('user_id')->get();
           if(count($devices) >= 1){
             return view('modals/linkmodal')->with('user',$user)->with('devices',$devices);
           }
           else {
-            return view('/modals/errormodal')->with('error','Geen toestellen gevonden om mee te werken');
+            return redirect()->back()->with('error','Geen toestellen gevonden om mee te werken');
           }
         }
         else{
-          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+          return redirect()->back()->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
-      }
-      else{
-        return view('/modals/errormodal')->with('error','Er is iets mis gegaan');
-      }
+
     }
 
-    public function linkBuddy(Request $request)
+    public function linkBuddy($id)
     {
-        $user = \App\User::where('id','=',$request->input('data'))->first();
+        $user = \App\User::where('id','=',$id)->first();
         if($user){
           $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
           $buddies = \App\User::where('buddy_id','=',$user->id)->get();
@@ -96,30 +86,29 @@ class ModalController extends Controller
             return view('modals/buddymodal')->with('user',$user)->with('users',$users)->with('buddies',$buddies);
           }
           else{
-            return view('modals/errormodal')->with('error','Geen buddies gevonden');
+            return redirect()->back()->with('error','Geen buddies gevonden');
           }
 
         }
         else{
-          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+          return redirect()->back()->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
     }
-    public function linkDokter(Request $request)
+    public function linkDokter($id)
     {
-        $user = \App\User::where('id','=',$request->input('data'))->first();
+        $user = \App\User::where('id','=',$id)->first();
         if($user){
           $dokter = \App\User::where('id','=',$user->buddy_id)->first();
-          if($dokter){
-            return view('modals/doktermodal')->with('user',$user)->with('dokter',$dokter);
-          }
-          else{
-            return view('modals/errormodal')->with('error','Geen dokter gevonden');
-          }
+          if($user->buddy_id != NULL)
+            $dokters = \App\User::where('role','=','Zorgmantel')->where('id','!=',$user->buddy_id)->get();
+          else
+            $dokters = \App\User::where('role','=','Zorgmantel')->get();
 
+          return view('modals/doktermodal')->with('user',$user)->with('dokter',$dokter)->with('dokters',$dokters);
         }
         else{
-          return view('/modals/errormodal')->with('error','Er bestaat geen gebruiker met dat ID');
+          return redirect()->back()->with('error','Er bestaat geen gebruiker met dat ID');
         }
 
     }
