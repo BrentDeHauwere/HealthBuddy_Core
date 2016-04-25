@@ -8,7 +8,11 @@
                 <div class="panel-heading">Welkom in de ZorgWinkel!</div>
 
                 <div class="panel-body">
+                @if (Auth::check())
+                    U bent ingelogd !
+                @else
                 Gelieve in te loggen alvorens verder te gaan.
+                @endif
                 </div>
             </div>
         </div>
