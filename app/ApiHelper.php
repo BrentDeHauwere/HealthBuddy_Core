@@ -13,6 +13,31 @@ use \App\Schedule;
 
 class ApiHelper {
 
+
+	public static function takeMedicineOnThisDate($schedule, $date)
+	{
+		$dateSec = $date->getTimeStamp(); 
+		if($dateSec < strtotime($schedule->start_date))
+		{
+			return false;
+		}
+
+		$secsPassed = $dateSec - strtotime($schedule->start_date);
+		$daysPassed = ApiHelper::secondsToDays($secsPassed);
+		
+		if($daysPassed % $schedule->interval == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	public static function secondsToDays($seconds)
+	{
+		return ($seconds / 60 /60 /24);
+	}
+
 	/**
 	 * This function creates a file from a base64 string, needed to receive photo's from the iOS app.
 	 * found info here: http://stackoverflow.com/questions/15153776/convert-base64-string-to-an-image-file

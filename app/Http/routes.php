@@ -90,6 +90,7 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
         'ApiController@showTodaysScheduleWithIntakes');
     Route::post('user/{patient_id}/medicine/{medicine_id}/intakes/last/{count}/weeks',
         'ApiController@showIntakesForMedicineLastxWeeks');
+    Route::post('user/{user_id}/intakes/progress', 'ApiController@showIntakesForMedicineProgress');
 
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
