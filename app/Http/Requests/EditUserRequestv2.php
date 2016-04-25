@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
 
-class EditUserRequest extends Request
+class EditUserRequestv2 extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class EditUserRequest extends Request
           'firstname' => 'required',
           'lastname' => 'required',
           'date' => 'required|before:today',
-          'email' => 'required|unique:users,email,'.$this->get('id').',id|regex:/.+\@.+\..+/',
+          'email' => 'required|unique:users,email,'.$this->get('id').'|regex:/.+\@.+\..+/',
           'phone' => 'required',
           'gender' => 'required|in:M,V',
           'role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',

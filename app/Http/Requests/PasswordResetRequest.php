@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
 
-class EditAddressUserRequest extends Request
+class PasswordResetRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class EditAddressUserRequest extends Request
     public function rules()
     {
         return [
-          //
+          'password' => 'required|min:7|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/',
+          'confirm' => 'required|same:password',
         ];
     }
 }
