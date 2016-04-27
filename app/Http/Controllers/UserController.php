@@ -192,7 +192,7 @@ class UserController extends Controller
     public function editUser(EditUserRequestv2 $request){
 
       $id = $request->input('id');
-      $user = \App\User::where('id','=',$id)->first();
+      $user = \App\User::where('id',$id)->first();
       if($user->email != $request->input('email')){
         $exists = \App\User::where('email',$request->input('email'))->first();
         if($exists){
