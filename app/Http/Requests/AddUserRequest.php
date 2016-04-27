@@ -29,7 +29,7 @@ class AddUserRequest extends Request
           'password' => 'required|min:7|regex:/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/',
           'confirm' => 'required|same:password',
           'date' => 'required|before:today',
-          'email' => 'required|unique:users,email|regex:/.+\@.+\..+/',
+          'email' => 'required|regex:/.+\@.+\..+/',
           'phone' => 'required',
           'gender' => 'required|in:M,V',
           'role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',

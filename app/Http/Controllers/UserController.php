@@ -199,6 +199,7 @@ class UserController extends Controller
           return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
         }
       }
+
       if($user){
         $user->firstName = $request->input('firstname');
         $user->lastName = $request->input('lastname');
@@ -236,38 +237,29 @@ class UserController extends Controller
     }
 
     public function addUser(AddUserRequest $request){
-        $array = [
-            "firstName" => $request->input('firstname'),
-            "lastName" => $request->input('lastname'),
-            "password" => $request->input('password'),
-            "dateOfBirth" => $request->input('date'),
-            "email" => $request->input('email'),
-            "phone" => $request->input('phone'),
-            "gender" => $request->input('gender'),
-            "role" => $request->input('role'),
-        ];
-
-        $request->session()->put($array);
-        if($request->session()->has('firstName')){
+          $exists = \App\User::where('email',$request->input('email'))->first();
+          if($exists){
+            return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
+          }
           $address = new Address();
           $address->street = $request->input('street');
           $address->streetNumber = $request->input('streetnumber');
           if($request->has('bus'))
-          $address->bus = $request->input('bus');
+            $address->bus = $request->input('bus');
           $address->zipCode = $request->input('zipcode');
           $address->city = $request->input('city');
           $address->country = $request->input('country');
           $savedAdd = $address->save();
           if($savedAdd){
             $user = new User();
-            $user->firstName = $request->session()->get('firstName');
-            $user->lastName = $request->session()->get('lastName');
-            $user->password = bcrypt($request->session()->get('password'));
+            $user->firstName = $request->input('firstName');
+            $user->lastName = $request->input('lastName');
+            $user->password = bcrypt($$request->input('password'));
             $user->api_token = str_random(60);
-            $user->dateOfBirth = $request->session()->get('dateOfBirth');
-            $user->email = $request->session()->get('email');
-            $user->phone = $request->session()->get('phone');
-            $user->role = $request->session()->get('role');
+            $user->dateOfBirth = $request->input('dateOfBirth');
+            $user->email = $request->input('email');
+            $user->phone = $request->input('phone');
+            $user->role = $request->input('role');
             $user->address_id = $address->id;
             $savedUser = $user->save();
 
@@ -282,12 +274,6 @@ class UserController extends Controller
           else{
             return redirect()->to('/home')->with('error','Adres kon niet worden opgeslagen');
           }
-        }
-        else{
-          return view('modals/errormodal')->with('error','User data kon niet worden afgehandeld');
-        }
-
-
 
     }
 }
