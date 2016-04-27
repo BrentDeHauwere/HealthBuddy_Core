@@ -234,6 +234,7 @@ class UserController extends Controller
           return redirect()->to('/home')->with('error','Gebruiker kon niet worden verandert');
         }
       }
+      return redirect()->to('/home')->with('error','Gebruiker kon niet worden verandert');
     }
 
     public function addUser(AddUserRequest $request){

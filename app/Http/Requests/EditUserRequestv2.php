@@ -24,7 +24,7 @@ class EditUserRequestv2 extends Request
     public function rules()
     {
         return [
-          'id' => 'required|exists:users,id',
+          'id' => 'required|exists:users',
           'firstname' => 'required',
           'lastname' => 'required',
           'date' => 'required|before:today',

@@ -39,9 +39,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/linkmodal/{id}','ModalController@link');
     Route::get('/buddymodal/{id}','ModalController@linkBuddy');
     Route::get('/doktermodal/{id}','ModalController@linkDokter');
-    Route::post('user/add','UserController@addUser');
+    Route::post('/user/add','UserController@addUser');
     //Route::post('user/addAddress','UserController@addUserAddress');
-    Route::post('user/editUser','UserController@editUser');
+    Route::post('/user/editUser','UserController@editUser');
     //Route::post('user/editAddress','UserController@editAddress');
     Route::post('user/link','UserController@linkDevice');
     Route::post('user/linkBuddy','UserController@linkBuddy');
