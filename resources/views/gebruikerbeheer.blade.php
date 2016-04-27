@@ -80,7 +80,7 @@
                       <button type="button" class="btn btn-primary ResetPass"  data-target="#ResetModal">Wachtwoord</button>
                       <button type="button" class="btn btn-primary LinkDev"  data-target="#LinkModal">Toestellen</button>
                       @if ($user->role == 'Zorgmantel')
-                        <button type="button" class="btn btn-primary LinkBuddy">Buddies</button>
+                        <button type="button" class="btn btn-primary LinkBuddy">Patiënten</button>
                       @endif
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
                       <form method="POST" action="user/delete">
