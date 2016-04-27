@@ -82,7 +82,10 @@ a:hover,.btn-link:hover{
 }
 
 
+.help-block {
+  color: #AC2925 !important;
+}
+
 body {
   padding-top: 70px;
-
 }

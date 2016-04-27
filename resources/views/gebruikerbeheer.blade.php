@@ -109,7 +109,7 @@
                     <a href="/resetmodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="wachtwoord">Wachtwoord</button></a>
                     <a href="/linkmodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="toestellen">Toestellen</button></a>
                     @if ($user->role == 'Zorgmantel')
-                      <a href="/buddymodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="buddies">Buddies</button></a>
+                      <a href="/buddymodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="buddies">Patiënten</button></a>
                     @elseif ($user->role == 'Zorgbehoevende')
                         <a href="/doktermodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="dokter" value="Dokter">Dokter</button></a>
                     @endif
