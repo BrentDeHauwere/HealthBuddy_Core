@@ -256,7 +256,7 @@ class UserController extends Controller
             $user->lastName = $request->input('lastname');
             $user->password = bcrypt($request->input('password'));
             $user->api_token = str_random(60);
-            $user->dateOfBirth = $request->input('dateOfBirth');
+            $user->dateOfBirth = $request->input('date');
             $user->email = $request->input('email');
             $user->phone = $request->input('phone');
             $user->role = $request->input('role');
