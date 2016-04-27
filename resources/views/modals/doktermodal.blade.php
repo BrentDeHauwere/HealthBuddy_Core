@@ -27,7 +27,7 @@
     @endif
     @if(!$dokters->isEmpty())
     <br/>
-    <form class="form-horizontal" method="POST" action="/user/linkDokter">
+    <form class="form-horizontal  col-md-8 col-md-offset-2" method="POST" action="/user/linkDokter">
     <input type="hidden" name="user" value="{{ $user->id }}">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
     <div class="form-group">

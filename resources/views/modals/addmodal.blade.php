@@ -2,7 +2,7 @@
 @section('content')
   <!-- Modal content-->
   <div class="container">
-  <form class="form-horizontal" method="POST" action="/user/add">
+  <form class="form-horizontal col-md-8 col-md-offset-2" method="POST" action="/user/add">
   <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
   <center><h4 class="col-sm-10 col-sm-offset-2">Voeg een nieuwe gebruiker toe</h4></center>
         <div class="form-group">
@@ -12,7 +12,7 @@
 
             @if ($errors->has('firstname'))
                 <span class="help-block">
-                    <strong>{{ $errors->first('firstname') }}</strong>
+                    <strong>{{ $errors->first('firstname') }}</strong>  
                 </span>
             @endif
           </div>

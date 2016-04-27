@@ -2,7 +2,7 @@
 @section('content')
   <!-- Modal content-->
   <div class="container">
-  <form class="form-horizontal" method="POST" action="/user/editUser">
+  <form class="form-horizontal  col-md-8 col-md-offset-2" method="POST" action="/user/editUser">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
     <center><h4 class="col-sm-10 col-sm-offset-2">Edit een gebruiker</h4></center>
          <input type="hidden" name="id" id="id" value="{{ $user->id }}">
