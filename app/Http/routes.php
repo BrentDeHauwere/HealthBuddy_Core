@@ -38,6 +38,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('/resetmodal','ModalController@reset');
     Route::post('/linkmodal','ModalController@link');
     Route::post('/buddymodal','ModalController@linkBuddy');
+    Route::post('/doktermodal','ModalController@linkDokter');
     Route::post('user/add','UserController@addUser');
     Route::post('user/addAddress','UserController@addUserAddress');
     Route::post('user/editUser','UserController@editUser');
@@ -46,6 +47,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('user/linkBuddy','UserController@linkBuddy');
     Route::post('user/reset','UserController@reset');
     Route::post('user/unlink','UserController@unlink');
+    Route::post('user/unlinkDokter','UserController@unlinkDokter');
     Route::post('user/delete','UserController@delete');
 
     Route::get('user/{user}', 'UserController@showProfile');
@@ -69,15 +71,17 @@ Route::group(['middleware' => 'web'], function () {
 */
 Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // Routes to get records
-    Route::post('buddyprofile', 'ApiController@showBuddyProfile');
+    Route::post('profile', 'ApiController@showProfile');
+
     Route::post('user/{user_id}/address', 'ApiController@showAddress');
     Route::post('patients', 'ApiController@showPatients');
-    Route::post('patient/{patient_id}', 'ApiController@showPatient');
+    Route::post('patient/{patient_id}/show', 'ApiController@showPatient');
     Route::post('user/{patient_id}/medicalinfo', 'ApiController@showMedicalInfo');
     Route::post('user/{patient_id}/medicines', 'ApiController@showMedicines');
-    Route::post('user/{patient_id}/medicine/{medicine_id}', 'ApiController@showMedicine');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/show', 'ApiController@showMedicine');
     Route::post('user/{patient_id}/medicine/{medicine_id}/photo', 'ApiController@showMedicinePhoto');
     Route::post('user/{patient_id}/schedule', 'ApiController@showSchedule');
+    Route::post('user/{patient_id}/schedule/today', 'ApiController@showTodaysSchedule');
     Route::post('user/{patient_id}/weights', 'ApiController@showWeights');
     Route::post('user/{patient_id}/lastWeight', 'ApiController@showLastWeight');
 
@@ -97,4 +101,5 @@ Route::group(['prefix' => 'api/', 'middleware' => 'auth:api'], function () {
     // routes to delete records
     Route::post('user/{user_id}/schedule/{schedule_id}/delete', 'ApiController@deleteSchedule');
     Route::post('user/{user_id}/medicine/{medicine_id}/delete', 'ApiController@deleteMedicine');
+    Route::post('user/{patient_id}/medicine/{medicine_id}/photo/delete', 'ApiController@deleteMedicinePhoto');
 });

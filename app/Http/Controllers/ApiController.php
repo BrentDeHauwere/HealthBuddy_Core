@@ -41,34 +41,48 @@ class ApiController extends Controller
   * The address and patients are retrieved seperately since we need maximum flexibility.
   *   @author eddi
   */
-  public function showBuddyProfile()
+  public function showProfile()
   {
-      // retrieve the buddy
+    // retrieve the user
     $auth_user = User::find(ApiHelper::getAuthenticatedUser()->id);
 
-      // retrieve the buddy's address
+    
+    // retrieve the address
     $address = Address::where('id', '=' ,$auth_user->address_id)->first();
-      // retrieve the buddy's patients and their infos
-    $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
-    ->with('medicalinfo', 'address')->get();
+    $auth_user->address = $address;
 
+    // if a budy get patients
+    if(!ApiHelper::isLoggedInUserPatient()){
+      // retrieve the buddy's patients and their infos
+      $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
+      ->with('medicalinfo', 'address')->get();
+
+      $auth_user->medicalinfo = null;
+      $auth_user->medicines = null;
 
       // now add the medicines and schedules to the patients
-    foreach ($patients_db as $patient) {
-      $patient->patients = null;
-      $patient->medicines = Medicine::with('schedule')->get();
+      foreach ($patients_db as $patient) {
+        $patient->patients = null;
+        $patient->medicines = Medicine::where('user_id', '=', $patient->id)->with('schedule')->get();
+        $auth_user->patients = $patients_db;
+      }
+    }elseif (ApiHelper::isLoggedInUserPatient()) {
+      // retrieve the patients madicines and schedules
+      $medicines = Medicine::where('user_id', '=', $auth_user->id)->with('schedule')->get();
+      // retrieve medicalinfo for the user
+      $medicalInfo =  MedicalInfo::where('user_id', '=', $auth_user->id)->first();
+
+      $auth_user->medicalinfo = $medicalInfo;
+      $auth_user->medicines = $medicines;
+
+      // $auth_user->weight = null;
     }
 
-      // append the patients to the buddy-object
-    $auth_user->address = $address;
-    $auth_user->patients = $patients_db;
-    $auth_user->medicalinfo = null;
-    $auth_user->medicines = null;
-      // $auth_user->weight = null;
 
-      // return the buddy
+    // return the user
     return $auth_user;
   }
+
 
   /**
    * This function retrieves the address of a user.
@@ -84,7 +98,7 @@ class ApiController extends Controller
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif (ApiHelper::isPatient($user_id)) {
+    elseif (ApiHelper::isPatient($user_id) || ApiHelper::isLoggedInUserPatient()) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -150,7 +164,7 @@ class ApiController extends Controller
   public function showMedicine ($patient_id, $medicine_id)
   {
     // is this a buddy's patient? 
-    if(!ApiHelper::isPatient($patient_id)) {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
       return response('Wrong Patient_id provided.', 403);
     }
     // is this a medicine of the patient?
@@ -167,8 +181,8 @@ class ApiController extends Controller
 
  public function showMedicinePhoto($patient_id, $medicine_id)
  {
-    // is this a buddy's patient? 
-  if(!ApiHelper::isPatient($patient_id)) {
+    // is this a patient? 
+  if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
     return response('Wrong Patient_id provided.', 403);
   }
     // is this a medicine of the patient?
@@ -198,8 +212,32 @@ return $photo;
     */
   public function showSchedule($patient_id){
         // send the requested patient info
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
       return Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+    }
+    return response('Wrong Patient_id provided.', 403);
+  }
+
+
+  /**
+    * This function retrieves a patients schedule for today.
+    * @author eddi
+    */
+  public function showTodaysSchedule($patient_id){
+    if(ApiHelper::isLoggedInUserPatient())
+    {
+      $dbMedicines = Medicine::with('schedule')
+      ->where('user_id', '=', $patient_id) 
+      ->get();
+      $medicines = array();
+
+      foreach ($dbMedicines as $m) {
+        if(date('w') == date("w", $m->dayOfWeek))
+        {
+          array_push($medicines, $m);
+        }
+      }
+      return $medicines;
     }
     return response('Wrong Patient_id provided.', 403);
   }
@@ -209,9 +247,12 @@ return $photo;
       * @author eddi
       */
   public function showMedicalInfo($patient_id){
-          // send the requested patient info
+    $auth_user = ApiHelper::getAuthenticatedUser();
+    // send the requested patient info
     if(ApiHelper::isPatient($patient_id)) {
       return MedicalInfo::where('user_id', '=', $patient_id)->first();
+    }elseif (ApiHelper::isLoggedInUserPatient() && $patient_id == $auth_user->id) {
+      return MedicalInfo::where('user_id', '=', $auth_user->id)->first();
     }
     return response('Wrong Patient_id provided.', 403);
   }
@@ -219,7 +260,7 @@ return $photo;
 
   public function showWeights($patient_id)
   {
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
       return Weight::where('user_id', '=', $patient_id)->get();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -227,7 +268,7 @@ return $photo;
 
   public function showLastWeight($patient_id)
   {
-    if(ApiHelper::isPatient($patient_id)) {
+    if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()){
       return Weight::where('user_id', '=', $patient_id)->orderBy('created_at', 'desc')->first();
     }
     return response('Wrong Patient_id provided.', 403);
@@ -366,6 +407,7 @@ return $photo;
   public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
   {
     $medicine = Medicine::find($medicine_id);
+    $fullPath = null;
 
     // if the name of the medicine changed, the photo is no longer valid!
     if($request->name != $medicine->name)
@@ -441,15 +483,21 @@ return $photo;
     */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
-    $path = 'userdata/user_'. $user_id . '/medicines/';
-    // sanitize the filename given the name of the medication.
-    $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
-    $fullPath = $path.$filename;
+    $fullPath = null;
 
-    if($request->photo->move($path, 
-      $filename) != $fullPath)
+    // if there is a photo attached -> update it.
+    if(isset($request->photo) && !empty($request->photo))
     {
-      return response('Saving the picture failed', 500);
+      $path = 'userdata/user_'. $user_id . '/medicines/';
+      // sanitize the filename given the name of the medication.
+      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
+      $fullPath = $path.$filename;
+
+      if($request->photo->move($path, 
+        $filename) != $fullPath)
+      {
+        return response('Saving the picture failed', 500);
+      }
     }
 
     // create the medicine object to store in DB
@@ -480,7 +528,7 @@ return $photo;
    */
   public function createWeight($patient_id)
   {
-    if(!ApiHelper::isPatient($patient_id))
+    if(!ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient())
     {
       return response('Wrong id provided.', 403);
     }
@@ -510,34 +558,65 @@ return $photo;
     // fetch the schedule to delete
   $schedule = Schedule::find($schedule_id);
   return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
-
-  return 'sdfsdfsdfsdf';
 }
 
-
-public function deleteMedicine(Request $request, $user_id, $medicine_id)
-{
-  if(!ApiHelper::isPatient($user_id)
-    || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+  /**
+ * This function deletes a medicine , and deletes it's photo
+ * @param medicine id the id of the medicine 
+ * @param user_id the id of the patient
+ * @author eddi
+ */
+  public function deleteMedicine(Request $request, $user_id, $medicine_id)
   {
-    return response("This medicine is not from a patient.", 403);
-  }
+    if(!ApiHelper::isPatient($user_id)
+      || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+    {
+      return response("This medicine is not from a patient.", 403);
+    }
   // fetch the medicine to delete
-  $medicine = Medicine::find($medicine_id);
+    $medicine = Medicine::find($medicine_id);
   // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
   // it's more important that a patient stops taking a medicine then a server having undeleted files.
-  $medicine->delete();
+    $medicine->delete();
 
   // delete the photo, if there is one 
-  if ($medicine->photoUrl != null) {
-    if( file_exists($medicine->photoUrl))
-    {
-      unlink($medicine->photoUrl);
+    if ($medicine->photoUrl != null) {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+      }
     }
+    return 'Medicine deleted';
   }
-  return 'Medicine deleted';
-}
 
+  /**
+   * This function deletes a photo attached to a medicine, and updates the medicine's photoUrl
+   * @param medicine id the id of the medicine 
+   * @param user_id the id of the patient
+   * @author eddi
+   */
+  public function deleteMedicinePhoto(Request $request, $user_id, $medicine_id)
+  {
+    if(!ApiHelper::isPatient($user_id)
+      || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
+    {
+      return response("This medicine is not from a patient.", 403);
+    }
+  // fetch the medicine to delete
+    $medicine = Medicine::find($medicine_id);
+
+  // delete the photo, if there is one 
+    if ($medicine->photoUrl != null) {
+      if( file_exists($medicine->photoUrl))
+      {
+        unlink($medicine->photoUrl);
+      }
+    }
+
+  // tell the medicine there is no photo anymore
+    $medicine->photoUrl = null;
+    return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':'Medicine photoUrl not updated';
+  }
 
   /**
    *  The login function for the API
@@ -551,19 +630,27 @@ public function deleteMedicine(Request $request, $user_id, $medicine_id)
       // find the user in the database.
       $user = User::where('email','=',$request->email)->firstOrFail();
 
-      if(Hash::check($request->password, $user->password)){
-              // on each login, regenerate the api_token.
-        $user->api_token = str_random(60);
-        $user->save();
+      // check if the user may login to the app
+      if(
+        $user->role == 'Zorgbehoevende'
+        || $user->role == 'Zorgmantel'
+        ){
+        if(Hash::check($request->password, $user->password)){
+        // on each login, regenerate the api_token.
+          $user->api_token = str_random(60);
+          $user->save();
 
-              // return the api_token.
-        $api_token = $user->api_token; 
-        return response()->json(array('api_token' => $api_token));
+        // return the api_token.
+          $api_token = $user->api_token; 
+          return response()->json(array('api_token' => $api_token));
+        }
+        else{
+          throw new ModelNotFoundException('Wrong password');
+        }
       }
       else{
-        throw new ModelNotFoundException('Wrong password');
+        throw new ModelNotFoundException('Wrong role'); 
       }
-
     }catch(ModelNotFoundException $ex){
       return response($ex->getMessage(), 401);
     }
