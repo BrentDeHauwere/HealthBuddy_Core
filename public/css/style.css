@@ -80,3 +80,7 @@ a:hover,.btn-link:hover{
 .container{
    width:95% !important;
 }
+
+.help-block {
+  color: #AC2925 !important;
+}
