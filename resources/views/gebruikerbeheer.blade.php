@@ -47,6 +47,13 @@
     <button type="button" class="close" data-dismiss="alert">&times;</button>
   </div>
 </div>
+@elseif(session('error'))
+<div class="col-md-6 col-md-offset-3">
+  <div class="alert alert-warning fade in">
+    <strong>Warning!</strong> {{ session('error') }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+</div>
 @elseif(session('success'))
 <div class="col-md-6 col-md-offset-3">
   <div class="alert alert-success fade in">
@@ -109,7 +116,7 @@
                     <a href="/resetmodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="wachtwoord">Wachtwoord</button></a>
                     <a href="/linkmodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="toestellen">Toestellen</button></a>
                     @if ($user->role == 'Zorgmantel')
-                      <a href="/buddymodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="buddies">Buddies</button></a>
+                      <a href="/buddymodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="buddies">Patiënten</button></a>
                     @elseif ($user->role == 'Zorgbehoevende')
                         <a href="/doktermodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="dokter" value="Dokter">Dokter</button></a>
                     @endif
