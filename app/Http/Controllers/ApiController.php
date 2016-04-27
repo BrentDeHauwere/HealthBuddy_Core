@@ -16,6 +16,7 @@ use \App\Address;
 use \App\Medicine;
 use \App\Weight;
 use \App\Schedule;
+use \App\Intake;
 
 // use App\Http\Requests\Request;
 use App\Http\Requests\UpdateUserApiRequest;
@@ -25,6 +26,7 @@ use App\Http\Requests\UpdateScheduleApiRequest;
 use App\Http\Requests\UpdateMedicineApiRequest;
 use App\Http\Requests\CreateScheduleApiRequest;
 use App\Http\Requests\CreateMedicineApiRequest;
+use App\Http\Requests\CreateIntakeApiRequest;
 
 
 // api helper functions
@@ -78,7 +80,6 @@ class ApiController extends Controller
       // $auth_user->weight = null;
     }
 
-
     // return the user
     return $auth_user;
   }
@@ -98,7 +99,7 @@ class ApiController extends Controller
       return $auth_user->address;
     }
     // check if the $user_id belongs to the buddy's patients
-    elseif (ApiHelper::isPatient($user_id) || ApiHelper::isLoggedInUserPatient()) {
+    elseif (ApiHelper::isPatient($user_id)) {
       $address = User::where('id', '=', $user_id)->first()->address;
       return $address;   
     }
@@ -113,7 +114,9 @@ class ApiController extends Controller
   public function showPatients()
   {
     $auth_user = ApiHelper::getAuthenticatedUser();
-
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Unauthorized, not a buddy', 403);
+    }
     // retrieve the buddy's patients and their medicalinfo.
     $patients_db = User::where('buddy_id', '=' ,$auth_user->id)
     ->with('medicalinfo', 'address')->get();
@@ -135,9 +138,12 @@ class ApiController extends Controller
    */
   public function showPatient($patient_id)
   {
+    if(ApiHelper::isLoggedInUserPatient()){
+      return response('Not a buddy.', 403);
+    }
     if(ApiHelper::isPatient($patient_id)) {
       $patient = User::with('address', 'medicalinfo')->where('id', '=', $patient_id)->first();
-      $patient->medicines = Medicine::with('schedule')->get();
+      $patient->medicines = Medicine::where('user_id', '=', $patient_id)->with('schedule')->get();
       $patient->patients = null;
       return $patient;
     }
@@ -149,11 +155,18 @@ class ApiController extends Controller
   * @author eddi
   */
   public function showMedicines ($patient_id){
-    if(!ApiHelper::isPatient($patient_id)) {
+    if(!ApiHelper::isPatient($patient_id)&& !ApiHelper::isLoggedInUserPatient()) {
       return response('Wrong Patient_id provided.', 403);
     }
-    $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
-    return $medicine;
+
+    if(!ApiHelper::isLoggedInUserPatient()){
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }elseif ($patient_id == ApiHelper::getAuthenticatedUser()->id) {
+      $medicine = Medicine::with('schedule')->where('user_id', '=', $patient_id)->get();
+      return $medicine;
+    }
+    return response('Wrong Patient_id provided.', 403);
   }
 
   /**
@@ -168,43 +181,57 @@ class ApiController extends Controller
       return response('Wrong Patient_id provided.', 403);
     }
     // is this a medicine of the patient?
-    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    if(ApiHelper::isMedicineOfPatient($patient_id, $medicine_id)
+      || (ApiHelper::isLoggedInUserPatient() 
+        && $patient_id == ApiHelper::getAuthenticatedUser()-id))
     {
-     return response('Wrong medicine_id provided.', 403); 
-   }
+      // fetch the medicine
+      $medicine = Medicine::find($medicine_id);
 
-    // fetch the medicine
-   $medicine = Medicine::find($medicine_id);
 
-   return $medicine;
- }
+      // attach the photo if it exists
+      $medicine->photo = ''; 
+      $photo = "empty";
+      // attach the photo if there is one.
+      if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+      {
+        $photo = base64_encode(file_get_contents($medicine->photoUrl));
+        $medicine->photo = $photo;
+      }
+      unset($medicine->photoUrl);
 
- public function showMedicinePhoto($patient_id, $medicine_id)
- {
-    // is this a patient? 
-  if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
-    return response('Wrong Patient_id provided.', 403);
+      return $medicine;
+    }
+
+    return response('Wrong medicine_id provided.', 403); 
   }
-    // is this a medicine of the patient?
-  if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
-  {
-   return response('Wrong medicine_id provided.', 403); 
- }
 
- $medicine = Medicine::find($medicine_id);
+//   public function showMedicinePhoto($patient_id, $medicine_id)
+//   {
+//     // is this a patient? 
+//     if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()) {
+//       return response('Wrong Patient_id provided.', 403);
+//     }
+//     // is this a medicine of the patient?
+//     if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+//     {
+//      return response('Wrong medicine_id provided.', 403); 
+//    }
 
- if($medicine->photoUrl == null || empty($medicine->photoUrl))
- {
-  return response("This medicine has no photo", 404);
-}
-$photo = "empty";
-    // attach the photo if there is one.
-if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
-{
-  $photo = file_get_contents($medicine->photoUrl);
-}
-return $photo;
-}
+//    $medicine = Medicine::find($medicine_id);
+
+//     // attach the photo if it exists
+//     $medicine->photo = ''; 
+//     $photo = "empty";
+//     // attach the photo if there is one.
+//     if($medicine->photoUrl != null && file_exists($medicine->photoUrl))
+//     {
+//       $photo = base64_encode(file_get_contents($medicine->photoUrl));
+//       $medicine->photo = $photo;
+//     }
+
+//   return $photo;
+// }
 
   /**
     * This function retrieves a patients schedule, when to take his medicines.
@@ -224,23 +251,285 @@ return $photo;
     * @author eddi
     */
   public function showTodaysSchedule($patient_id){
-    if(ApiHelper::isLoggedInUserPatient())
+    // check if user is valid
+    if(!ApiHelper::isLoggedInUserPatient())
     {
-      $dbMedicines = Medicine::with('schedule')
-      ->where('user_id', '=', $patient_id) 
-      ->get();
-      $medicines = array();
+      return response('Wrong Patient_id provided.', 403);
+    }
 
-      foreach ($dbMedicines as $m) {
-        if(date('w') == date("w", $m->dayOfWeek))
-        {
-          array_push($medicines, $m);
+    // fetch the patients medicines with schedules
+    $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+    ->get();
+    // the medicines to be taken today.
+    $medicines = array();
+
+    // check all medicines for this patient
+    foreach ($dbMedicines as $m) {
+      $medToday = false;
+      $schedToday = array();
+      $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+      ->get();
+
+      // check all schedules of this medicine
+      foreach ($dbSchedules as $schedule) {
+
+        if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+          if(!empty($schedule->dayOfWeek) 
+            && date('w') == date("w", $schedule->dayOfWeek))
+          {
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+          else if(!empty($schedule->start_date) 
+            && (strtotime($schedule->start_date) < strtotime('now')))
+          {
+          // check if the medicine should still be taken.
+            if( (!empty($schedule->end_date) 
+              && (strtotime($schedule->end_date) > strtotime('now')))
+              || empty($schedule->end_date)
+              )
+            {
+              $medToday = true;
+              array_push($schedToday, $schedule);
+            }
+          }
         }
       }
-      return $medicines;
+      if($medToday)
+      {
+        $m->schedule = $schedToday;
+        array_push($medicines, $m);
+        $medToday = false;
+      }
     }
+    return $medicines;    
+  }
+
+
+ /**
+    * This function retrieves a patients schedule for today.
+    * @author eddi
+    */
+ public function showTodaysScheduleWithIntakes($patient_id){
+    // check if user is valid
+  if(!ApiHelper::isLoggedInUserPatient())
+  {
     return response('Wrong Patient_id provided.', 403);
   }
+
+  $date = date_create();
+
+  // fetch the patients medicines with schedules
+  $dbMedicines = Medicine::where('user_id', '=', $patient_id) 
+  ->get();
+  // the medicines to be taken today.
+  $medicines = array();
+
+    // check all medicines for this patient
+  foreach ($dbMedicines as $m) {
+    $medToday = false;
+    $schedToday = array();
+    $dbSchedules = Schedule::where('medicine_id', '=', $m->id)
+    ->get();
+
+      // check all schedules of this medicine
+    foreach ($dbSchedules as $schedule) {
+
+      if($schedule->medicine_id == $m->id){
+        // check the original dayOfWeek
+        if(!empty($schedule->dayOfWeek) 
+          && date('w') == date("w", $schedule->dayOfWeek))
+        {
+          $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+          ->whereNotNull('created_at')
+          ->where('created_at', '=', date('Y-m-d', time()))
+          ->orderBy('created_at', 'desc')
+          ->get();
+
+          $medToday = true;
+          array_push($schedToday, $schedule);
+        }
+
+          // check the interval intake:
+          // check if the medicine intake has started.
+        else if(!empty($schedule->start_date) 
+          && (strtotime($schedule->start_date) < strtotime('now')))
+        {
+          // check if the medicine should still be taken.
+          if( (!empty($schedule->end_date) 
+            && (strtotime($schedule->end_date) > strtotime('now')))
+            || empty($schedule->end_date)
+            )
+          {
+            $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+            ->whereNotNull('created_at')
+            ->where('created_at', '=', date('Y-m-d', time()))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            $medToday = true;
+            array_push($schedToday, $schedule);
+          }
+        }
+      }
+    }
+    if($medToday)
+    {
+      $m->schedule = $schedToday;
+      array_push($medicines, $m);
+      $medToday = false;
+    }
+  }
+  return $medicines;    
+}
+
+  /**
+   * Show the intakes for a given medicine
+   * @return returns the schedules and its intakes.
+   * @author eddi
+   */
+  public function showIntakesForMedicineLastxWeeks($patient_id, $medicine_id, $count)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+    if(!ApiHelper::isMedicineOfPatient($patient_id, $medicine_id))
+    {
+      return response('Wrong medicine_id provided.', 403);
+    }
+    if($count < 1){
+      return response('Wrong count provided.', 403); 
+    }
+
+    $date = date_sub(date_create(),date_interval_create_from_date_string( $count . " weeks"));
+    
+
+    $schedules = Schedule::where('medicine_id','=', $medicine_id)->get();
+
+    foreach ($schedules as $schedule) {
+
+      $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+      ->whereNotNull('created_at')
+      ->where('created_at', '<', $date)
+      ->orderBy('created_at', 'desc')
+      ->first();
+    }
+    return $schedules;
+  }
+
+  /**
+   * Show the intakes for today of a given medicine
+   * @return returns the schedule and its intakes for today.
+   * @author eddi
+   */
+  public function showIntakesForToday($patient_id)
+  {
+    if(!ApiHelper::isPatient($patient_id) && !ApiHelper::isLoggedInUserPatient()){
+      return response('Wrong Patient_id provided.', 403);
+    }
+
+    $date = date_create();
+    
+    $medicines = Medicine::where('user_id', '=', ApiHelper::getAuthenticatedUser()->id)
+    ->with('schedule')
+    ->get();
+
+    $intakes = array();
+    
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+
+        $schedule->intakes = Intake::where('schedule_id', '=', $schedule->id)
+        ->whereNotNull('created_at')
+        ->where('created_at', '=', date('Y-m-d', time()))
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        if(!empty($schedule->intakes))
+        {
+          array_push($intakes, $schedule->intakes);
+        }
+      }
+    }
+
+    return $intakes;
+  }
+
+  public function showIntakesForMedicineProgress ($user_id) 
+  {
+
+    if (!ApiHelper::isPatient($user_id)){
+      return response(array('422' => array("Het id is niet van een patient")), 422);
+    }
+
+    // fetch the medicines with schedules
+    $medicines = Medicine::where('user_id', '=', $user_id)
+    ->with('schedule')
+    ->get();
+    $scheduleIds = array();
+    // fetch the intakes for each schedule
+    $intakes = array();
+    // fetch the intakes
+    foreach ($medicines as $m) {
+      foreach ($m->schedule as $schedule) {
+        array_push($scheduleIds, $schedule->id);
+      }
+    }
+    $intakes = Intake::whereIn('schedule_id', $scheduleIds)->get()->toArray();
+    
+
+    $date = date_create();  
+    $endDate = strtotime($schedule->start_date);
+    
+    // the response message
+    $progress = array();
+    
+    while($date->getTimeStamp() > $schedule->start_date)
+    {
+      $entry = array(
+        'day' => date_format($date, 'Y-m-d'),
+        'taken' => 0,
+        'toTake' => 0,
+        );
+      // check the medicines schedule for that day
+      foreach ($medicines as $m) {
+        foreach ($m->schedule as $schedule) {
+
+          if(ApiHelper::takeMedicineOnThisDate($schedule, $date))
+          {
+            // update toTake:
+            $entry['toTake'] = $entry['toTake'] + 1;
+            
+            foreach ($intakes as $intake) {
+              $intakeDate = substr($intake['created_at'], 0, strpos($intake['created_at'],' '));
+              // update taken:
+              if($intakeDate == date_format($date, 'Y-m-d') 
+                && $intake['schedule_id'] == $schedule->id)
+              {
+                $entry['taken'] = $entry['taken'] + 1;
+              }
+            }
+          }
+        }
+      }
+      if($entry['toTake'] > 0)
+      {
+        array_push($progress, $entry);
+      }
+
+      // go back one day
+      $date = date_sub($date, date_interval_create_from_date_string('1 day'));
+    }
+
+
+
+    return $progress;
+  }
+
 
   /**
       * This function retrieves a patients medicalInfo.
@@ -258,6 +547,8 @@ return $photo;
   }
 
 
+
+
   public function showWeights($patient_id)
   {
     if(ApiHelper::isPatient($patient_id) || ApiHelper::isLoggedInUserPatient()) {
@@ -273,6 +564,7 @@ return $photo;
     }
     return response('Wrong Patient_id provided.', 403);
   }
+
 
 
 
@@ -303,7 +595,7 @@ return $photo;
       && !empty($request->buddy_id)
       && $request->buddy_id != $user->buddy_id)
     {
-      return response('Not allowed to change the buddy itself.', 403);
+      return response(array('422' => array('Not allowed to change the buddy itself.')), 422);
     }
 
     // check if the request wants to change the email of the buddy
@@ -312,18 +604,19 @@ return $photo;
       && !empty($request->email)
       && $request->email != $user->email)
     {
-      return response('Not allowed to change the buddy email.', 403);
+      return response(array('422' => array('Not allowed to change the buddy email.')), 403);
     }
 
     if(ApiHelper::isPatient($user_id) || $auth_user->id == $user_id)
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
       $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
+      dd($user);
       
       // save the updated user to the db.
-      return ($user->save())?$user:response("User not updated", 500);
+      return ($user->save())?$user:response(array('422' => array("User not updated")), 500);
     }
-    return response('Wrong id provided.', 403);
+    return response(array('422' => array('Wrong id provided.')),422);
   }
 
   /**
@@ -347,7 +640,7 @@ return $photo;
     $address = ApiHelper::fillApiRequestFields($fields, $request, $address);
     
     // save the updated user to the db.
-    return ($address->save())?$address:response("Address not updated", 500);
+    return ($address->save())?$address:response(array('422'=> array("Address not updated")), 500);
   }
 
 
@@ -369,7 +662,7 @@ return $photo;
     // the updatable fields.
     $fields = array('length', 'weight', 'bloodType', 'medicalCondition', 'allergies');
     $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $medicalinfo);    
-    return ($medicalinfo->save())?$medicalinfo:response("MedicalInfo not updated", 500);
+    return ($medicalinfo->save())?$medicalinfo:response(array('422' => array("MedicalInfo not updated")), 422);
   }
 
   /**
@@ -383,14 +676,15 @@ return $photo;
    * @return mixed
    * @author eddi
    */
-  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $schedule_id)
+  public function updateSchedule(UpdateScheduleApiRequest $request, $user_id, $medicine_id, $schedule_id)
   {
     $patient = User::find($user_id);   
     $schedule = Schedule::find($schedule_id);
-    $fields = array('dayOfWeek','time','amount');
-    $medicalinfo = ApiHelper::fillApiRequestFields($fields, $request, $Schedule);
+    $fields = array('time','amount', 'start_date', 'end_date', 'interval');
+    $schedule = ApiHelper::fillApiRequestFields($fields, $request, $schedule);
+    $schedule->medicine_id  = $medicine_id;
 
-    return ($schedule->save())?$schedule:response("Schedule not updated", 500);
+    return ($schedule->save())?$schedule:response(array('422' => array("Schedule not updated")), 422);
   }
 
   /**
@@ -407,7 +701,6 @@ return $photo;
   public function updateMedicine(UpdateMedicineApiRequest $request, $user_id, $medicine_id)
   {
     $medicine = Medicine::find($medicine_id);
-    $fullPath = null;
 
     // if the name of the medicine changed, the photo is no longer valid!
     if($request->name != $medicine->name)
@@ -428,23 +721,28 @@ return $photo;
       }
     }
 
+    $photo_url = null;
     // if there is a photo attached -> update it.
     if(isset($request->photo) && !empty($request->photo))
     {
-      $path = 'userdata/user_'. $user_id . '/medicines/';
-      // sanitize the filename given the name of the medication.
-      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
-      $fullPath = $path.$filename;
+      $directory = 'userdata/user_'. $user_id . '/medicines/';
 
-      if($request->photo->move($path, 
-        $filename) != $fullPath)
-      {
-        return response('Saving the picture failed', 500);
+      // create the directory:
+      if(!file_exists($directory)){
+        mkdir($directory, 0755, true);
       }
-      // add the photoUrl to the medicine
-      $medicine->photoUrl = $fullPath;
+
+      $path = $directory . $request->name;
+      // create the photo from the base64 param
+      $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+      if($photo_url == -1)
+      {
+        return response(array('422' => array('Saving the photo failed')), 422); 
+      }
     }
-    return ($medicine->save() == 1)? $medicine:response('The medicine was not updated', 500);
+    $medicine->photoUrl = $photo_url;
+
+    return ($medicine->save() == 1)? $medicine:response(array('422'=> array('The medicine was not updated')), 422);
   }
 
 
@@ -454,23 +752,49 @@ return $photo;
    */
 
   /**
+    * This function creates a Intake for a medicine, validating the user and the schedule before creation.
+    * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
+    * @param $user_id The id of the user to create a schedule for
+    * @return mixed
+    * @author eddi
+    */  
+  public function createIntake(CreateIntakeApiRequest $request, $user_id, $schedule_id)
+  {
+
+    // for brent
+    $schedule_updated = Schedule::find($schedule_id);
+    $schedule_updated->updated_at = date('Y-m-d h:m:s');
+    $schedule_updated->save();
+
+    $intake = new Intake();
+    $fields = array('schedule_id');
+    $intake->schedule_id = $schedule_id;
+    return ($intake->save())?$intake:response(array('422' => array('De inname werd niet opgeslaan')), 422);
+    ;
+  }
+
+  /**
     * This function creates a schedule for a medicine, validating the user and the medicine before creation.
     * @param $request The field with which to create the schedule, containing the medicine_id to do validation on.
     * @param $user_id The id of the user to create a schedule for
     * @return mixed
     * @author eddi
     */
-  public function createSchedule(CreateScheduleApiRequest $request, $user_id)
+  public function createSchedule(CreateScheduleApiRequest $request, $user_id, $medicine_id)
   {
     $schedule = new Schedule();
-    $fields = array('medicine_id','dayOfWeek','time','amount');
+    $fields = array('time','amount', 'start_date', 'end_date', 'interval');
     foreach ($fields as $f) {
       if(isset($request->$f) && !empty($request->$f))
       {
         $schedule->$f = $request->$f;
       }
     }
-    return ($schedule->save())?$schedule:response("Schedule not created", 403);
+    $schedule->medicine_id  = $medicine_id;
+
+
+    return ($schedule->save())?$schedule:response(array('422' => array('De schedule werd niet opgeslaan.')), 422);
+
   }
 
 
@@ -483,41 +807,54 @@ return $photo;
     */
   public function createMedicine(CreateMedicineApiRequest $request, $user_id)
   {
-    $fullPath = null;
 
+   // check if the mdicine is unique
+    $medicine_exists = Medicine::where('user_id', '=', $user_id)->where('name', '=', $request->name)->first();
+    if($medicine_exists != null){
+     return response(array('422' => array('Het medicijn moet uniek zijn.')), 422);
+   }
+
+
+   $photo_url = null;
     // if there is a photo attached -> update it.
-    if(isset($request->photo) && !empty($request->photo))
-    {
-      $path = 'userdata/user_'. $user_id . '/medicines/';
-      // sanitize the filename given the name of the medication.
-      $filename = ApiHelper::createValidFileName($request->name, $request->photo->guessClientExtension());
-      $fullPath = $path.$filename;
+   if(isset($request->photo) && !empty($request->photo))
+   {
+    $directory = 'userdata/user_'. $user_id . '/medicines/';
+      // create the directory:
+    if(!file_exists($directory)){
+     mkdir($directory, 0755, true);
+   }
 
-      if($request->photo->move($path, 
-        $filename) != $fullPath)
-      {
-        return response('Saving the picture failed', 500);
-      }
-    }
+   $path = $directory . $request->name;
+
+      // create the photo from the base64 param
+   $photo_url = ApiHelper::saveBase64Photo($request->photo, $path);
+
+      // check if the foto is saved
+   if($photo_url == -1)
+   {
+    return array('Saving the photo failed', 500); 
+  }
+}
 
     // create the medicine object to store in DB
-    $medicine = new Medicine;
-    $medicine->user_id = $user_id;
-    $medicine->name = trim($request->name);
-    $medicine->info = trim($request->info);
-    $medicine->photoUrl = $fullPath;
+$medicine = new Medicine;
+$medicine->user_id = $user_id;
+$medicine->name = trim($request->name);
+$medicine->info = trim($request->info);
+$medicine->photoUrl = $photo_url;
 
     // store the medicine in the DB.
-    if($medicine->save() != 1)
-    {
-      unlink($fullPath);
-      return response('Saving the medicine failed', 500);
-    }
+if($medicine->save() != 1)
+{
+  unlink($fullPath);
+  return response('Saving the medicine failed', 500);
+}
 
-    return $medicine;
-  }
+return $medicine;
+}
 
-  
+
 
   /**
    * This function adds a new weight to the patients records.
@@ -549,16 +886,18 @@ return $photo;
     * @return mixed
     * @author eddi
     */
-  public function deleteSchedule(Request $request, $user_id, $schedule_id)
+  public function deleteSchedule(Request $request, $user_id, $medicine_id, $schedule_id)
   {
-    if(!isPatient($user_id) 
-      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id)){
-      return response("This schedule is not from a patient.", 403);
-  }
+    if(!ApiHelper::isPatient($user_id) 
+      || !ApiHelper::isScheduleOfPatientsMedicine($user_id, $schedule_id))
+    {
+      return response(array('422' => array('Het schedule is niet van een patient.')), 422);
+
+    }
     // fetch the schedule to delete
-  $schedule = Schedule::find($schedule_id);
-  return ($schedule->delete())?"Schedule is deleted":"Schedule not deleted";
-}
+    $schedule = Schedule::find($schedule_id);
+    return ($schedule->delete())?response(array('200' => array('schedule werd verwijderd.')), 200):response(array('422' => array('Het schedule werd niet verwijderd.')), 422);
+  }
 
   /**
  * This function deletes a medicine , and deletes it's photo
@@ -571,23 +910,24 @@ return $photo;
     if(!ApiHelper::isPatient($user_id)
       || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
     {
-      return response("This medicine is not from a patient.", 403);
-    }
+     return response(array('422' => array('Het medicijn is niet van een patient.')), 422);
+
+   }
   // fetch the medicine to delete
-    $medicine = Medicine::find($medicine_id);
+   $medicine = Medicine::find($medicine_id);
   // first delete the medicine, this way the medicine will not show anymore, even if the photo deletion fails.
   // it's more important that a patient stops taking a medicine then a server having undeleted files.
-    $medicine->delete();
+   $medicine->delete();
 
   // delete the photo, if there is one 
-    if ($medicine->photoUrl != null) {
-      if( file_exists($medicine->photoUrl))
-      {
-        unlink($medicine->photoUrl);
-      }
+   if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
     }
-    return 'Medicine deleted';
   }
+  return 'Medicine deleted';
+}
 
   /**
    * This function deletes a photo attached to a medicine, and updates the medicine's photoUrl
@@ -600,23 +940,23 @@ return $photo;
     if(!ApiHelper::isPatient($user_id)
       || !ApiHelper::isMedicineOfPatient($user_id, $medicine_id))
     {
-      return response("This medicine is not from a patient.", 403);
-    }
+     return response(array('422' => array('Het medicijn is niet van een patient.')), 422);
+   }
   // fetch the medicine to delete
-    $medicine = Medicine::find($medicine_id);
+   $medicine = Medicine::find($medicine_id);
 
   // delete the photo, if there is one 
-    if ($medicine->photoUrl != null) {
-      if( file_exists($medicine->photoUrl))
-      {
-        unlink($medicine->photoUrl);
-      }
+   if ($medicine->photoUrl != null) {
+    if( file_exists($medicine->photoUrl))
+    {
+      unlink($medicine->photoUrl);
     }
+  }
 
   // tell the medicine there is no photo anymore
-    $medicine->photoUrl = null;
-    return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':'Medicine photoUrl not updated';
-  }
+  $medicine->photoUrl = null;
+  return ($medicine->save())?'Medicine photo deleted and medicines photoUrl updated':response(array('422' => array('De foto werd niet verwijderd.')), 422);
+}
 
   /**
    *  The login function for the API

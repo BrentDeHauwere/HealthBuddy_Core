@@ -13,6 +13,72 @@ use \App\Schedule;
 
 class ApiHelper {
 
+
+	public static function takeMedicineOnThisDate($schedule, $date)
+	{
+		$dateSec = $date->getTimeStamp(); 
+		if($dateSec < strtotime($schedule->start_date))
+		{
+			return false;
+		}
+
+		$secsPassed = $dateSec - strtotime($schedule->start_date);
+		$daysPassed = ApiHelper::secondsToDays($secsPassed);
+		
+		if($daysPassed % $schedule->interval == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	public static function secondsToDays($seconds)
+	{
+		return ($seconds / 60 /60 /24);
+	}
+
+	/**
+	 * This function creates a file from a base64 string, needed to receive photo's from the iOS app.
+	 * found info here: http://stackoverflow.com/questions/15153776/convert-base64-string-to-an-image-file
+	 * @param base64 the photo base64 encodes from the iOS app.
+	 * @param path the path including filename to save the photo in.
+	 * @return the path of the photo or -1 on fail.
+	 * @author eddi
+	 */
+	public static function saveBase64Photo($base64, $path)
+	{
+  		// create a new file, using the w mode, overwriting the file if it exists!
+  		// originally the mode was set to 'wb'
+		$file = fopen($path, "w+");
+		// write the decoded file contents into the file.
+		fwrite($file, base64_decode($base64)); 
+		// close the file
+		fclose($file);
+
+		// create a path with a file extention
+		$newPath = $path . ApiHelper::getFileExtension($path);
+		
+		rename($path, $newPath);
+		// return the path on success or -1 on fail
+		return (file_exists($newPath))?$newPath:-1;
+	}
+
+	/**
+	 * A small function that returns the filextension from a file NOT using the filename,
+	 * but actually looking at the mimetype.
+	 * @author eddi
+	 */
+	public static function getFileExtension($path)
+	{	
+		$file = file_get_contents($path);
+		$fileInfo = finfo_open();
+		$name = finfo_buffer($fileInfo, $file, FILEINFO_MIME_TYPE);
+		$extension = str_split($name, strpos($name, '/') + 1);
+
+		return '.' . $extension[1];
+	}
+
 	/**
 	  * iOS sends back <null> instead of null, replace this with a php null.
 	  * @param fields the fields to check for <null> values.

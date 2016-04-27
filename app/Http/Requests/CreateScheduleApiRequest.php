@@ -6,6 +6,7 @@ use App\Http\Requests\Request;
 use App\ApiHelper;
 use App\User;
 use App\Medicine;
+use App\Schedule;
 
 class CreateScheduleApiRequest extends Request
 {
@@ -36,10 +37,12 @@ class CreateScheduleApiRequest extends Request
     public function rules()
     {
         return [
-        'medicine_id'   => 'required|numeric|exists:medicines,id',
-        'dayOfWeek'     => 'required|numeric|between:1,7',
+        // 'medicine_id'   => 'required|numeric|exists:medicines,id',
         'time'          => 'required|date_format:H:i:s',
-        'amount'        => 'required|numeric',        
+        'amount'        => 'required|min:1',
+        'start_date'    => 'required|after:yesterday',
+	'end_date'	=> 'after:start_date',
+        'interval'      => 'required|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
     }
 }

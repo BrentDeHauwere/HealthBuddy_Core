@@ -5,8 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Request;
 use App\ApiHelper;
 
-
-class UpdateMedicineApiRequest extends Request
+class CreateIntakeApiRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,11 +14,13 @@ class UpdateMedicineApiRequest extends Request
      */
     public function authorize()
     {
-        if(ApiHelper::isPatient($this->route('user_id')) 
-            && ApiHelper::isMedicineOfPatient($this->route('user_id'), $this->route('medicine_id')) )
+        $user_id = $this->route('user_id');
+        $schedule_id = $this->schedule_id;
+
+        if(ApiHelper::isLoggedInUserPatient($user_id)) 
         {
             return true;
-        }      
+        }
         return false;
     }
 
@@ -31,8 +32,7 @@ class UpdateMedicineApiRequest extends Request
     public function rules()
     {
         return [
-        'name'  => 'min:3|max:255',
-        'info'  => 'min:3|max:1500',
+        // 'schedule_id'  => 'required|numeric',
         ];
     }
 }

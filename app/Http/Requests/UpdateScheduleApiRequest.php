@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Request;
 use App\ApiHelper;
 use App\User;
+use App\Schedule;
 
 class UpdateScheduleApiRequest extends Request
 {
@@ -36,9 +37,11 @@ class UpdateScheduleApiRequest extends Request
     public function rules()
     {
         return [
-        'dayOfWeek'     => 'numeric|between:1,7',
+        // 'medicine_id'   => 'required|numeric|exists:medicines,id',
         'time'          => 'date_format:H:i:s',
-        'amount'        => 'alpha_num|min:3',
+        'amount'        => 'min:1',
+        // 'start_date'    => 'after:today',
+        'interval'      => 'filled|in:'.join(',', Schedule::getPossibleIntervals()),
         ];
     }
 }

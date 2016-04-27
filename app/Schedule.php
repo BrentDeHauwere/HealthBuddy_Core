@@ -13,4 +13,21 @@ class Schedule extends Model
     {
         return $this->belongsTo('App\Medicine');
     }
+
+    /**
+     * Get the intakes of the medicine for this schedule.
+     */
+    public function intakes()
+    {
+        return $this->hasMany('App\Intakes');
+    }
+
+
+    /** 
+     * 
+     */
+    public static function getPossibleIntervals()
+    {
+        return [1, 2, 3, 7, 14];
+    }
 }
