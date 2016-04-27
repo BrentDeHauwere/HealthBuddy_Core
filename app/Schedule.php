@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Schedule extends Model
 {
     /**
-     * Make sure nobody edits certain fields of the record.
-     * @var array
+     * This way the buddy will not change the timestamps when a schedule is updated,
+     * the timestamp is used by the intakes functions.
      */
-    // protected $guarded = ['updated_at'];
     public $timestamps = false; 
     /**
      * Get the medicine that owns the schedule.
