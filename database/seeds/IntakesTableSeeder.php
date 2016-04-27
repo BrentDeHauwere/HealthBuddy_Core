@@ -18,7 +18,7 @@ class IntakesTableSeeder extends Seeder
       // NOTE: schedule 1 will have intakes that are "missing" 
       // to emulate the patient forgetting his medicine
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
 
         // emulate missing medicine
@@ -34,7 +34,8 @@ class IntakesTableSeeder extends Seeder
 
       // schedule 2
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 2,
@@ -47,7 +48,8 @@ class IntakesTableSeeder extends Seeder
 
         // schedule 3
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 3,
@@ -59,7 +61,8 @@ class IntakesTableSeeder extends Seeder
 
       // schedule 4 
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 4,
@@ -71,7 +74,8 @@ class IntakesTableSeeder extends Seeder
 
       // schedule 5: Week
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 5,
@@ -82,7 +86,8 @@ class IntakesTableSeeder extends Seeder
       }
      // schedule 6
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 6,
@@ -95,7 +100,8 @@ class IntakesTableSeeder extends Seeder
 
       // schedule 7
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 7,
@@ -108,7 +114,8 @@ class IntakesTableSeeder extends Seeder
 
       // schedule 8
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 8,
@@ -121,7 +128,8 @@ class IntakesTableSeeder extends Seeder
       // for eli
       // schedule 9
       $start_date = date_create('2016-03-08');
-      $end_date = date_create('2018-03-08');
+      // $end_date = date_create('2018-03-08');
+      $end_date = date('Y-m-d', time() - 60 * 60 * 24);
       while($end_date > $start_date) {
         DB::table('intakes')->insert([
           'schedule_id'   => 9,
@@ -130,8 +138,6 @@ class IntakesTableSeeder extends Seeder
 
         $start_date = date_add($start_date, date_interval_create_from_date_string('2 days'));
       }
-
-
 
     }
   }
