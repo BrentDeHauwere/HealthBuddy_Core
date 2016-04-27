@@ -42,7 +42,7 @@ class AddUserRequest extends Request
         ];
     }
 
-    public function response(array $errors)
+    /*public function response(array $errors)
     {
         // Optionally, send a custom response on authorize failure
         // (default is to just redirect to initial page with errors)
@@ -53,5 +53,5 @@ class AddUserRequest extends Request
              ->back()
              ->withInput(Request::flash())
              ->withErrors($errors);
-    }
+    }*/
 }
