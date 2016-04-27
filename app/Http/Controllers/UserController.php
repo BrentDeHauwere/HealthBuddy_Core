@@ -193,11 +193,12 @@ class UserController extends Controller
 
       $id = $request->input('id');
       $user = \App\User::where('id','=',$id)->first();
-      $exists = \App\User::where('email',$request->input('email'))->first();
-      if($exists){
-        return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
+      if($user->email != $request->input('email')){
+        $exists = \App\User::where('email',$request->input('email'))->first();
+        if($exists){
+          return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
+        }
       }
-
       if($user){
         $user->firstName = $request->input('firstname');
         $user->lastName = $request->input('lastname');

@@ -47,6 +47,13 @@
     <button type="button" class="close" data-dismiss="alert">&times;</button>
   </div>
 </div>
+@elseif(session('error'))
+<div class="col-md-6 col-md-offset-3">
+  <div class="alert alert-warning fade in">
+    <strong>Warning!</strong> {{ session('error') }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+</div>
 @elseif(session('success'))
 <div class="col-md-6 col-md-offset-3">
   <div class="alert alert-success fade in">
