@@ -252,8 +252,8 @@ class UserController extends Controller
           $savedAdd = $address->save();
           if($savedAdd){
             $user = new User();
-            $user->firstName = $request->input('firstName');
-            $user->lastName = $request->input('lastName');
+            $user->firstName = $request->input('firstname');
+            $user->lastName = $request->input('lastname');
             $user->password = bcrypt($request->input('password'));
             $user->api_token = str_random(60);
             $user->dateOfBirth = $request->input('dateOfBirth');
