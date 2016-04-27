@@ -20,7 +20,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '1', 
             'time'          => '08:00',
             'amount'        => '1 en half, pilletje in twee breken',
-            'updated_at'    => date('Y-m-d h:m:s'),
             ]); 
 
 
@@ -31,7 +30,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '1',
             'time'          => '12:00',
             'amount'        => '1 en half, pilletje in twee breken',
-            'updated_at'    => date('Y-m-d h:m:s'),
             ]); 
 
 
@@ -52,7 +50,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '1', 
             'time'          => '20:00',
             'amount'        => '1 en half, pilletje in twee breken',
-            'updated_at'    => date('Y-m-d h:m:s', time()-(60*60*24) ),
             ]); 
 
 
@@ -66,7 +63,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '2', 
             'time'          => '08:00',
             'amount'        => '1 pil, niet breken en met water innemen.',
-            'updated_at'    => date('Y-m-d h:m:s'),
             ]); 
        DB::table('schedules')->insert([
             'medicine_id'   => 6,
@@ -75,7 +71,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '3', 
             'time'          => '16:00',
             'amount'        => '1 tablet oplossen in water',
-            'updated_at'    => date('Y-m-d h:m:s'),
             ]); 
        DB::table('schedules')->insert([
             'medicine_id'   => 7,
@@ -93,7 +88,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '14', 
             'time'          => '12:00',
             'amount'        => "1 ampule oplossen in water of dergelijke. 's Ochtends",
-            'updated_at'    => date('Y-m-d h:m:s', time()-(60*60*24) ),
             ]);
 
         // medicine for eli
@@ -104,7 +98,6 @@ class SchedulesTableSeeder extends Seeder
             'interval'      => '2', 
             'time'          => '13:00',
             'amount'        => "1 ampule oplossen in water of dergelijke. 's Ochtends",
-            'updated_at'    => date('Y-m-d h:m:s', time()-(60*60*24) ),
             ]);
 
     }
