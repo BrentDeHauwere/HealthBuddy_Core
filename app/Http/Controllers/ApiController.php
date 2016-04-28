@@ -611,7 +611,6 @@ class ApiController extends Controller
     {
       $fields = array('firstName', 'lastName', 'phone', 'gender', 'dateOfBirth', 'email');
       $user = ApiHelper::fillApiRequestFields($fields, $request, $user);
-      dd($user);
       
       // save the updated user to the db.
       return ($user->save())?$user:response(array('422' => array("User not updated")), 500);
