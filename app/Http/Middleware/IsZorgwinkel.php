@@ -21,15 +21,20 @@ class IsZorgwinkel
      */
     public function handle($request, Closure $next)
     {
-        try {
+        if($request->has('loginform')){
+            try {
             // check if the
-            $role = User::where('email', '=', $request->email)->firstOrFail()->role;
-            if($role != 'Zorgwinkel') {
-                return Redirect::to('login')->withInput($request->except('password'));
-            }
-            return $next($request);
+                $role = User::where('email', '=', $request->email)->firstOrFail()->role;
+                if($role != 'Zorgwinkel') {
+                    return Redirect::to('login')->withInput($request->except('password'));
+                }
+                return $next($request);
 
-        }catch(ModelNotFoundException $x){
+            }catch(ModelNotFoundException $x){
+                return $next($request);
+            }
+        }
+        else{
             return $next($request);
         }
     }
