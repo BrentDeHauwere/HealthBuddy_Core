@@ -39,7 +39,6 @@ class UpdateUserApiRequest extends Request
             $this->$f == null;
           }
         }
-
         return true;
       }
       return false;
