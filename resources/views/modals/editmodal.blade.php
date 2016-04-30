@@ -23,7 +23,7 @@
           <label for="lastname" class="col-sm-2 control-label">Achternaam</label>
           <div class="col-sm-10">
             @if ($errors->has('lastname'))
-                <input type="email" class="form-control" id="email" name="lastname" value="{{ old('lastname') }}">
+                <input type="text" class="form-control" id="email" name="lastname" value="{{ old('lastname') }}">
                 <span class="help-block">
                     <strong>{{ $errors->first('lastname') }}</strong>
                 </span>
@@ -62,7 +62,7 @@
           <label for="phone" class="col-sm-2 control-label">Telefoon</label>
           <div class="col-sm-10">
             @if ($errors->has('phone'))
-                <input type="email" class="form-control" id="phone" name="phone" value="{{ old('phone') }}">
+                <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') }}">
                 <span class="help-block">
                     <strong>{{ $errors->first('phone') }}</strong>
                 </span>
