@@ -35,7 +35,7 @@ class AddUserRequest extends Request
           'role' => 'required|in:Zorgwinkel,Zorgbehoevende,Zorgmantel',
           'street' => 'required',
           'streetnumber' => 'required|digits_between:1,10',
-          'bus' => 'digits_between:1,10',
+          'bus' => 'string',
           'zipcode' => 'required',
           'city' => 'required',
           'country' => 'required',
