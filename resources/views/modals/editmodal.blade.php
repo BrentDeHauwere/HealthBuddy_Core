@@ -93,6 +93,7 @@
               <option>{{ $user->role }}</option>
               <option>Zorgbehoevende</option>
               <option>Zorgmantel</option>
+              <option>Zorgwinkel</option>
               @if ($errors->has('role'))
                   <span class="help-block">
                       <strong>{{ $errors->first('role') }}</strong>
