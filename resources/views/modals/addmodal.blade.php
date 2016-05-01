@@ -110,6 +110,7 @@
             <select class="form-control" id="role" name="role">
               <option>Zorgbehoevende</option>
               <option>Zorgmantel</option>
+              <option>Zorgwinkel</option>
             </select>
             @if ($errors->has('role'))
                 <span class="help-block">

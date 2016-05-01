@@ -1,10 +1,10 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-    <center><h4 class="">Beheer de dokter van een gebruiker</h4></center>
+    <center><h4 class="">Beheer de mantelzorger van een patient</h4></center>
     <br/>
     @if($dokter)
-    <center><p>De gebruiker {{ $user->firstName.' '.$user->lastName }} is gelinked aan de volgende dokter: </p></center>
+    <center><p>De patiënt {{ $user->firstName.' '.$user->lastName }} is gelinked aan de volgende mantelzorger: </p></center>
     <br/>
     <table class="table table-bordered">
         <tr>
@@ -31,7 +31,7 @@
     <input type="hidden" name="user" value="{{ $user->id }}">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
     <div class="form-group">
-      <label for="buddy" class="col-sm-2 control-label">Dokters</label>
+      <label for="buddy" class="col-sm-2 control-label">Mantelzorgers</label>
       <div class="col-sm-6">
         <select class="form-control" name="dokter">
         @foreach ($dokters as $u)

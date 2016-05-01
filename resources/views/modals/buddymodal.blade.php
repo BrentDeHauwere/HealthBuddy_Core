@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-      <center><h4 class="">Beheer de buddies van een gebruiker</h4></center>
+      <center><h4 class="">Beheer de patiënten van een mantelzorger</h4></center>
       @if(!$buddies->isEmpty())
         <table class="table table-bordered">
             <tr>
