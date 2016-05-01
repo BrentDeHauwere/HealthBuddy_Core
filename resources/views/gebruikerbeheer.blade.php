@@ -118,7 +118,7 @@
                     @if ($user->role == 'Zorgmantel')
                       <a href="/buddymodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="buddies">Patiënten</button></a>
                     @elseif ($user->role == 'Zorgbehoevende')
-                        <a href="/doktermodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="dokter" value="Dokter">Dokter</button></a>
+                        <a href="/doktermodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="dokter" value="Dokter">Mantelzorger</button></a>
                     @endif
                     <form method="POST" action="user/delete">
                       <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
