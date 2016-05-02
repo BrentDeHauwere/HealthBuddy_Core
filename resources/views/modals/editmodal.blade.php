@@ -4,7 +4,7 @@
   <div class="container">
   <form class="form-horizontal  col-md-8 col-md-offset-2" method="POST" action="/user/editUser">
     <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-    <center><h4 class="col-sm-10 col-sm-offset-2">Edit een gebruiker</h4></center>
+    <center><h4 class="col-sm-10 col-sm-offset-2">Edit {{ $user->firstName . ' ' . $user->lastName }}</h4></center>
          <input type="hidden" name="id" id="id" value="{{ $user->id }}">
          <div class="form-group">
           <label for="firstname" class="col-sm-2 control-label">Voornaam</label>
