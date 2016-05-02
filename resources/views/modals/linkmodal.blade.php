@@ -5,7 +5,7 @@
   <form class="form-horizontal col-md-8 col-md-offset-2" method="POST" action="/user/link">
   <input type="hidden" name="id" value="{{$user->id}}">
   <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-  <center><h4 class="col-sm-10 col-sm-offset-2">Link een gebruiker en een toestel</h4></center>
+  <center><h4 class="col-sm-10 col-sm-offset-2">Link een toestel aan {{ $user->firstName . ' ' . $user->lastName }} </h4></center>
 
         <input type="hidden" name="id" value="{{ $user->id }}">
         <div class="form-group">

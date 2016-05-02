@@ -79,6 +79,7 @@ class ModalController extends Controller
     public function linkBuddy($id)
     {
         $user = \App\User::where('id','=',$id)->first();
+        
         if($user){
           $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
           $buddies = \App\User::where('buddy_id','=',$user->id)->get();
