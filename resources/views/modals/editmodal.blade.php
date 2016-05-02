@@ -20,7 +20,7 @@
         <div class="form-group">
           <label for="lastname" class="col-sm-2 control-label">Achternaam</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="email" name="lastname" value="{{ old('lastname') ? old('lastname') : $user->lastName }}">
+            <input type="text" class="form-control" id="email" name="lastname" value="{{ old('lastname') != null ? old('lastname') : $user->lastName }}">
             @if ($errors->has('lastname'))
                 <span class="help-block">
                     <strong>{{ $errors->first('lastname') }}</strong>
@@ -31,7 +31,7 @@
         <div class="form-group">
           <label for="date" class="col-sm-2 control-label">Geboortedatum</label>
           <div class="col-sm-10">
-            <input type="date" class="form-control" id="date" name="date" placeholder="DD/MM/YYYY" value="{{ old('date') ? old('date') : $user->dateOfBirth }}">
+            <input type="date" class="form-control" id="date" name="date" placeholder="DD/MM/YYYY" value="{{ old('date') != null ? old('date') : $user->dateOfBirth }}">
             @if ($errors->has('date'))
                 <span class="help-block">
                     <strong>{{ $errors->first('date') }}</strong>
@@ -42,7 +42,7 @@
         <div class="form-group">
           <label for="email" class="col-sm-2 control-label">Email</label>
           <div class="col-sm-10">
-            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') ? old('email') : $user->email }}">
+            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') != null ? old('email') : $user->email }}">
             @if ($errors->has('email'))
                 <span class="help-block">
                     <strong>{{ $errors->first('email') }}</strong>
@@ -53,7 +53,7 @@
         <div class="form-group">
           <label for="phone" class="col-sm-2 control-label">Telefoon</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') ? old('phone') : $user->phone }}">
+            <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') != null ? old('phone') : $user->phone }}">
             @if ($errors->has('phone'))
                 <span class="help-block">
                     <strong>{{ $errors->first('phone') }}</strong>
@@ -95,7 +95,7 @@
         <div class="form-group">
          <label for="street" class="col-sm-2 control-label">Straat</label>
          <div class="col-sm-10">
-           <input type="text" class="form-control" id="street" name="street" placeholder="Straat" value="{{ old('street') ? old('street') : $address->street}}">
+           <input type="text" class="form-control" id="street" name="street" placeholder="Straat" value="{{ old('street') != null ? old('street') : $address->street}}">
 
            @if ($errors->has('street'))
                <span class="help-block">
@@ -107,7 +107,7 @@
        <div class="form-group">
         <label for="streetnumber" class="col-sm-2 control-label">Huisnummer</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="streetnumber" name="streetnumber" placeholder="Huisnummer" value="{{ old('streetnumber') ? old('streetnumber') : $address->streetNumber}}">
+          <input type="text" class="form-control" id="streetnumber" name="streetnumber" placeholder="Huisnummer" value="{{ old('streetnumber') != null ? old('streetnumber') : $address->streetNumber}}">
           @if ($errors->has('streetnumber'))
               <span class="help-block">
                   <strong>{{ $errors->first('streetnumber') }}</strong>
@@ -118,7 +118,7 @@
       <div class="form-group">
        <label for="bus" class="col-sm-2 control-label">Bus</label>
        <div class="col-sm-10">
-         <input type="text" class="form-control" id="bus" name="bus" placeholder="Bus" value="{{ old('bus') ? old('bus') : $address->bus}}">
+         <input type="text" class="form-control" id="bus" name="bus" placeholder="Bus" value="{{ old('bus') != null ? old('bus') : $address->bus}}">
          @if ($errors->has('bus'))
              <span class="help-block">
                  <strong>{{ $errors->first('bus') }}</strong>
@@ -129,7 +129,7 @@
       <div class="form-group">
        <label for="zipcode" class="col-sm-2 control-label">Postcode</label>
        <div class="col-sm-10">
-        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Postcode" value="{{ old('zipcode') ? old('zipcode') : $address->zipCode}}">
+        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="Postcode" value="{{ old('zipcode') != null ? old('zipcode') : $address->zipCode}}">
 
          @if ($errors->has('zipcode'))
              <span class="help-block">
@@ -141,7 +141,7 @@
      <div class="form-group">
       <label for="city" class="col-sm-2 control-label">Stad</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="city" name="city" placeholder="Stad" value="{{old('city') ? old('city') : $address->city}}">
+        <input type="text" class="form-control" id="city" name="city" placeholder="Stad" value="{{old('city') != null ? old('city') : $address->city}}">
 
         @if ($errors->has('city'))
             <span class="help-block">
@@ -154,7 +154,7 @@
     <div class="form-group">
      <label for="country" class="col-sm-2 control-label">Land</label>
      <div class="col-sm-10">
-       <input type="text" class="form-control" id="country" name="country" placeholder="Land" value="{{ old('country') ? old('country') : $address->country}}">
+       <input type="text" class="form-control" id="country" name="country" placeholder="Land" value="{{ old('country') != null ? old('country') : $address->country}}">
        @if ($errors->has('country'))
            <span class="help-block">
                <strong>{{ $errors->first('country') }}</strong>
