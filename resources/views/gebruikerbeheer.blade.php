@@ -122,9 +122,29 @@
                     @endif
                     <form method="POST" action="user/delete">
                       <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-                      <input class="btn btn-primary" type="submit" name="delete" value="Verwijder"/>
+                      <span class="btn btn-primary" data-toggle="modal" data-target="#trashmodal">Verwijder</span>
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
+
+
+                      <!-- Modal -->
+                      <div id="trashmodal" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                          <!-- Modal content-->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                              <h4 class="modal-title" style="color: #000;">Bent u zeker?</h4>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                              <input type="submit" class="btn btn-warning" name="delete" value="Verwijder" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                     </form>
+
                   </td>
                 </tr>
             @endforeach

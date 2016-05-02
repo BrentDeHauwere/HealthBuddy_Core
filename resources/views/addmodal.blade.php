@@ -58,6 +58,7 @@
             <select class="form-control" name="role">
               <option>Zorgbehoevende</option>
               <option>ZorgMantel</option>
+              <option>Zorgwinkel</option>
             </select>
           </div>
         </div>
