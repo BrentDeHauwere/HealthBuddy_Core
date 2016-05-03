@@ -62,8 +62,9 @@ class ModalController extends Controller
         $user = \App\User::find($id);
         if(!empty($user)){
           $devices = \App\Device::whereNull('user_id')->get();
-          if(count($devices) >= 1){
-            return view('modals/linkmodal')->with('user',$user)->with('devices',$devices);
+          $mydevices = \App\Device::where('user_id',$user->id)->get();
+          if(count($devices) >= 1 || count($mydevices) >= 1){
+            return view('modals/linkmodal')->with('user',$user)->with('devices',$devices)->with('mydevices',$mydevices);
           }
           else {
             return redirect()->back()->with('error','Geen toestellen gevonden om mee te werken');
@@ -79,7 +80,7 @@ class ModalController extends Controller
     public function linkBuddy($id)
     {
         $user = \App\User::where('id','=',$id)->first();
-        
+
         if($user){
           $users = \App\User::whereNull('buddy_id')->where('role','=','Zorgbehoevende')->get();
           $buddies = \App\User::where('buddy_id','=',$user->id)->get();

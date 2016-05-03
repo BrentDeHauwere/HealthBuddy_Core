@@ -47,6 +47,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('user/linkBuddy','UserController@linkBuddy');
     Route::post('user/reset','UserController@reset');
     Route::post('user/unlink','UserController@unlink');
+    Route::post('user/unlinkDevice','UserController@unlinkDevice');
     Route::post('user/unlinkDokter','UserController@unlinkDokter');
     Route::post('user/delete','UserController@delete');
     Route::post('user/linkDokter','UserController@linkDokter');
@@ -54,6 +55,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('user/{user}', 'UserController@showProfile');
     Route::get('patients/{user}', 'UserController@showPatients');
     Route::get('devices/{user}', 'UserController@showDevices');
+
     Route::get('weights/{user}', 'UserController@showWeights');
     Route::get('latestWeight', function () { // TESTING PURPOSES: TO DELETE
         return \App\User::with('latestWeight')->get();
@@ -62,6 +64,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('apparaatbeheer/show', 'DeviceController@index');
     Route::get('apparaatbeheer/add', 'DeviceController@create');
     Route::post('apparaatbeheer/add', 'DeviceController@store');
+
     Route::delete('apparaatbeheer/{device}', 'DeviceController@destroy');
 });
 
