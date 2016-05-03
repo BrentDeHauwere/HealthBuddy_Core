@@ -5,7 +5,6 @@
 
   <center><h4 class="col-sm-12">Beheer de toestellen van {{ $user->firstName . ' ' . $user->lastName }} </h4></center>
   @if(!$mydevices->isEmpty())
-    @foreach($mydevices as $mydevice)
     <center><p class="col-sm-12">De gebruiker {{ $user->firstName.' '.$user->lastName }} is gelinked aan de volgende toestellen: </p></center>
     <br/>
     <table class="table table-bordered">
@@ -14,6 +13,8 @@
           <td>Type</td>
           <td>Unlink</td>
         </tr>
+    @foreach($mydevices as $mydevice)
+
         <tr>
             <td>{{ $mydevice->id }}</td>
             <td>{{ $mydevice->type }}</td>
@@ -25,8 +26,9 @@
               </form>
             </td>
         </tr>
-     </table>
+
      @endforeach
+     </table>
   @endif
   @if(!$devices->isEmpty())
         <form class="form-horizontal col-md-10" method="POST" action="/user/link">
