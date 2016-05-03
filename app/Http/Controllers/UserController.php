@@ -189,6 +189,20 @@ class UserController extends Controller
       }
     }
 
+    public function unlinkDevice(Request $request){
+      $device = \App\Device::where('id','=',$request->input('device'))->first();
+      if($device){
+        $device->user_id = NULL;
+        $savedUnlink = $device->save();
+        if($savedUnlink){
+          return redirect()->to('/home')->with('success','Device is successvol geunlinked');
+        }
+        else{
+          return redirect()->to('/home')->with('error','Device is niet geunlinked');
+        }
+      }
+    }
+
     public function editUser(EditUserRequestv2 $request){
 
       $id = $request->input('id');
