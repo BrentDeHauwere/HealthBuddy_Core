@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use \App\User;
 use \App\Address;
+use \App\MedicalInfo;
 
 
 use Illuminate\Http\Request;
@@ -23,30 +24,30 @@ use \App\Http\Requests\PasswordResetRequest;
 
 class UserController extends Controller
 {
-    public function showProfile($user_id)
-    {
-            return User::with('address', 'medicalInfo')->find($user_id);
-    }
+  public function showProfile($user_id)
+  {
+    return User::with('address', 'medicalInfo')->find($user_id);
+  }
 
-    public function showPatients(User $user)
-    {
-            return $user->patients;
-    }
+  public function showPatients(User $user)
+  {
+    return $user->patients;
+  }
 
-    public function showDevices(User $user)
-    {
-            return $user->devices;
-    }
+  public function showDevices(User $user)
+  {
+    return $user->devices;
+  }
 
-    public function showWeights(User $user)
-    {
-            return $user->weights;
-    }
+  public function showWeights(User $user)
+  {
+    return $user->weights;
+  }
 
-    public function showSchedule($user)
-    {
-        return Medicine::with('schedule')->where('user_id', '=', $user)->get();
-    }
+  public function showSchedule($user)
+  {
+    return Medicine::with('schedule')->where('user_id', '=', $user)->get();
+  }
 
     /**
      * This is a function to get the authenticated user,
@@ -56,13 +57,13 @@ class UserController extends Controller
     public function getAuthenticatedUser()
     {
         // get the web-user
-        $user = Auth::guard()->user();
+      $user = Auth::guard()->user();
 
         // get the api-user
-        if(!isset($user) && $user == null) {
-            $user = Auth::guard('api')->user();
-        }
-        return $user;
+      if(!isset($user) && $user == null) {
+        $user = Auth::guard('api')->user();
+      }
+      return $user;
     }
 
     public function delete(Request $request){
@@ -98,65 +99,65 @@ class UserController extends Controller
     }
 
     public function unlinkDokter(Request $request){
-        $id = $request->input('buddy');
-        $user = \App\User::where('id','=',$id)->first();
-        if($user){
-          $user->buddy_id = NULL;
-          $saved = $user->save();
-          if($saved){
-            return redirect('/home')->with('success','Dokter is geunlinked');
-          }
-          else{
-            return redirect('/home')->with('error','Dokter is niet geunlinked');
-          }
+      $id = $request->input('buddy');
+      $user = \App\User::where('id','=',$id)->first();
+      if($user){
+        $user->buddy_id = NULL;
+        $saved = $user->save();
+        if($saved){
+          return redirect('/home')->with('success','Dokter is geunlinked');
         }
+        else{
+          return redirect('/home')->with('error','Dokter is niet geunlinked');
+        }
+      }
     }
 
     public function linkDokter(Request $request){
-        $id = $request->input('user');
-        $user = \App\User::where('id','=',$id)->first();
-        $dokterid = $request->input('dokter');
-        $dokter = \App\User::where('id','=',$dokterid)->first();
-        if($user && $dokter){
-          $user->buddy_id = $dokter->id;
-          $saved = $user->save();
-          if($saved){
-            return redirect('/home')->with('success','Dokter is gelinked');
-          }
-          else{
-            return redirect('/home')->with('error','Dokter is niet gelinked');
-          }
+      $id = $request->input('user');
+      $user = \App\User::where('id','=',$id)->first();
+      $dokterid = $request->input('dokter');
+      $dokter = \App\User::where('id','=',$dokterid)->first();
+      if($user && $dokter){
+        $user->buddy_id = $dokter->id;
+        $saved = $user->save();
+        if($saved){
+          return redirect('/home')->with('success','Dokter is gelinked');
         }
+        else{
+          return redirect('/home')->with('error','Dokter is niet gelinked');
+        }
+      }
     }
 
     public function unlink(Request $request){
-        $id = $request->input('buddy');
-        $user = \App\User::where('id','=',$id)->first();
-        if($user){
-          $user->buddy_id = NULL;
-          $saved = $user->save();
-          if($saved){
-            return redirect('/home')->with('success','Buddy is geunlinked');
-          }
-          else{
-            return redirect('/home')->with('error','Buddy is niet geunlinked');
-          }
+      $id = $request->input('buddy');
+      $user = \App\User::where('id','=',$id)->first();
+      if($user){
+        $user->buddy_id = NULL;
+        $saved = $user->save();
+        if($saved){
+          return redirect('/home')->with('success','Buddy is geunlinked');
         }
+        else{
+          return redirect('/home')->with('error','Buddy is niet geunlinked');
+        }
+      }
     }
 
     public function reset(PasswordResetRequest $request){
-        $id = $request->input('id');
-        $user = \App\User::where('id','=',$id)->first();
-        if($user){
-          $user->password = bcrypt($request->input('password'));
-          $saved = $user->save();
-          if($saved){
-            return redirect()->to('/home')->with('success','Wachtwoord is successvol verandert');
-          }
-          else{
-            return redirect()->to('/home')->with('error','Wachtwoord kon niet aangepast worden');
-          }
+      $id = $request->input('id');
+      $user = \App\User::where('id','=',$id)->first();
+      if($user){
+        $user->password = bcrypt($request->input('password'));
+        $saved = $user->save();
+        if($saved){
+          return redirect()->to('/home')->with('success','Wachtwoord is successvol verandert');
         }
+        else{
+          return redirect()->to('/home')->with('error','Wachtwoord kon niet aangepast worden');
+        }
+      }
     }
 
     public function linkDevice(Request $request){
@@ -252,43 +253,57 @@ class UserController extends Controller
     }
 
     public function addUser(AddUserRequest $request){
-          $exists = \App\User::where('email',$request->input('email'))->first();
-          if($exists){
-            return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
-          }
-          $address = new Address();
-          $address->street = $request->input('street');
-          $address->streetNumber = $request->input('streetnumber');
-          if($request->has('bus'))
-            $address->bus = $request->input('bus');
-          $address->zipCode = $request->input('zipcode');
-          $address->city = $request->input('city');
-          $address->country = $request->input('country');
-          $savedAdd = $address->save();
-          if($savedAdd){
-            $user = new User();
-            $user->firstName = $request->input('firstname');
-            $user->lastName = $request->input('lastname');
-            $user->password = bcrypt($request->input('password'));
-            $user->api_token = str_random(60);
-            $user->dateOfBirth = $request->input('date');
-            $user->email = $request->input('email');
-            $user->phone = $request->input('phone');
-            $user->role = $request->input('role');
-            $user->address_id = $address->id;
-            $savedUser = $user->save();
+      $exists = \App\User::where('email',$request->input('email'))->first();
+      if($exists){
+        return redirect()->to('/home')->with('error','Er bestaat al een gebruiker met deze email.');
+      }
+      $address = new Address();
+      $address->street = $request->input('street');
+      $address->streetNumber = $request->input('streetnumber');
+      if($request->has('bus'))
+        $address->bus = $request->input('bus');
+      $address->zipCode = $request->input('zipcode');
+      $address->city = $request->input('city');
+      $address->country = $request->input('country');
+      $savedAdd = $address->save();
+      
 
-            if($savedUser){
-              return redirect()->to('/home')->with('success','Gebruiker is successvol opgeslagen');
-            }
-            else{
-              $address->delete();
-              return redirect()->to('/home')->with('error','Gebruiker kon niet worden opgeslagen');
-            }
+      if($savedAdd){
+        $user = new User();
+        $user->firstName = $request->input('firstname');
+        $user->lastName = $request->input('lastname');
+        $user->password = bcrypt($request->input('password'));
+        $user->api_token = str_random(60);
+        $user->dateOfBirth = $request->input('date');
+        $user->email = $request->input('email');
+        $user->phone = $request->input('phone');
+        $user->role = $request->input('role');
+        $user->address_id = $address->id;
+
+
+        $savedUser = $user->save();
+
+        if($savedUser){
+          // link a MedicalInfo
+          $medicalInfo = new MedicalInfo();
+          $medicalInfo->user_id = $user->id;
+          $savedMedicalInfo = $medicalInfo->save();
+
+          if($savedMedicalInfo){
+            return redirect()->to('/home')->with('success','Gebruiker is successvol opgeslagen');
           }
-          else{
-            return redirect()->to('/home')->with('error','Adres kon niet worden opgeslagen');
-          }
+          $user->delete();
+          $address->delete();
+          return redirect()->to('/home')->with('error','Gebruiker zijn medicalinfo kon niet worden opgeslagen');
+        }
+        else{
+          $address->delete();
+          return redirect()->to('/home')->with('error','Gebruiker kon niet worden opgeslagen');
+        }
+      }
+      else{
+        return redirect()->to('/home')->with('error','Adres kon niet worden opgeslagen');
+      }
 
     }
-}
+  }

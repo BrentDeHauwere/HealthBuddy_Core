@@ -97,7 +97,7 @@ class SchedulesTableSeeder extends Seeder
             'end_date'      => '2018-03-08 01:03',
             'interval'      => '2', 
             'time'          => '13:00',
-            'amount'        => "1 ampule oplossen in water of dergelijke. 's Ochtends",
+            'amount'        => "1 ampule oplossen in water of dergelijke. In de Ochtends",
             ]);
 
     }

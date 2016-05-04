@@ -31,7 +31,7 @@
         <div class="form-group">
           <label for="date" class="col-sm-2 control-label">Geboortedatum</label>
           <div class="col-sm-10">
-            <input type="date" class="form-control" id="date" name="date" placeholder="DD/MM/YYYY" value="{{ old('date') != null ? old('date') : $user->dateOfBirth }}">
+            <input type="date" class="form-control" id="date" name="date" placeholder="YYYY-MM-DD" value="{{ old('date') != null ? old('date') : $user->dateOfBirth }}">
             @if ($errors->has('date'))
                 <span class="help-block">
                     <strong>{{ $errors->first('date') }}</strong>
