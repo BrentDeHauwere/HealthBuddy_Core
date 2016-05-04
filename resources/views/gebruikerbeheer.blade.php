@@ -100,6 +100,7 @@
               </tr>
             <thead>
             <tbody class="list">
+           
             @foreach ($users as $user)
                 <tr>
                   <td class="Name">{{ $user->firstName.' '.$user->lastName }}</td>
@@ -122,12 +123,12 @@
                     @endif
                     <form method="POST" action="user/delete">
                       <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-                      <span class="btn btn-primary" data-toggle="modal" data-target="#trashmodal">Verwijder</span>
+                      <span class="btn btn-primary" data-toggle="modal" data-target="#trashmodal{{ $user->id }}">Verwijder</span>
                       <input type="hidden" value="{{ $user->id }}" name="ID"/>
 
 
                       <!-- Modal -->
-                      <div id="trashmodal" class="modal fade" role="dialog">
+                      <div id="trashmodal{{ $user->id }}" class="modal fade" role="dialog">
                         <div class="modal-dialog">
                           <!-- Modal content-->
                           <div class="modal-content">
@@ -148,6 +149,9 @@
                   </td>
                 </tr>
             @endforeach
+
+
+
           </tbody>
           </table>
         </div>
