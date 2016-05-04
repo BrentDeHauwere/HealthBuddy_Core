@@ -121,6 +121,7 @@
                     @elseif ($user->role == 'Zorgbehoevende')
                         <a href="/doktermodal/{{$user->id}}"><button class="btn btn-primary" type="button" name="dokter" value="Dokter">Mantelzorger</button></a>
                     @endif
+                    @if ($user->id != Auth::user()->id)
                     <form method="POST" action="user/delete">
                       <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
                       <span class="btn btn-primary" data-toggle="modal" data-target="#trashmodal{{ $user->id }}">Verwijder</span>
@@ -145,7 +146,7 @@
                       </div>
 
                     </form>
-
+                    @endif
                   </td>
                 </tr>
             @endforeach
