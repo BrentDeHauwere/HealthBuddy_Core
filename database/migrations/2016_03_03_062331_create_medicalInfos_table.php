@@ -15,9 +15,9 @@ class CreateMedicalInfosTable extends Migration
         Schema::create('medicalInfos', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->integer('length')->unsigned();
-            $table->decimal('weight', 5, 2);
-            $table->enum('bloodType', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'onbekend']);
+            $table->integer('length')->unsigned()->nullable();
+            $table->decimal('weight', 5, 2)->nullable();
+            $table->enum('bloodType', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'onbekend'])->nullable();
             $table->string('medicalCondition')->nullable();
             $table->string('allergies')->nullable();
             $table->timestamps(); // eloquent needs this: created_at && updated_at
