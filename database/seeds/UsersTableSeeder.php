@@ -12,12 +12,12 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         DB::table('users')->insert([
-            'firstName' => 'Brent',
+            'firstName' => 'Frans',
             'lastName' => 'De Hauwere',
             'address_id' => 3,
             'gender' => 'M',
-            'dateOfBirth' => '1996-06-30',
-            'email' => 'brentdehauwere@gmail.com',
+            'dateOfBirth' => '1976-06-30',
+            'email' => 'frans@gmail.com',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
             'role' => 'Zorgmantel'
@@ -28,8 +28,8 @@ class UsersTableSeeder extends Seeder
             'lastName' => 'DeLanghe',
             'address_id' => 4,
             'gender' => 'M',
-            'dateOfBirth' => '1990-08-23',
-            'email' => 'eddi_wallie@gmail.com',
+            'dateOfBirth' => '1950-08-23',
+            'email' => 'eddi@gmail.com',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
             'role' => 'Zorgbehoevende',
@@ -38,11 +38,11 @@ class UsersTableSeeder extends Seeder
 
         DB::table('users')->insert([
             'firstName' => 'Eli',
-            'lastName' => 'Boey',
+            'lastName' => 'Jansens',
             'address_id' => 2,
             'gender' => 'M',
-            'dateOfBirth' => '1997-09-20',
-            'email' => 'eli_wallie@gmail.com',
+            'dateOfBirth' => '1947-09-20',
+            'email' => 'eli@gmail.com',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
             'role' => 'Zorgbehoevende',
@@ -56,7 +56,7 @@ class UsersTableSeeder extends Seeder
             'address_id' => 1,
             'gender' => 'M',
             'dateOfBirth' => '1962-09-20',
-            'email' => 'marie@gmail.com',
+            'email' => 'marie@healthbuddy.be',
             'password' => bcrypt('secret'),
             'api_token' => str_random(60),
             'role' => 'Zorgwinkel',
